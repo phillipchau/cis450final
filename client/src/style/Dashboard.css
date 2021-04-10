@@ -1,0 +1,22 @@
+.people-container .people-header, .results-container .person {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  height: 40px;
+}
+
+.person .login, .people-header .header-lg {
+  flex: 1 0 50%;
+}
+
+.people-header .header, .person .name, .person .birthyear {
+  flex: 1 0 25%;
+}
+
+.less-headspace {
+  padding-top: 1rem !important;
+}
+
+.findFriend-headspace {
+  padding-top: 2rem !important;
+}
