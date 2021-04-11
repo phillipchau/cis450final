@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 
-function CustomRoute(props: any) {
+function CustomRoute(props) {
   const { component: Component, layout: Layout, ...rest } = props;
   return (
     <Route

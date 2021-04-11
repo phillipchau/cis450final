@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
-export const ThemeConfig: any = {
+export const ThemeConfig = {
   colors: {
     text: '#444',
     background: '#f0f4f8',
@@ -24,9 +24,7 @@ export const ThemeConfig: any = {
   },
 };
 
-export type ThemeType = typeof ThemeConfig;
-
-const Theme = ({ children }: any) => (
+const Theme = ({ children }) => (
   <ThemeProvider theme={ThemeConfig}>{children}</ThemeProvider>
 );
 
