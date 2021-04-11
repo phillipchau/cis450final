@@ -14,9 +14,14 @@ const LeftHeader = styled(NavbarLink)`
   font-weight: bold;
 `;
 
-const RightHeader = styled(NavbarLink)`
+const RightEdgeHeader = styled(NavbarLink)`
   float: right;
   margin-right: 50px;
+`;
+
+const RightHeader = styled(NavbarLink)`
+  float: right;
+  margin-right: 20px;
 `;
 
 // Note: Can also create a center header with simply display: inline-block
@@ -26,13 +31,16 @@ function Header() {
     <Content>
       <nav>
         <LeftHeader to="/">
-          OFTW @ Penn
+          CIS 450 Final Project
         </LeftHeader>
+        <RightEdgeHeader to="/plot">
+          Plot
+        </RightEdgeHeader>
         <RightHeader to="/map">
           Map
         </RightHeader>
-        <RightHeader to="/plot">
-          Plot
+        <RightHeader to="/">
+          Dashboard
         </RightHeader>
       </nav>
     </Content>

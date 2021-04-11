@@ -5,6 +5,10 @@ export const NavbarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text};
   font-size: ${({ theme }) => theme.fontSize.medium};
   text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 export const TextLink = styled(Link)`
@@ -15,7 +19,12 @@ export const TextLink = styled(Link)`
 
 export const TextBlockLink = styled(Link)`
   display: block;
-  font-size: ${({ theme }) => theme.fontSize.default};
+  margin: 1rem;
+  font-size: ${({ theme }) => theme.fontSize.medium};
   color: ${({ theme }) => theme.colors.gray};
   text-decoration: none;
+
+  &:hover {
+    font-weight: 700;
+  }
 `;
