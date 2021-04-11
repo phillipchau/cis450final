@@ -16,15 +16,21 @@ function LandingPage() {
   // Hold the vaccine data.
   const [vaccineData, setVaccineData] = useState<Vaccine[] | undefined>();
 
+  // Hold loading boolean.
+  const [loading, setLoading] = useState(false);
+  
   // Hold error text.
   const [error, setError] = useState('');
 
   // Get the vaccine data.
   useEffect(() => {
+    setLoading(true);
     getVaccineData().then((res) => {
       setVaccineData(res);
+      setLoading(false);
     }).catch((err) => {
       setError(err.message);
+      setLoading(false);
     });
   }, [setVaccineData]);
 
@@ -45,11 +51,13 @@ function LandingPage() {
         <TableBody>
           {vaccineData === undefined ?
             (
-              <TableRowElement>
-                <TableDataElement>Loading...</TableDataElement>
-                <TableDataElement>Loading...</TableDataElement>
-                <TableDataElement>Loading...</TableDataElement>
-              </TableRowElement>
+              loading ? (
+                <TableRowElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                </TableRowElement>
+              ) : null
             )
             :
             vaccineData.map((vaccine, index) => (

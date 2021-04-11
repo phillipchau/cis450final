@@ -8,6 +8,7 @@ const Content = styled.div`
   min-height: 100vh;
   text-align: center;
   background-color: ${({ theme }) => theme.colors.background};
+  font-family: ${({ theme }) => theme.font};
 `;
 
 type MyProps = {

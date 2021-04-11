@@ -12,28 +12,28 @@ export const TableElement = styled.table`
 `;
 
 export const TableHead = styled.thead`
-  background-color: #009879;
-  color: #ffffff;
+  background-color: ${({ theme }) => theme.colors.blue};
+  color: ${({ theme }) => theme.colors.white};
   text-align: left;
   font-weight: bold;
 `;
 
 export const TableBody = styled.tbody`
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.white};
   text-align: left;
 `;
 
 export const TableRowElement = styled.tr`
-  color: #444;
+  color: ${({ theme }) => theme.colors.text};
   text-align: left;
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.tableBorder};
 
   &:nth-of-type(even) {
-    background-color: #f3f3f3;
+    background-color: ${({ theme }) => theme.colors.tableBackground};
   }
 
   &:last-of-type {
-    border-bottom: 2px solid #009879;
+    border-bottom: 2px solid ${({ theme }) => theme.colors.blue};
   }
 
   &:last-child {
@@ -44,7 +44,7 @@ export const TableRowElement = styled.tr`
 
 export const TableHeadElement = styled.th`
   padding: 12px 15px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.white};
 `;
 
 export const TableDataElement = styled.td`
