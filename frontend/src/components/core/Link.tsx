@@ -23,8 +23,4 @@ export const TextBlockLink = styled(Link)`
   font-size: ${({ theme }) => theme.fontSize.medium};
   color: ${({ theme }) => theme.colors.gray};
   text-decoration: none;
-
-  &:hover {
-    font-weight: 700;
-  }
 `;
