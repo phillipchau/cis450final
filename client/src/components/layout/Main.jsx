@@ -11,11 +11,7 @@ const Content = styled.div`
   font-family: ${({ theme }) => theme.font};
 `;
 
-type MyProps = {
-  children: React.ReactNode,
-}
-
-function MainLayout({ children }: MyProps) {
+function MainLayout({ children }) {
   return (
     <Content>
       <Header />

@@ -1,11 +1,7 @@
 import React from 'react';
 import { ErrorText } from './Text';
 
-type MyProps = {
-  message: string,
-}
-
-function ErrorMessage(props: MyProps) {
+function ErrorMessage(props) {
   const { message } = props;
   return (
     <ErrorText>

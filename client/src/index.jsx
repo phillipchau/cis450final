@@ -4,9 +4,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
 import App from './components/config/App';
 import * as serviceWorker from './serviceWorker';
-import Theme, { ThemeType } from './components/config/Theme';
+import Theme from './components/config/Theme';
 
-const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
+const GlobalStyle = createGlobalStyle`
   html {
     height: 100vh;
     min-width: 640px;

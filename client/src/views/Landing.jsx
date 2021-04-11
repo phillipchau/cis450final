@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getVaccineData, Vaccine } from '../api/Vaccine';
+import { getVaccineData } from '../api/Vaccine';
 import ErrorMessage from '../components/core/Error';
 import { LandingHeaderText } from '../components/core/Text';
 import {
@@ -14,7 +14,7 @@ import {
 function LandingPage() {
 
   // Hold the vaccine data.
-  const [vaccineData, setVaccineData] = useState<Vaccine[] | undefined>();
+  const [vaccineData, setVaccineData] = useState();
 
   // Hold loading boolean.
   const [loading, setLoading] = useState(false);

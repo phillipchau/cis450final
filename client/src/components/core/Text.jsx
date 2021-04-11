@@ -1,10 +1,6 @@
 import styled from 'styled-components';
 
-type TextAttributes = {
-  bold?: boolean,
-};
-
-export const Text = styled.p<TextAttributes>`
+export const Text = styled.p`
   font-size: ${({ theme }) => theme.fontSize.default};
   font-weight: ${({ bold }) => (bold ? 'bold' : 'normal')};
 `;

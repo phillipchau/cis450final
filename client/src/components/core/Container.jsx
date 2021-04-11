@@ -1,11 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-type MyProps = {
-  children: React.ReactNode,
-}
-
-const createContainer = (Container: any, props: MyProps) => {
+const createContainer = (Container, props) => {
   const { children } = props;
   return <Container>{children}</Container>;
 };
@@ -16,4 +12,4 @@ const StyledMainContainer = styled.div`
   width: 80%;
 `;
 
-export const MainContainer = (props: MyProps) => createContainer(StyledMainContainer, props);
+export const MainContainer = (props) => createContainer(StyledMainContainer, props);
