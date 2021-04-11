@@ -13,13 +13,13 @@ const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
     // @ts-ignore
     font-family: ${({ theme }) => theme.font};
     // @ts-ignore
-    font-size: ${({ theme }) => theme.fontSize.globalDefault};
+    font-size: ${({ theme }) => theme.fontSize.medium};
     // @ts-ignore
     color: ${({ theme }) => theme.colors.text};
     
     @media (max-width: 800px) {
       // @ts-ignore
-      font-size: ${({ theme }) => theme.fontSize.globalSmall};
+      font-size: ${({ theme }) => theme.fontSize.small};
     }
   }
   

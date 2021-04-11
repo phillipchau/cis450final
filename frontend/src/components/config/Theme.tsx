@@ -15,17 +15,10 @@ export const ThemeConfig: any = {
   },
   font: 'Roboto',
   fontSize: {
-    xSmall: '0.4rem',
     small: '0.6rem',
-    mediumSmall: '0.8rem',
     default: '1rem',
-    mediumLarge: '1.2rem',
-    xMediumLarge: '1.5rem',
+    medium: '1.2rem',
     large: '1.8rem',
-    xLarge: '2rem',
-    xxLarge: '2.5rem',
-    globalDefault: '16px',
-    globalSmall: '14px',
   },
 };
 

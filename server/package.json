@@ -7,7 +7,7 @@
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Kellie Carlson <carlson.kellie.27@gmail.com>",
+  "author": "Chris Elliott <zpchris@wharton.upenn.edu>",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.0",

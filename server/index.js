@@ -13,14 +13,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 /* ------------------- Route handler registration ----------------- */
 /* ---------------------------------------------------------------- */
 
-/* ---- (Dashboard) ---- */
-// The route localhost:8081/people is registered to the function
+/* ---- (Landing Page) ---- */
+// The route localhost:8081/vaccine is registered to the function
 // routes.getAllPeople, specified in routes.js.
-app.get('/people', routes.getAllPeople);
-
-/* ---- Part 2 (FindFriends) ---- */
-app.get('/friends/:login', routes.getFriends);
-
+app.get('/vaccine', routes.getVaccineData);
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);

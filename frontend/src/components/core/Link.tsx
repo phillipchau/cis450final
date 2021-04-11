@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 export const NavbarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text};
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-size: ${({ theme }) => theme.fontSize.medium};
   text-decoration: none;
 `;
 

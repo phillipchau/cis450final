@@ -8,11 +8,12 @@ var connection = mysql.createPool(config);
 /* ------------------- Route Handlers --------------- */
 /* -------------------------------------------------- */
 
-/* ---- (Dashboard) ---- */
-function getAllPeople(req, res) {
+/* ---- (Landing Page) ---- */
+function getVaccineData(req, res) {
   var query = `
-    SELECT login, name, birthyear
-    FROM Person;
+    SELECT *
+    FROM vaccine
+    WHERE State = 'Washington';
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
@@ -20,32 +21,9 @@ function getAllPeople(req, res) {
       res.json(rows);
     }
   });
-};
-
-/* ---- Part 2 (FindFriends) ---- */
-function getFriends(req, res) {
-  var inputLogin = req.params.login;
-  
-  var query = `
-    SELECT login, name
-    FROM Person
-    WHERE login IN (
-        SELECT friend
-        FROM Friends
-        WHERE login = '${inputLogin}'
-    );
-  `;
-  connection.query(query, function(err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
-};
+}
 
 // The exported functions, which can be accessed in index.js.
 module.exports = {
-  getAllPeople: getAllPeople,
-  getFriends: getFriends
+  getVaccineData: getVaccineData,
 }
