@@ -21,10 +21,17 @@ app.get('/income/q1', routes.getIncomeDataQ1);
 app.get('/income/q2', routes.getIncomeDataQ2);
 app.get('/income/q3', routes.getIncomeDataQ3);
 app.get('/income/q4', routes.getIncomeDataQ4);
+
+app.get('/poverty/q1', routes.getPovertyQ1)
+app.get('/poverty/q2', routes.getPovertyQ2)
+app.get('/poverty/q3', routes.getPovertyQ3)
+app.get('/poverty/q4', routes.getPovertyQ4)
+
 app.get('/state/', routes.getState);
 app.get('/statecoords/:state', routes.getStateCoords)
 app.get('/states', routes.getDistinctStates);
 app.get('/state-date-cases', routes.getCountPerStateDate);
+app.get('/covidtotal', routes.getTotalCovid)
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);

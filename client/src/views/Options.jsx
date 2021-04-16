@@ -34,7 +34,7 @@ function Options({statefilter, modefilter}) {
           e.preventDefault()
           submitForm()
           setCurrState('Alabama')
-          setMode('')
+          setMode(mode)
         }}
         >
         <h5>Date Range</h5>
@@ -66,9 +66,9 @@ function Options({statefilter, modefilter}) {
         <h5 style={{marginTop:20}}>Filters</h5>
         <div id="radiogroup">
         <div class="form-check">
-            <input class="form-check-input" type="radio" name="filter" value="" id="defaultcheck" checked={mode === ""} onChange={e => setMode(e.target.value)}/>
+            <input class="form-check-input" type="radio" name="filter" value="total" id="defaultcheck" checked={mode === "total"} onChange={e => setMode(e.target.value)}/>
             <label class="form-check-label" for="defaultcheck">
-                None
+                Total
             </label>
         </div>
         <div class="form-check">

@@ -2,62 +2,125 @@ import React, { useEffect, useState } from 'react';
 import { TextBlockLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
 import { getIncomeDataQ1, getIncomeDataQ2, getIncomeDataQ3, getIncomeDataQ4 } from '../api/Income';
+import { getPovertyQ1, getPovertyQ2, getPovertyQ3, getPovertyQ4, getTotalCovid, getStateCoords } from '../api/MapData';
 import {MapContainer, CircleMarker, TileLayer, Tooltip} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 function MapPage({statefilter, modefilter}) {
   //sets income data for various quarters if the income option is toggled
-  const [incomeDataQ1, setIncomeDataQ1] = useState([])
-  const [incomeDataQ2, setIncomeDataQ2] = useState([])
-  const [incomeDataQ3, setIncomeDataQ3] = useState([])
-  const [incomeDataQ4, setIncomeDataQ4] = useState([])
+  const [groupDataQ1, setGroupDataQ1] = useState([])
+  const [groupDataQ2, setGroupDataQ2] = useState([])
+  const [groupDataQ3, setGroupDataQ3] = useState([])
+  const [groupDataQ4, setGroupDataQ4] = useState([])
 
-  const[filterstate, setFilterState] = useState(statefilter)
-  const[filtermode, setFilterMode] = useState(modefilter)
+  //state variables to track change of state from form submission
+  const[filterstate, setFilterState] = useState('')
+  const[filtermode, setFilterMode] = useState('')
+
   const defaultPosition = [37.0902, -100]; // center of US position
+  const defaultZoom = 5
+  const defaultRadius = 5000
 
+  //changes map parameters based on if a certain state is chosen
+  const[zoom, setZoom] = useState(defaultZoom)
+  const [center, setCenter] = useState(defaultPosition)
+  const [radius, setRadius] = useState(defaultRadius)
+
+
+  if (modefilter !== filtermode) {
+    setFilterMode(modefilter)
+  }
+
+  if (filterstate !== statefilter) {
+    setFilterState(statefilter)
+  }
+  //if we specify a state, change map parameters
   useEffect(() => {
-    getIncomeDataQ1().then((res) => {
-      setIncomeDataQ1(res);
-      }).catch((err) => {
-        console.log(err)
+    if (filterstate !== '') {
+      getStateCoords(filterstate).then((res) => {
+        const newCoor = []
+        console.log(res)
+        newCoor.push(res[0].Lat)
+        newCoor.push(res[0].Lon)
+        console.log(newCoor)
+        setCenter(newCoor)
+      })
+    }
+  }, [filterstate])
+  
+  useEffect(() => {
+    if (filtermode === 'income') {
+      getIncomeDataQ1().then((res) => {
+        setGroupDataQ1(res);
+        }).catch((err) => {
+          console.log(err)
+        });
+  
+      getIncomeDataQ2().then((res) => {
+        setGroupDataQ2(res);
+        }).catch((err) => {
+          console.log(err)
+        });
+  
+      getIncomeDataQ3().then((res) => {
+        setGroupDataQ3(res);
+        }).catch((err) => {
+          console.log(err)
+        });
+  
+      getIncomeDataQ4().then((res) => {
+        setGroupDataQ4(res);
+        }).catch((err) => {
+          console.log(err)
+        });
+    } else if (filtermode === 'poverty') {
+      getPovertyQ1().then((res) => {
+        setGroupDataQ1(res);
+        }).catch((err) => {
+          console.log(err)
       });
 
-    getIncomeDataQ2().then((res) => {
-      setIncomeDataQ2(res);
-      }).catch((err) => {
-        console.log(err)
+      getPovertyQ2().then((res) => {
+        setGroupDataQ2(res);
+        }).catch((err) => {
+          console.log(err)
       });
 
-    getIncomeDataQ3().then((res) => {
-      setIncomeDataQ3(res);
-      }).catch((err) => {
-        console.log(err)
+      getPovertyQ3().then((res) => {
+        setGroupDataQ3(res);
+        }).catch((err) => {
+          console.log(err)
       });
 
-    getIncomeDataQ4().then((res) => {
-      setIncomeDataQ4(res);
-      }).catch((err) => {
-        console.log(err)
+      getPovertyQ4().then((res) => {
+        setGroupDataQ4(res);
+        }).catch((err) => {
+          console.log(err)
       });
-  }, []);
+    }
+    else {
+      setGroupDataQ1([])
+      setGroupDataQ2([])
+      setGroupDataQ3([])
+      setGroupDataQ4([])
+    }
+  }, [filtermode]);
 
-  console.log('changing filter')
   return(
     <>
     <div className="map__container">
       <MapContainer
-        center={defaultPosition}
-        zoom={4.49}
+        center={center}
+        zoom={zoom}
         style={{ height: '100vh', width: '100%' }}
       >
         <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {incomeDataQ1.map((city, k) => {
+        {groupDataQ1.map((city, k) => {
             return (
               <CircleMarker
                 key={k}
                 center={[city["Lat"], city["Lon"]]}
-                radius={5000 * city["DeathsRate"]}
+                radius={radius * city["DeathsRate"]}
                 fillOpacity={0.6}
                 stroke={false}
                 fillColor='blue'
@@ -68,7 +131,7 @@ function MapPage({statefilter, modefilter}) {
               </CircleMarker>
             );
           })}
-        {incomeDataQ2.map((city, k) => {
+        {groupDataQ2.map((city, k) => {
             return (
               <CircleMarker
                 key={k}
@@ -84,7 +147,7 @@ function MapPage({statefilter, modefilter}) {
               </CircleMarker>
             );
           })}
-          {incomeDataQ3.map((city, k) => {
+          {groupDataQ3.map((city, k) => {
             return (
               <CircleMarker
                 key={k}
@@ -100,7 +163,7 @@ function MapPage({statefilter, modefilter}) {
               </CircleMarker>
             );
           })}
-          {incomeDataQ4.map((city, k) => {
+          {groupDataQ4.map((city, k) => {
             return (
               <CircleMarker
                 key={k}
