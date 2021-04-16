@@ -1,15 +1,22 @@
+import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
-import { getDistinctStates, getCountPerStateDate } from '../api/StateCases';
+import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import ErrorMessage from '../components/core/Error';
 import { TextBlockLink } from '../components/core/Link';
-import { LandingHeaderText } from '../components/core/Text';
+import { Text, LandingHeaderText } from '../components/core/Text';
 
+// Helper function to determine if two dates are the same.
 function sameDay(d1, d2) {
   return d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 }
+
+const CustomChart = styled(Chart)`
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin: 1rem 0;
+`;
 
 function PlotPage() {
 
@@ -19,6 +26,9 @@ function PlotPage() {
   // Hold the data retrieved by the database.
   const [countPerStateDate, setCountPerStateDate] = useState();
 
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
+
   // Hold the formatted plot data to be displayed.
   const [plotData, setPlotData] = useState();
 
@@ -26,12 +36,16 @@ function PlotPage() {
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
 
+  // Hold loading boolean.
+  const [loading, setLoading] = useState(true);
+
   // Hold error text.
   const [error, setError] = useState('');
 
   // Get the states data.
   useEffect(() => {
     setError('');
+    setLoading(true);
 
     // Get the distinct states to be displayed.
     getDistinctStates().then((res) => {
@@ -42,13 +56,16 @@ function PlotPage() {
     });
 
     // Get the count data.
-    getCountPerStateDate().then((res) => {
+    let params = {
+      typeCount: typeCount,
+    };
+    getCountPerStateDate(params).then((res) => {
       console.log(res);
       setCountPerStateDate(res);
     }).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [typeCount]);
 
   // Set the starting and ending dates.
   useEffect(() => {
@@ -65,6 +82,20 @@ function PlotPage() {
     console.log('The dates were changed!');
   }, [startDate, endDate]);
 
+  // Helper method to add the state's count.
+  const addStateCount = (states, currentStateIndex, data, count) => {
+    // Add 0 until we get to the correct state.
+    while (states[currentStateIndex] !== data.State) {
+      count.push(0);
+      currentStateIndex++;
+    }
+
+    // Add the current state's count, and increment.
+    count.push(data.Count);
+    currentStateIndex++;
+    return currentStateIndex;
+  };
+
   // Construct the plot data to be displayed.
   useEffect(() => {
     // Only load the plot once all variables are defined.
@@ -77,42 +108,42 @@ function PlotPage() {
       distinctStates.forEach((data) => {
         states.push(data.State);
       });
+
+      // Add the 'Date' as the first entry for x-axis description.
       states.unshift('Date');
       newPlotData.push(states);
 
       // Iterate through the plot data, for every new date, construct the list.
       let currentDate = startDate;
       let currentStateIndex = 1;
-      let cases = [currentDate];
+      let count = [currentDate];
       countPerStateDate.forEach((data) => {
         if (sameDay(currentDate, new Date(data.Date))) {
-          // Add 0 until we get to the correct state.
-          while (states[currentStateIndex] !== data.State) {
-            cases.push(0);
-            currentStateIndex++;
-          }
-
-          // Add the current state's cases, and increment.
-          cases.push(data.Cases);
-          currentStateIndex++;
+          currentStateIndex = addStateCount(states, currentStateIndex, data, count);
         } else {
           // Add 0 until there is no state date left to add.
           while (currentStateIndex < states.length) {
-            cases.push(0);
+            count.push(0);
             currentStateIndex++;
           }
 
-          newPlotData.push(cases);
+          // Reset variables, then add new state.
+          newPlotData.push(count);
           currentDate = new Date(data.Date);
           currentStateIndex = 1;
-          cases = [currentDate];
+          count = [currentDate];
+          currentStateIndex = addStateCount(states, currentStateIndex, data, count);
         }
       });
 
+      // Print to console for debugging.
       console.log(newPlotData);
 
       // Set the new plot data.
       setPlotData(newPlotData);
+
+      // Display the plot.
+      setLoading(false);
     }
   }, [setPlotData, distinctStates, countPerStateDate, startDate, endDate]);
 
@@ -121,26 +152,52 @@ function PlotPage() {
       <LandingHeaderText>
         This is the Plot page.
       </LandingHeaderText>
+      <label>
+        Count Cases
+        <input
+          name="Count Cases"
+          type="checkbox"
+          checked={typeCount === TypeCount.CASES}
+          onChange={() => setTypeCount(TypeCount.CASES)}
+        />
+      </label>
+      <label>
+        Count Deaths
+        <input
+          name="Count Deaths"
+          type="checkbox"
+          checked={typeCount === TypeCount.DEATHS}
+          onChange={() => setTypeCount(TypeCount.DEATHS)}
+        />
+      </label>
+      { loading ? <Text>Loading Chart...</Text> : null }
       { error ? <ErrorMessage message={error} /> : null }
-      <Chart
-        width={'600px'}
-        height={'400px'}
-        chartType="LineChart"
-        loader={<div>Loading Chart</div>}
-        data={plotData}
-        options={{
-          hAxis: {
-            title: 'Date',
-          },
-          vAxis: {
-            title: 'Cases',
-          },
-          series: {
-            1: { curveType: 'function' },
-          },
-        }}
-        rootProps={{ 'data-testid': '2' }}
-      />
+      {plotData !== undefined ?
+        <CustomChart
+          width={'600px'}
+          height={'400px'}
+          chartType="LineChart"
+          loader={<div>Loading Chart...</div>}
+          data={plotData}
+          options={{
+            title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,
+            hAxis: {
+              title: 'Date',
+            },
+            vAxis: {
+              title: (typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'),
+              viewWindow: {
+                min: 0,
+              },
+            },
+            series: {
+              1: { curveType: 'function' },
+            },
+          }}
+          rootProps={{ 'data-testid': '2' }}
+        />
+        : null
+      }
       <TextBlockLink to="/">Return to homepage.</TextBlockLink>
     </div>
   );
