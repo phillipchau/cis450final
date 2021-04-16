@@ -65,6 +65,20 @@ function PlotPage() {
     console.log('The dates were changed!');
   }, [startDate, endDate]);
 
+  // Helper method to add the state's cases.
+  const addStateCases = (states, currentStateIndex, data, cases) => {
+    // Add 0 until we get to the correct state.
+    while (states[currentStateIndex] !== data.State) {
+      cases.push(0);
+      currentStateIndex++;
+    }
+
+    // Add the current state's cases, and increment.
+    cases.push(data.Cases);
+    currentStateIndex++;
+    return currentStateIndex;
+  };
+
   // Construct the plot data to be displayed.
   useEffect(() => {
     // Only load the plot once all variables are defined.
@@ -86,15 +100,7 @@ function PlotPage() {
       let cases = [currentDate];
       countPerStateDate.forEach((data) => {
         if (sameDay(currentDate, new Date(data.Date))) {
-          // Add 0 until we get to the correct state.
-          while (states[currentStateIndex] !== data.State) {
-            cases.push(0);
-            currentStateIndex++;
-          }
-
-          // Add the current state's cases, and increment.
-          cases.push(data.Cases);
-          currentStateIndex++;
+          currentStateIndex = addStateCases(states, currentStateIndex, data, cases);
         } else {
           // Add 0 until there is no state date left to add.
           while (currentStateIndex < states.length) {
@@ -102,10 +108,12 @@ function PlotPage() {
             currentStateIndex++;
           }
 
+          // Reset variables, then add new state.
           newPlotData.push(cases);
           currentDate = new Date(data.Date);
           currentStateIndex = 1;
           cases = [currentDate];
+          currentStateIndex = addStateCases(states, currentStateIndex, data, cases);
         }
       });
 
