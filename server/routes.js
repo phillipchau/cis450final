@@ -184,10 +184,42 @@ function getStateCoords(req, res) {
   })
 }
 
+// Get the number of cases for each state for every date.
+function getDistinctStates(req, res) {
+  var query = `
+    SELECT DISTINCT State
+    FROM covid;
+  `;
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err);
+    else {
+      res.json(rows);
+    }
+  });
+}
+
+// Get the number of cases for each state for every date.
+function getCountPerStateDate(req, res) {
+  let type = 'CaseCount';
+  var query = `
+    SELECT Date, State, SUM(${type}) AS Cases
+    FROM covid
+    GROUP BY Date, State
+    ORDER BY Date ASC, State ASC;
+  `;
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err);
+    else {
+      res.json(rows);
+    }
+  });
+}
 
 // The exported functions, which can be accessed in index.js.
 module.exports = {
   getVaccineData: getVaccineData,
+  getDistinctStates: getDistinctStates,
+  getCountPerStateDate: getCountPerStateDate,
   getIncomeDataQ1: getIncomeQ1,
   getIncomeDataQ2: getIncomeQ2,
   getIncomeDataQ3: getIncomeQ3,

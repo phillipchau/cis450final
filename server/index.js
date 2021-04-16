@@ -23,6 +23,8 @@ app.get('/income/q3', routes.getIncomeDataQ3);
 app.get('/income/q4', routes.getIncomeDataQ4);
 app.get('/state/', routes.getState);
 app.get('/statecoords/:state', routes.getStateCoords)
+app.get('/states', routes.getDistinctStates);
+app.get('/state-date-cases', routes.getCountPerStateDate);
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);
