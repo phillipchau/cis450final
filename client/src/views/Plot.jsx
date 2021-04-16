@@ -4,7 +4,7 @@ import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import ErrorMessage from '../components/core/Error';
 import { TextBlockLink } from '../components/core/Link';
-import { Text, LandingHeaderText } from '../components/core/Text';
+import { LandingHeaderText } from '../components/core/Text';
 
 // Helper function to determine if two dates are the same.
 function sameDay(d1, d2) {
@@ -16,6 +16,23 @@ function sameDay(d1, d2) {
 const CustomChart = styled(Chart)`
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   margin: 1rem 0;
+`;
+
+const LoadingChart = styled.div`
+  background: white;
+  position: relative;
+  width: 600px;
+  height: 400px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin: 1rem 0;
+`;
+
+const LoadingChartText = styled(LandingHeaderText)`
+  vertical-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
 
 function PlotPage() {
@@ -170,14 +187,14 @@ function PlotPage() {
           onChange={() => setTypeCount(TypeCount.DEATHS)}
         />
       </label>
-      { loading ? <Text>Loading Chart...</Text> : null }
+      { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
       { error ? <ErrorMessage message={error} /> : null }
       {plotData !== undefined ?
         <CustomChart
           width={'600px'}
           height={'400px'}
           chartType="LineChart"
-          loader={<div>Loading Chart...</div>}
+          loader={<LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart>}
           data={plotData}
           options={{
             title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,
