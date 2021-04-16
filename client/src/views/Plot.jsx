@@ -1,3 +1,4 @@
+import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
@@ -5,11 +6,17 @@ import ErrorMessage from '../components/core/Error';
 import { TextBlockLink } from '../components/core/Link';
 import { Text, LandingHeaderText } from '../components/core/Text';
 
+// Helper function to determine if two dates are the same.
 function sameDay(d1, d2) {
   return d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 }
+
+const CustomChart = styled(Chart)`
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin: 1rem 0;
+`;
 
 function PlotPage() {
 
@@ -38,8 +45,7 @@ function PlotPage() {
   // Get the states data.
   useEffect(() => {
     setError('');
-
-    alert(typeCount);
+    setLoading(true);
 
     // Get the distinct states to be displayed.
     getDistinctStates().then((res) => {
@@ -167,7 +173,7 @@ function PlotPage() {
       { loading ? <Text>Loading Chart...</Text> : null }
       { error ? <ErrorMessage message={error} /> : null }
       {plotData !== undefined ?
-        <Chart
+        <CustomChart
           width={'600px'}
           height={'400px'}
           chartType="LineChart"
