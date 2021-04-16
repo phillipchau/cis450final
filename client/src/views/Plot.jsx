@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import ErrorMessage from '../components/core/Error';
+import dateRangeInput from '../components/core/Input';
 import { TextBlockLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
 
@@ -169,6 +170,7 @@ function PlotPage() {
       <LandingHeaderText>
         This is the Plot page.
       </LandingHeaderText>
+      { dateRangeInput() }
       <label>
         Count Cases
         <input
