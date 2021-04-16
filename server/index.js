@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // routes.getAllPeople, specified in routes.js.
 app.get('/vaccine', routes.getVaccineData);
 app.get('/states', routes.getDistinctStates);
-app.get('/state-date-cases', routes.getCountPerStateDate);
+app.get('/state-date-count', routes.getCountPerStateDate);
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);

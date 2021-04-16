@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
-import { getDistinctStates, getCountPerStateDate } from '../api/StateCases';
+import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import ErrorMessage from '../components/core/Error';
 import { TextBlockLink } from '../components/core/Link';
 import { Text, LandingHeaderText } from '../components/core/Text';
@@ -19,6 +19,9 @@ function PlotPage() {
   // Hold the data retrieved by the database.
   const [countPerStateDate, setCountPerStateDate] = useState();
 
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
+
   // Hold the formatted plot data to be displayed.
   const [plotData, setPlotData] = useState();
 
@@ -36,6 +39,8 @@ function PlotPage() {
   useEffect(() => {
     setError('');
 
+    alert(typeCount);
+
     // Get the distinct states to be displayed.
     getDistinctStates().then((res) => {
       console.log(res);
@@ -45,13 +50,16 @@ function PlotPage() {
     });
 
     // Get the count data.
-    getCountPerStateDate().then((res) => {
+    let params = {
+      typeCount: typeCount,
+    };
+    getCountPerStateDate(params).then((res) => {
       console.log(res);
       setCountPerStateDate(res);
     }).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [typeCount]);
 
   // Set the starting and ending dates.
   useEffect(() => {
@@ -68,16 +76,16 @@ function PlotPage() {
     console.log('The dates were changed!');
   }, [startDate, endDate]);
 
-  // Helper method to add the state's cases.
-  const addStateCases = (states, currentStateIndex, data, cases) => {
+  // Helper method to add the state's count.
+  const addStateCount = (states, currentStateIndex, data, count) => {
     // Add 0 until we get to the correct state.
     while (states[currentStateIndex] !== data.State) {
-      cases.push(0);
+      count.push(0);
       currentStateIndex++;
     }
 
-    // Add the current state's cases, and increment.
-    cases.push(data.Cases);
+    // Add the current state's count, and increment.
+    count.push(data.Count);
     currentStateIndex++;
     return currentStateIndex;
   };
@@ -102,23 +110,23 @@ function PlotPage() {
       // Iterate through the plot data, for every new date, construct the list.
       let currentDate = startDate;
       let currentStateIndex = 1;
-      let cases = [currentDate];
+      let count = [currentDate];
       countPerStateDate.forEach((data) => {
         if (sameDay(currentDate, new Date(data.Date))) {
-          currentStateIndex = addStateCases(states, currentStateIndex, data, cases);
+          currentStateIndex = addStateCount(states, currentStateIndex, data, count);
         } else {
           // Add 0 until there is no state date left to add.
           while (currentStateIndex < states.length) {
-            cases.push(0);
+            count.push(0);
             currentStateIndex++;
           }
 
           // Reset variables, then add new state.
-          newPlotData.push(cases);
+          newPlotData.push(count);
           currentDate = new Date(data.Date);
           currentStateIndex = 1;
-          cases = [currentDate];
-          currentStateIndex = addStateCases(states, currentStateIndex, data, cases);
+          count = [currentDate];
+          currentStateIndex = addStateCount(states, currentStateIndex, data, count);
         }
       });
 
@@ -138,6 +146,24 @@ function PlotPage() {
       <LandingHeaderText>
         This is the Plot page.
       </LandingHeaderText>
+      <label>
+        Count Cases
+        <input
+          name="Count Cases"
+          type="checkbox"
+          checked={typeCount === TypeCount.CASES}
+          onChange={() => setTypeCount(TypeCount.CASES)}
+        />
+      </label>
+      <label>
+        Count Deaths
+        <input
+          name="Count Deaths"
+          type="checkbox"
+          checked={typeCount === TypeCount.DEATHS}
+          onChange={() => setTypeCount(TypeCount.DEATHS)}
+        />
+      </label>
       { loading ? <Text>Loading Chart...</Text> : null }
       { error ? <ErrorMessage message={error} /> : null }
       {plotData !== undefined ?
@@ -152,7 +178,7 @@ function PlotPage() {
               title: 'Date',
             },
             vAxis: {
-              title: 'Cases',
+              title: (typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'),
               viewWindow: {
                 min: 0,
               },

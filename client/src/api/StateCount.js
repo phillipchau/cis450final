@@ -5,8 +5,10 @@ import { axiosErrorHandler } from './Error';
 const basePath = 'http://localhost:8081';
 const routes = {
   getDistinctStates: `${basePath}/states`,
-  getCountPerStateDate: `${basePath}/state-date-cases`,
+  getCountPerStateDate: `${basePath}/state-date-count`,
 };
+
+export const TypeCount = Object.freeze({ CASES: 'CaseCount', DEATHS: 'DeathCount' });
 
 // Function used to get the number of cases or deaths per state for every date.
 export const getDistinctStates = () => axios.get(routes.getDistinctStates)
@@ -16,7 +18,7 @@ export const getDistinctStates = () => axios.get(routes.getDistinctStates)
   });
 
 // Function used to get the number of cases or deaths per state for every date.
-export const getCountPerStateDate = () => axios.get(routes.getCountPerStateDate)
+export const getCountPerStateDate = (params) => axios.get(routes.getCountPerStateDate, params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
