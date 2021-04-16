@@ -1,30 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'react-google-charts';
-import getStates from '../api/States';
+import getStatesCasesMap from '../api/States';
 import ErrorMessage from '../components/core/Error';
 import { TextBlockLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
 
 function PlotPage() {
 
-  // Hold the vaccine data.
-  const [states, setStates] = useState();
+  // Hold the cases data, where each state connects list of cases and dates.
+  const [statesCasesMap, setStatesCasesMap] = useState();
 
-  // Hold the vaccine data.
-  const [startDate, setEndDate] = useState();
+  // Hold the formatted plot data to be displayed.
+  const [plotData, setPlotData] = useState();
+
+  // Hold the starting and ending dates.
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
 
   // Hold error text.
   const [error, setError] = useState('');
 
-  // Get the vaccine data.
+  // Get the states data.
   useEffect(() => {
     setError('');
-    getStates().then((res) => {
-      setStates(res);
+    getStatesCasesMap().then((res) => {
+      setStatesCasesMap(res);
     }).catch((err) => {
       setError(err.message);
     });
   }, [setStates]);
+
+  // Get the states data.
+  useEffect(() => {
+    // First day of 2021 (furthest date we have is 1/21/2021).
+    setStartDate(new Date(2021, 0, 1));
+
+    // This is the most recent date we have available in our database.
+    setEndDate(new Date(2021, 3, 1));
+  }, [setStartDate, setEndDate]);
+
+  // Update the data retrieved from the database.
+  useEffect(() => {
+    // Update the plot data to display the correct dates.
+    console.log('The dates were changed!');
+  }, [startDate, endDate]);
 
   return (
     <div>
@@ -38,7 +57,7 @@ function PlotPage() {
         chartType="LineChart"
         loader={<div>Loading Chart</div>}
         data={[
-          states,
+          Object.keys(statesCasesMap),
           [0, 0, 0, 0],
           [1, 10, 5, 10],
           [2, 23, 15,6],
