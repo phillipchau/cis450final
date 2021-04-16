@@ -39,16 +39,15 @@ function getDistinctStates(req, res) {
 
 // Get the number of cases for each state for every date.
 function getCountPerStateDate(req, res) {
-  console.log(req);
 
   // Hard-code valid values to prevent SQL injection.
-  if (req.typeCount !== 'CaseCount' && req.typeCount !== 'DeathCount') {
+  if (req.query.typeCount !== 'CaseCount' && req.query.typeCount !== 'DeathCount') {
     console.log('The request must specify a valid typeCount. Default to CaseCount.');
-    req.typeCount = 'CaseCount';
+    req.params.typeCount = 'CaseCount';
   }
 
   var query = `
-    SELECT Date, State, SUM(${req.typeCount}) AS Count
+    SELECT Date, State, SUM(${req.query.typeCount}) AS Count
     FROM covid
     GROUP BY Date, State
     ORDER BY Date ASC, State ASC;

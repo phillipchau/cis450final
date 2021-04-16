@@ -18,7 +18,8 @@ export const getDistinctStates = () => axios.get(routes.getDistinctStates)
   });
 
 // Function used to get the number of cases or deaths per state for every date.
-export const getCountPerStateDate = (params) => axios.get(routes.getCountPerStateDate, params)
+export const getCountPerStateDate = (params) => axios.get(
+  routes.getCountPerStateDate, { params: params })
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
