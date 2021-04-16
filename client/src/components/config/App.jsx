@@ -6,12 +6,13 @@ import NotFound from '../../views/NotFound';
 import CustomRoute from './Route';
 import MapPage from '../../views/Map';
 import PlotPage from '../../views/Plot';
+import MapContainer from '../../views/MapContainer';
 
 function App() {
   return (
     <Switch>
       <CustomRoute path="/" component={LandingPage} layout={MainLayout} exact />
-      <CustomRoute path="/map" component={MapPage} layout={MainLayout} exact />
+      <CustomRoute path="/map" component={MapContainer} layout={MainLayout} exact />
       <CustomRoute path="/plot" component={PlotPage} layout={MainLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
