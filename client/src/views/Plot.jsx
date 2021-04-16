@@ -3,7 +3,7 @@ import Chart from 'react-google-charts';
 import { getDistinctStates, getCountPerStateDate } from '../api/StateCases';
 import ErrorMessage from '../components/core/Error';
 import { TextBlockLink } from '../components/core/Link';
-import { LandingHeaderText } from '../components/core/Text';
+import { Text, LandingHeaderText } from '../components/core/Text';
 
 function sameDay(d1, d2) {
   return d1.getFullYear() === d2.getFullYear() &&
@@ -25,6 +25,9 @@ function PlotPage() {
   // Hold the starting and ending dates.
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
+
+  // Hold loading boolean.
+  const [loading, setLoading] = useState(true);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -91,6 +94,8 @@ function PlotPage() {
       distinctStates.forEach((data) => {
         states.push(data.State);
       });
+
+      // Add the 'Date' as the first entry for x-axis description.
       states.unshift('Date');
       newPlotData.push(states);
 
@@ -117,10 +122,14 @@ function PlotPage() {
         }
       });
 
+      // Print to console for debugging.
       console.log(newPlotData);
 
       // Set the new plot data.
       setPlotData(newPlotData);
+
+      // Display the plot.
+      setLoading(false);
     }
   }, [setPlotData, distinctStates, countPerStateDate, startDate, endDate]);
 
@@ -129,26 +138,33 @@ function PlotPage() {
       <LandingHeaderText>
         This is the Plot page.
       </LandingHeaderText>
+      { loading ? <Text>Loading Chart...</Text> : null }
       { error ? <ErrorMessage message={error} /> : null }
-      <Chart
-        width={'600px'}
-        height={'400px'}
-        chartType="LineChart"
-        loader={<div>Loading Chart</div>}
-        data={plotData}
-        options={{
-          hAxis: {
-            title: 'Date',
-          },
-          vAxis: {
-            title: 'Cases',
-          },
-          series: {
-            1: { curveType: 'function' },
-          },
-        }}
-        rootProps={{ 'data-testid': '2' }}
-      />
+      {plotData !== undefined ?
+        <Chart
+          width={'600px'}
+          height={'400px'}
+          chartType="LineChart"
+          loader={<div>Loading Chart...</div>}
+          data={plotData}
+          options={{
+            hAxis: {
+              title: 'Date',
+            },
+            vAxis: {
+              title: 'Cases',
+              viewWindow: {
+                min: 0,
+              },
+            },
+            series: {
+              1: { curveType: 'function' },
+            },
+          }}
+          rootProps={{ 'data-testid': '2' }}
+        />
+        : null
+      }
       <TextBlockLink to="/">Return to homepage.</TextBlockLink>
     </div>
   );
