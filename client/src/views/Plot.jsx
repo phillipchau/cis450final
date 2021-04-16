@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import getStatesCasesMap from '../api/States';
 import ErrorMessage from '../components/core/Error';
@@ -25,10 +25,11 @@ function PlotPage() {
     setError('');
     getStatesCasesMap().then((res) => {
       setStatesCasesMap(res);
+      constructPlotData();
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setStates]);
+  }, [setStatesCasesMap]);
 
   // Get the states data.
   useEffect(() => {
@@ -43,7 +44,18 @@ function PlotPage() {
   useEffect(() => {
     // Update the plot data to display the correct dates.
     console.log('The dates were changed!');
+    constructPlotData();
   }, [startDate, endDate]);
+
+  const constructPlotData = useCallback(() => {
+    if (startDate !== undefined && endDate !== undefined) {
+      setPlotData([
+        ['Washington', 'Oregon', 'California', 'Idaho'],
+        [startDate, 0, 0, 0],
+        [endDate, 10, 5, 20],
+      ]);
+    }
+  }, [setPlotData, startDate, endDate]);
 
   return (
     <div>
@@ -56,17 +68,7 @@ function PlotPage() {
         height={'400px'}
         chartType="LineChart"
         loader={<div>Loading Chart</div>}
-        data={[
-          Object.keys(statesCasesMap),
-          [0, 0, 0, 0],
-          [1, 10, 5, 10],
-          [2, 23, 15,6],
-          [3, 17, 9, 19],
-          [4, 18, 10, 1],
-          [5, 9, 5, 1],
-          [6, 11, 3, 1],
-          [7, 27, 19, 1],
-        ]}
+        data={plotData}
         options={{
           hAxis: {
             title: 'Date',

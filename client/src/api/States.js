@@ -61,4 +61,4 @@ const getStatesCasesMap = () => new Promise((resolve, reject) => {
   resolve(casesMap);
 });
 
-export default getStates;
+export default getStatesCasesMap;
