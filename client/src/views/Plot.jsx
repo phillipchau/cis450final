@@ -180,6 +180,7 @@ function PlotPage() {
           loader={<div>Loading Chart...</div>}
           data={plotData}
           options={{
+            title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,
             hAxis: {
               title: 'Date',
             },
