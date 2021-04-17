@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import ErrorMessage from '../components/core/Error';
-import DateRangeInput from '../components/core/Input';
 import { TextBlockLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
 
@@ -12,6 +11,23 @@ function sameDay(d1, d2) {
   return d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
+}
+
+// Get the formatted date to display as the value.
+function getFormattedDate(date) {
+  if (date === undefined) {
+    return date;
+  }
+
+  var year = date.getFullYear();
+
+  var month = (1 + date.getMonth()).toString();
+  month = month.length > 1 ? month : '0' + month;
+
+  var day = date.getDate().toString();
+  day = day.length > 1 ? day : '0' + day;
+
+  return year + '-' + month + '-' + day;
 }
 
 const CustomChart = styled(Chart)`
@@ -170,7 +186,21 @@ function PlotPage() {
       <LandingHeaderText>
         This is the Plot page.
       </LandingHeaderText>
-      { DateRangeInput(startDate, setStartDate, endDate, setEndDate) }
+      <h5>Date Range</h5>
+
+      <label htmlFor="start-date-input">Start</label>
+      <input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+        let newDate = new Date(e.target.value);
+        newDate.setDate(newDate.getDate() + 1);
+        setStartDate(newDate);
+      }} />
+
+      <label htmlFor="end-date-input" >End</label>
+      <input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
+        let newDate = new Date(e.target.value);
+        newDate.setDate(newDate.getDate() + 1);
+        setEndDate(newDate);
+      }} />
       <label>
         Count Cases
         <input
