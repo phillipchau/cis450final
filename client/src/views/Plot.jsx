@@ -48,6 +48,10 @@ const LoadingChartText = styled(LandingHeaderText)`
   transform: translate(-50%, -50%);
 `;
 
+// These are the dates available in the COVID database.
+const firstDay = new Date(2020, 0, 20);
+const lastDay = new Date(2021, 3, 1);
+
 function PlotPage() {
 
   // Hold the data retrieved by the database.
@@ -100,10 +104,10 @@ function PlotPage() {
   // Set the starting and ending dates.
   useEffect(() => {
     // First day in the COVID history.
-    setStartDate(new Date(2020, 0, 20));
+    setStartDate(firstDay);
 
     // This is the most recent date we have available in our database.
-    setEndDate(new Date(2021, 3, 1));
+    setEndDate(lastDay);
   }, [setStartDate, setEndDate]);
 
   // Update the data retrieved from the database.
@@ -184,16 +188,26 @@ function PlotPage() {
 
         <Label htmlFor="start-date-input">Start</Label>
         <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+          setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          setStartDate(newDate);
+          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDate) {
+            setStartDate(newDate);
+          } else {
+            setError('The date must have data in the database and be before the ending date.');
+          }
         }} />
 
         <Label htmlFor="end-date-input" >End</Label>
         <Input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
+          setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          setEndDate(newDate);
+          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDate) {
+            setEndDate(newDate);
+          } else {
+            setError('The date must have data in the database and be after the starting date.');
+          }
         }} />
 
         <br></br>
@@ -216,10 +230,10 @@ function PlotPage() {
             onChange={() => setTypeCount(TypeCount.DEATHS)}
           />
         </MinimalLabel>
+        { error ? <ErrorMessage message={error} /> : null }
       </ChildFlexContainer>
       <ChildFlexContainer>
         { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
-        { error ? <ErrorMessage message={error} /> : null }
         { !loading && plotData !== undefined ?
           <Chart
             width={'600px'}
