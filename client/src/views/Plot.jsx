@@ -2,8 +2,8 @@ import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
+import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
-import { TextBlockLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
 
 // Helper function to determine if two dates are the same.
@@ -30,9 +30,23 @@ function getFormattedDate(date) {
   return year + '-' + month + '-' + day;
 }
 
-const CustomChart = styled(Chart)`
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  margin: 1rem 0;
+const Label = styled.label`
+  display: block;
+  margin: 1rem 0 0.25rem 0;
+`;
+
+const Input = styled.input`
+  display: block;
+`;
+
+const MinimalLabel = styled.label`
+  display: block;
+  margin: 0.25rem 0;
+`;
+
+const InlineInput = styled.input`
+  display: inline-block;
+  margin-left: 5px;
 `;
 
 const LoadingChart = styled.div`
@@ -40,8 +54,6 @@ const LoadingChart = styled.div`
   position: relative;
   width: 600px;
   height: 400px;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  margin: 1rem 0;
 `;
 
 const LoadingChartText = styled(LandingHeaderText)`
@@ -182,73 +194,76 @@ function PlotPage() {
   }, [setPlotData, distinctStates, countPerStateDate, startDate, endDate]);
 
   return (
-    <div>
-      <LandingHeaderText>
-        This is the Plot page.
-      </LandingHeaderText>
-      <h5>Date Range</h5>
+    <FlexContainer>
+      <ChildFlexContainer>
+        <h5>Date Range</h5>
 
-      <label htmlFor="start-date-input">Start</label>
-      <input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
-        let newDate = new Date(e.target.value);
-        newDate.setDate(newDate.getDate() + 1);
-        setStartDate(newDate);
-      }} />
+        <Label htmlFor="start-date-input">Start</Label>
+        <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          setStartDate(newDate);
+        }} />
 
-      <label htmlFor="end-date-input" >End</label>
-      <input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
-        let newDate = new Date(e.target.value);
-        newDate.setDate(newDate.getDate() + 1);
-        setEndDate(newDate);
-      }} />
-      <label>
-        Count Cases
-        <input
-          name="Count Cases"
-          type="checkbox"
-          checked={typeCount === TypeCount.CASES}
-          onChange={() => setTypeCount(TypeCount.CASES)}
-        />
-      </label>
-      <label>
-        Count Deaths
-        <input
-          name="Count Deaths"
-          type="checkbox"
-          checked={typeCount === TypeCount.DEATHS}
-          onChange={() => setTypeCount(TypeCount.DEATHS)}
-        />
-      </label>
-      { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
-      { error ? <ErrorMessage message={error} /> : null }
-      {plotData !== undefined ?
-        <CustomChart
-          width={'600px'}
-          height={'400px'}
-          chartType="LineChart"
-          loader={<LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart>}
-          data={plotData}
-          options={{
-            title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,
-            hAxis: {
-              title: 'Date',
-            },
-            vAxis: {
-              title: (typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'),
-              viewWindow: {
-                min: 0,
+        <Label htmlFor="end-date-input" >End</Label>
+        <Input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          setEndDate(newDate);
+        }} />
+
+        <br></br>
+        <h5>Filters</h5>
+        <MinimalLabel>
+          Count Cases
+          <InlineInput
+            name="Count Cases"
+            type="checkbox"
+            checked={typeCount === TypeCount.CASES}
+            onChange={() => setTypeCount(TypeCount.CASES)}
+          />
+        </MinimalLabel>
+        <MinimalLabel>
+          Count Deaths
+          <InlineInput
+            name="Count Deaths"
+            type="checkbox"
+            checked={typeCount === TypeCount.DEATHS}
+            onChange={() => setTypeCount(TypeCount.DEATHS)}
+          />
+        </MinimalLabel>
+      </ChildFlexContainer>
+      <ChildFlexContainer>
+        { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
+        { error ? <ErrorMessage message={error} /> : null }
+        { !loading && plotData !== undefined ?
+          <Chart
+            width={'600px'}
+            height={'400px'}
+            chartType="LineChart"
+            loader={<LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart>}
+            data={plotData}
+            options={{
+              title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,
+              hAxis: {
+                title: 'Date',
               },
-            },
-            series: {
-              1: { curveType: 'function' },
-            },
-          }}
-          rootProps={{ 'data-testid': '2' }}
-        />
-        : null
-      }
-      <TextBlockLink to="/">Return to homepage.</TextBlockLink>
-    </div>
+              vAxis: {
+                title: (typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'),
+                viewWindow: {
+                  min: 0,
+                },
+              },
+              series: {
+                1: { curveType: 'function' },
+              },
+            }}
+            rootProps={{ 'data-testid': '2' }}
+          />
+          : null
+        }
+      </ChildFlexContainer>
+    </FlexContainer>
   );
 }
 
