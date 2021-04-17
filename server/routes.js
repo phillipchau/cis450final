@@ -1,8 +1,10 @@
 var config = require('./db-config.json');
 var mysql = require('mysql');
+var axios = require('axios');
 
 config.connectionLimit = 10;
 var connection = mysql.createPool(config);
+require('dotenv').config();
 
 /* -------------------------------------------------- */
 /* ------------------- Route Handlers --------------- */
@@ -369,6 +371,13 @@ function getTotalCovid(req, res) {
   })
 }
 
+function getLatestCovidArticles(req, res) {
+  axios.get(`https://api.nytimes.com/svc/search/v2/articlesearch.json?q=covid&sort=newest&api-key=${process.env.NYT_API_KEY}`)
+  .then((articles) => res.json(articles.data.response))
+  .catch((err) => {
+    console.log(err);
+  });
+}
 
 // The exported functions, which can be accessed in index.js.
 module.exports = {
@@ -385,5 +394,6 @@ module.exports = {
   getPovertyQ2: getPovertyQ2,
   getPovertyQ3: getPovertyQ3,
   getPovertyQ4: getPovertyQ4,
-  getTotalCovid: getTotalCovid
+  getTotalCovid: getTotalCovid,
+  getLatestCovidArticles: getLatestCovidArticles,
 }

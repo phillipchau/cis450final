@@ -10,11 +10,15 @@ import {
   TableHeadElement,
   TableDataElement,
 } from '../components/core/Table';
+import { getLatestCovidArticles } from '../api/NYTData';
 
 function LandingPage() {
 
   // Hold the vaccine data.
   const [vaccineData, setVaccineData] = useState();
+
+  // The latest articles from NYT.
+  const [latestArticles, setLatestArticles] = useState();
 
   // Hold loading boolean.
   const [loading, setLoading] = useState(false);
@@ -33,6 +37,17 @@ function LandingPage() {
       setLoading(false);
     });
   }, [setVaccineData]);
+
+  useEffect(() => {
+    setLoading(true);
+    getLatestCovidArticles().then((res) => {
+      console.log(res);
+      setLatestArticles(res);
+    }).catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
+  }, [setLatestArticles]);
 
   return (
     <>
