@@ -12,4 +12,12 @@ const StyledMainContainer = styled.div`
   width: 80%;
 `;
 
+const StyledMinimalContainer = styled.div`
+  margin: 0 auto;
+  padding: 2vw 0;
+  width: 80%;
+`;
+
 export const MainContainer = (props) => createContainer(StyledMainContainer, props);
+
+export const MinimalContainer = (props) => createContainer(StyledMinimalContainer, props);
