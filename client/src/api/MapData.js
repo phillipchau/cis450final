@@ -6,11 +6,8 @@ const basePath = 'http://localhost:8081';
 const routes = {
   States: `${basePath}/state`,
   Filters:`${basePath}/filters`,
-  PovertyQ1: `${basePath}/poverty/q1`,
-  PovertyQ2: `${basePath}/poverty/q2`,
-  PovertyQ3: `${basePath}/poverty/q3`,
-  PovertyQ4: `${basePath}/poverty/q4`,
-  totalCovid: `${basePath}/covidtotal`
+  totalCovid: `${basePath}/covidtotal`,
+  totalCovidState: `${basePath}/covidtotalstate`
 };
 
 export const getStates = () => axios.get(routes.States)
@@ -25,31 +22,37 @@ export const getStateCoords = (state) => axios.get(`${basePath}/statecoords/${st
     throw axiosErrorHandler(err);
 });
 
-export const getPovertyQ1 = () => axios.get(routes.PovertyQ1)
+export const getPovertyQ1 = (state) => axios.get(`${basePath}/poverty/q1?state=${state}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
 
-export const getPovertyQ2 = () => axios.get(routes.PovertyQ2)
+export const getPovertyQ2 = (state) => axios.get(`${basePath}/poverty/q2?state=${state}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
 
-export const getPovertyQ3 = () => axios.get(routes.PovertyQ3)
+export const getPovertyQ3 = (state) => axios.get(`${basePath}/poverty/q3?state=${state}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
 
-export const getPovertyQ4 = () => axios.get(routes.PovertyQ4)
+export const getPovertyQ4 = (state) => axios.get(`${basePath}/poverty/q4?state=${state}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
 
 export const getTotalCovid = () => axios.get(routes.totalCovid)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})
+
+export const getTotalCovidState = () => axios.get(routes.totalCovidState)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

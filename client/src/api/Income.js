@@ -4,31 +4,27 @@ import { axiosErrorHandler } from './Error';
 // This will not work for deployed versions - only for connecting to local.
 const basePath = 'http://localhost:8081';
 const routes = {
-  IncomeDataQ1: `${basePath}/income/q1`,
-  IncomeDataQ2: `${basePath}/income/q2`,
-  IncomeDataQ3: `${basePath}/income/q3`,
-  IncomeDataQ4: `${basePath}/income/q4`
 };
 
-export const getIncomeDataQ1 = () => axios.get(routes.IncomeDataQ1)
+export const getIncomeDataQ1 = (state) => axios.get(`${basePath}/income/q1?state=${state}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const getIncomeDataQ2= () => axios.get(routes.IncomeDataQ2)
+export const getIncomeDataQ2= (state) => axios.get(`${basePath}/income/q2?state=${state}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const getIncomeDataQ3 = () => axios.get(routes.IncomeDataQ3)
+export const getIncomeDataQ3 = (state) => axios.get(`${basePath}/income/q3?state=${state}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const getIncomeDataQ4 = () => axios.get(routes.IncomeDataQ4)
+export const getIncomeDataQ4 = (state) => axios.get(`${basePath}/income/q4?state=${state}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
