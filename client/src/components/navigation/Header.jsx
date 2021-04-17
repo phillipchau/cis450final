@@ -39,6 +39,9 @@ function Header() {
         <RightHeader to="/map">
           Map
         </RightHeader>
+        <RightHeader to="/vaccinepage">
+          Vaccine
+        </RightHeader>
         <RightHeader to="/">
           Dashboard
         </RightHeader>

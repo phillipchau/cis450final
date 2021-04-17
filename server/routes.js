@@ -11,9 +11,11 @@ var connection = mysql.createPool(config);
 /* ---- (Landing Page) ---- */
 function getVaccineData(req, res) {
   var query = `
-    SELECT *
-    FROM vaccine
-    WHERE State = 'Washington';
+  SELECT v.State, v.Vaccinated / t.SumTotalPop
+  FROM (SELECT State, SUM(Vaccinated) AS Vaccinated FROM vaccine GROUP BY State) v JOIN (SELECT State, SUM(TotalPop) AS SumTotalPop
+  FROM census 
+  GROUP BY State) t 
+  ON v.State = t.State; 
   `;
   connection.query(query, function(err, rows, fields) {
     if (err) console.log(err);
