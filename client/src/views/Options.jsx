@@ -11,8 +11,9 @@ border: 3px solid black;
 
 function Options({statefilter, modefilter}) {
     const [states, setStates] = useState([])
-    const [currState, setCurrState] = useState('')
+    const [currState, setCurrState] = useState('Alabama')
     const [mode, setMode] = useState('')
+    const [popmode, setPopMode] = useState('country')
 
     useEffect(() => {
       getStates().then((res) => {
@@ -24,9 +25,16 @@ function Options({statefilter, modefilter}) {
     }, [])
 
   const submitForm = () => {
+    if (popmode !== "state") {
+      statefilter('none')
+    }
+    else {
       statefilter(currState)
-      modefilter(mode)
+    }
+    modefilter(mode)
   }
+
+  console.log(popmode)
   return (
     <>
       <Bar id="options">
@@ -53,8 +61,18 @@ function Options({statefilter, modefilter}) {
         </div>
 
         <h5>Population Level</h5>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="filterPop" value="country" id="defaultcheckpop" checked={popmode === "country"} onChange={e => setPopMode(e.target.value)}/>
+            <label class="form-check-label" for="defaultcheck" style={{marginRight:50}}>
+                Country View
+            </label>
+            <input class="form-check-input" type="radio" name="filterPop" value="state" id="defaultcheckpopstate" checked={popmode === "state"} onChange={e => setPopMode(e.target.value)}/>
+            <label class="form-check-label" for="defaultcheckpopstate">
+                State View
+            </label>
+        </div>
         <p style={{marginBottom: 0}}> State</p>
-        <select class="form-select" aria-label="State Selector" value={currState} onChange={e => setCurrState(e.target.value)}>
+        <select class="form-select" aria-label="State Selector" value={currState} onChange={e => setCurrState(e.target.value)} disabled={popmode !== "state"}>
           {states.map((state, k) => {
             return (
               <>

@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import { TextBlockLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
-import styled from 'styled-components';
 import Options from './Options'
 import Map from './Map'
 
