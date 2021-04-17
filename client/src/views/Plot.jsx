@@ -2,9 +2,9 @@ import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
+import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
-import { TextBlockLink } from '../components/core/Link';
-import { Text, LandingHeaderText } from '../components/core/Text';
+import { LandingHeaderText } from '../components/core/Text';
 
 // Helper function to determine if two dates are the same.
 function sameDay(d1, d2) {
@@ -13,9 +13,55 @@ function sameDay(d1, d2) {
     d1.getDate() === d2.getDate();
 }
 
-const CustomChart = styled(Chart)`
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  margin: 1rem 0;
+// Get the formatted date to display as the value.
+function getFormattedDate(date) {
+  if (date === undefined) {
+    return date;
+  }
+
+  var year = date.getFullYear();
+
+  var month = (1 + date.getMonth()).toString();
+  month = month.length > 1 ? month : '0' + month;
+
+  var day = date.getDate().toString();
+  day = day.length > 1 ? day : '0' + day;
+
+  return year + '-' + month + '-' + day;
+}
+
+const Label = styled.label`
+  display: block;
+  margin: 1rem 0 0.25rem 0;
+`;
+
+const Input = styled.input`
+  display: block;
+`;
+
+const MinimalLabel = styled.label`
+  display: block;
+  margin: 0.25rem 0;
+`;
+
+const InlineInput = styled.input`
+  display: inline-block;
+  margin-left: 5px;
+`;
+
+const LoadingChart = styled.div`
+  background: white;
+  position: relative;
+  width: 600px;
+  height: 400px;
+`;
+
+const LoadingChartText = styled(LandingHeaderText)`
+  vertical-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
 
 function PlotPage() {
@@ -148,58 +194,76 @@ function PlotPage() {
   }, [setPlotData, distinctStates, countPerStateDate, startDate, endDate]);
 
   return (
-    <div>
-      <LandingHeaderText>
-        This is the Plot page.
-      </LandingHeaderText>
-      <label>
-        Count Cases
-        <input
-          name="Count Cases"
-          type="checkbox"
-          checked={typeCount === TypeCount.CASES}
-          onChange={() => setTypeCount(TypeCount.CASES)}
-        />
-      </label>
-      <label>
-        Count Deaths
-        <input
-          name="Count Deaths"
-          type="checkbox"
-          checked={typeCount === TypeCount.DEATHS}
-          onChange={() => setTypeCount(TypeCount.DEATHS)}
-        />
-      </label>
-      { loading ? <Text>Loading Chart...</Text> : null }
-      { error ? <ErrorMessage message={error} /> : null }
-      {plotData !== undefined ?
-        <CustomChart
-          width={'600px'}
-          height={'400px'}
-          chartType="LineChart"
-          loader={<div>Loading Chart...</div>}
-          data={plotData}
-          options={{
-            title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,
-            hAxis: {
-              title: 'Date',
-            },
-            vAxis: {
-              title: (typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'),
-              viewWindow: {
-                min: 0,
+    <FlexContainer>
+      <ChildFlexContainer>
+        <h5>Date Range</h5>
+
+        <Label htmlFor="start-date-input">Start</Label>
+        <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          setStartDate(newDate);
+        }} />
+
+        <Label htmlFor="end-date-input" >End</Label>
+        <Input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          setEndDate(newDate);
+        }} />
+
+        <br></br>
+        <h5>Filters</h5>
+        <MinimalLabel>
+          Count Cases
+          <InlineInput
+            name="Count Cases"
+            type="checkbox"
+            checked={typeCount === TypeCount.CASES}
+            onChange={() => setTypeCount(TypeCount.CASES)}
+          />
+        </MinimalLabel>
+        <MinimalLabel>
+          Count Deaths
+          <InlineInput
+            name="Count Deaths"
+            type="checkbox"
+            checked={typeCount === TypeCount.DEATHS}
+            onChange={() => setTypeCount(TypeCount.DEATHS)}
+          />
+        </MinimalLabel>
+      </ChildFlexContainer>
+      <ChildFlexContainer>
+        { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
+        { error ? <ErrorMessage message={error} /> : null }
+        { !loading && plotData !== undefined ?
+          <Chart
+            width={'600px'}
+            height={'400px'}
+            chartType="LineChart"
+            loader={<LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart>}
+            data={plotData}
+            options={{
+              title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,
+              hAxis: {
+                title: 'Date',
               },
-            },
-            series: {
-              1: { curveType: 'function' },
-            },
-          }}
-          rootProps={{ 'data-testid': '2' }}
-        />
-        : null
-      }
-      <TextBlockLink to="/">Return to homepage.</TextBlockLink>
-    </div>
+              vAxis: {
+                title: (typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'),
+                viewWindow: {
+                  min: 0,
+                },
+              },
+              series: {
+                1: { curveType: 'function' },
+              },
+            }}
+            rootProps={{ 'data-testid': '2' }}
+          />
+          : null
+        }
+      </ChildFlexContainer>
+    </FlexContainer>
   );
 }
 
