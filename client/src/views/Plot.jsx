@@ -67,8 +67,8 @@ function PlotPage() {
   const [plotData, setPlotData] = useState();
 
   // Hold the starting and ending dates.
-  const [startDate, setStartDate] = useState();
-  const [endDate, setEndDate] = useState();
+  const [startDate, setStartDate] = useState(firstDay);
+  const [endDate, setEndDate] = useState(lastDay);
 
   // Hold loading boolean.
   const [loading, setLoading] = useState(true);
@@ -92,6 +92,8 @@ function PlotPage() {
     // Get the count data.
     let params = {
       typeCount: typeCount,
+      startDate: getFormattedDate(startDate),
+      endDate: getFormattedDate(endDate),
     };
     getCountPerStateDate(params).then((res) => {
       console.log(res);
@@ -99,22 +101,7 @@ function PlotPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [typeCount]);
-
-  // Set the starting and ending dates.
-  useEffect(() => {
-    // First day in the COVID history.
-    setStartDate(firstDay);
-
-    // This is the most recent date we have available in our database.
-    setEndDate(lastDay);
-  }, [setStartDate, setEndDate]);
-
-  // Update the data retrieved from the database.
-  useEffect(() => {
-    // Update the plot data to display the correct dates.
-    console.log('The dates were changed!');
-  }, [startDate, endDate]);
+  }, [typeCount, startDate, endDate]);
 
   // Helper method to add the state's count.
   const addStateCount = (states, currentStateIndex, data, count) => {
