@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
+import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
 import { LandingHeaderText } from '../components/core/Text';
 
@@ -11,23 +12,6 @@ function sameDay(d1, d2) {
   return d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
-}
-
-// Get the formatted date to display as the value.
-function getFormattedDate(date) {
-  if (date === undefined) {
-    return date;
-  }
-
-  var year = date.getFullYear();
-
-  var month = (1 + date.getMonth()).toString();
-  month = month.length > 1 ? month : '0' + month;
-
-  var day = date.getDate().toString();
-  day = day.length > 1 ? day : '0' + day;
-
-  return year + '-' + month + '-' + day;
 }
 
 const Label = styled.label`

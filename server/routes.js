@@ -1,8 +1,10 @@
 var config = require('./db-config.json');
 var mysql = require('mysql');
+var axios = require('axios');
 
 config.connectionLimit = 10;
 var connection = mysql.createPool(config);
+require('dotenv').config();
 
 /* -------------------------------------------------- */
 /* ------------------- Route Handlers --------------- */
@@ -408,6 +410,15 @@ function getTotalCovid(req, res) {
   })
 }
 
+
+function getLatestCovidArticles(req, res) {
+  axios.get(`https://api.nytimes.com/svc/search/v2/articlesearch.json?q=covid&sort=newest&api-key=${process.env.NYT_API_KEY}`)
+  .then((articles) => res.json(articles.data.response))
+  .catch((err) => {
+    console.log(err);
+  });
+}
+
 //gets the aggregation for all days of the total covid cases by county
 function getTotalCovidState(req, res) {
   var query = `
@@ -433,7 +444,6 @@ function getTotalCovidState(req, res) {
   })
 }
 
-
 // The exported functions, which can be accessed in index.js.
 module.exports = {
   getVaccineData: getVaccineData,
@@ -450,5 +460,6 @@ module.exports = {
   getPovertyQ3: getPovertyQ3,
   getPovertyQ4: getPovertyQ4,
   getTotalCovid: getTotalCovid,
+  getLatestCovidArticles: getLatestCovidArticles,
   getTotalCovidState: getTotalCovidState
 }
