@@ -34,6 +34,7 @@ app.get('/state-date-cases', routes.getCountPerStateDate);
 app.get('/covidtotal', routes.getTotalCovid)
 app.get('/covidtotalstate', routes.getTotalCovidState)
 app.get('/state-date-count', routes.getCountPerStateDate);
+app.get('/latest-covid-articles', routes.getLatestCovidArticles);
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);

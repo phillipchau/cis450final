@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
+import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
 import { LandingHeaderText } from '../components/core/Text';
 
@@ -11,23 +12,6 @@ function sameDay(d1, d2) {
   return d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
-}
-
-// Get the formatted date to display as the value.
-function getFormattedDate(date) {
-  if (date === undefined) {
-    return date;
-  }
-
-  var year = date.getFullYear();
-
-  var month = (1 + date.getMonth()).toString();
-  month = month.length > 1 ? month : '0' + month;
-
-  var day = date.getDate().toString();
-  day = day.length > 1 ? day : '0' + day;
-
-  return year + '-' + month + '-' + day;
 }
 
 const Label = styled.label`
@@ -64,6 +48,10 @@ const LoadingChartText = styled(LandingHeaderText)`
   transform: translate(-50%, -50%);
 `;
 
+// These are the dates available in the COVID database.
+const firstDay = new Date(2020, 0, 20);
+const lastDay = new Date(2021, 3, 1);
+
 function PlotPage() {
 
   // Hold the data retrieved by the database.
@@ -79,8 +67,8 @@ function PlotPage() {
   const [plotData, setPlotData] = useState();
 
   // Hold the starting and ending dates.
-  const [startDate, setStartDate] = useState();
-  const [endDate, setEndDate] = useState();
+  const [startDate, setStartDate] = useState(firstDay);
+  const [endDate, setEndDate] = useState(lastDay);
 
   // Hold loading boolean.
   const [loading, setLoading] = useState(true);
@@ -104,6 +92,8 @@ function PlotPage() {
     // Get the count data.
     let params = {
       typeCount: typeCount,
+      startDate: getFormattedDate(startDate),
+      endDate: getFormattedDate(endDate),
     };
     getCountPerStateDate(params).then((res) => {
       console.log(res);
@@ -111,22 +101,7 @@ function PlotPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [typeCount]);
-
-  // Set the starting and ending dates.
-  useEffect(() => {
-    // First day in the COVID history.
-    setStartDate(new Date(2020, 0, 20));
-
-    // This is the most recent date we have available in our database.
-    setEndDate(new Date(2021, 3, 1));
-  }, [setStartDate, setEndDate]);
-
-  // Update the data retrieved from the database.
-  useEffect(() => {
-    // Update the plot data to display the correct dates.
-    console.log('The dates were changed!');
-  }, [startDate, endDate]);
+  }, [typeCount, startDate, endDate]);
 
   // Helper method to add the state's count.
   const addStateCount = (states, currentStateIndex, data, count) => {
@@ -200,16 +175,26 @@ function PlotPage() {
 
         <Label htmlFor="start-date-input">Start</Label>
         <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+          setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          setStartDate(newDate);
+          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDate) {
+            setStartDate(newDate);
+          } else {
+            setError('The date must have data in the database and be before the ending date.');
+          }
         }} />
 
         <Label htmlFor="end-date-input" >End</Label>
         <Input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
+          setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          setEndDate(newDate);
+          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDate) {
+            setEndDate(newDate);
+          } else {
+            setError('The date must have data in the database and be after the starting date.');
+          }
         }} />
 
         <br></br>
@@ -232,10 +217,10 @@ function PlotPage() {
             onChange={() => setTypeCount(TypeCount.DEATHS)}
           />
         </MinimalLabel>
+        { error ? <ErrorMessage message={error} /> : null }
       </ChildFlexContainer>
       <ChildFlexContainer>
         { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
-        { error ? <ErrorMessage message={error} /> : null }
         { !loading && plotData !== undefined ?
           <Chart
             width={'600px'}
