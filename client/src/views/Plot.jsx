@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
-import Button from '../components/core/Button';
+import OptionsSidebar from '../components/core/Options';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
@@ -14,25 +14,6 @@ function sameDay(d1, d2) {
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 }
-
-const Label = styled.label`
-  display: block;
-  margin: 1rem 0 0.25rem 0;
-`;
-
-const Input = styled.input`
-  display: block;
-`;
-
-const MinimalLabel = styled.label`
-  display: block;
-  margin: 0.25rem 0;
-`;
-
-const InlineInput = styled.input`
-  display: inline-block;
-  margin-left: 5px;
-`;
 
 const LoadingChart = styled.div`
   background: white;
@@ -61,27 +42,38 @@ function PlotPage() {
   // Hold the data retrieved by the database.
   const [countPerStateDate, setCountPerStateDate] = useState();
 
-  // Specifies whether the plot holds cases or deaths information.
-  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
-
   // Hold the formatted plot data to be displayed.
   const [plotData, setPlotData] = useState();
+
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
 
   // Hold the starting and ending dates.
   const [startDate, setStartDate] = useState(firstDay);
   const [endDate, setEndDate] = useState(lastDay);
 
-  // Hold loading boolean.
-  const [loading, setLoading] = useState(true);
-
   // Hold error text.
   const [error, setError] = useState('');
 
-  // Get the states data.
-  useEffect(() => {
+    // Hold loading boolean.
+    const [loading, setLoading] = useState(true);
+
+  // Load and plot the data on initial plot load.
+  // useEffect(() => {
+  //   getPlotData(TypeCount.CASES, firstDay, lastDay);
+  // }, []);
+
+  // Submit the options shown on the sidebar.
+  const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam) => {
     setError('');
     setLoading(true);
+    setTypeCount(typeCountParam);
+    setStartDate(startDateParam);
+    setEndDate(endDateParam);
+  }, [setTypeCount, setStartDate, setEndDate])
 
+  // Get the states data.
+  useEffect(() => {
     // Get the distinct states to be displayed.
     getDistinctStates().then((res) => {
       console.log(res);
@@ -171,56 +163,9 @@ function PlotPage() {
 
   return (
     <FlexContainer>
-      <ChildFlexContainer>
-        <h5>Date Range</h5>
-
-        <Label htmlFor="start-date-input">Start</Label>
-        <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
-          setError('');
-          let newDate = new Date(e.target.value);
-          newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDate) {
-            setStartDate(newDate);
-          } else {
-            setError('The date must have data in the database and be before the ending date.');
-          }
-        }} />
-
-        <Label htmlFor="end-date-input" >End</Label>
-        <Input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
-          setError('');
-          let newDate = new Date(e.target.value);
-          newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDate) {
-            setEndDate(newDate);
-          } else {
-            setError('The date must have data in the database and be after the starting date.');
-          }
-        }} />
-
-        <br></br>
-        <h5>Filters</h5>
-        <MinimalLabel>
-          Count Cases
-          <InlineInput
-            name="Count Cases"
-            type="checkbox"
-            checked={typeCount === TypeCount.CASES}
-            onChange={() => setTypeCount(TypeCount.CASES)}
-          />
-        </MinimalLabel>
-        <MinimalLabel>
-          Count Deaths
-          <InlineInput
-            name="Count Deaths"
-            type="checkbox"
-            checked={typeCount === TypeCount.DEATHS}
-            onChange={() => setTypeCount(TypeCount.DEATHS)}
-          />
-        </MinimalLabel>
-        <Button>Submit</Button>
-        { error ? <ErrorMessage message={error} /> : null }
-      </ChildFlexContainer>
+      <OptionsSidebar
+        onSubmit={submitOptions}
+      />
       <ChildFlexContainer>
         { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
         { !loading && plotData !== undefined ?
@@ -249,6 +194,7 @@ function PlotPage() {
           />
           : null
         }
+        { error ? <ErrorMessage message={error} /> : null }
       </ChildFlexContainer>
     </FlexContainer>
   );
