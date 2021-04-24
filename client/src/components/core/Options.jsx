@@ -41,24 +41,15 @@ function OptionsSidebar(params) {
   // Hold error text.
   const [error, setError] = useState('');
 
-  const options = [
-    { label: "Grapes 🍇", value: "grapes" },
-    { label: "Mango 🥭", value: "mango" },
-    { label: "Strawberry 🍓", value: "strawberry" },
-    { label: "Watermelon 🍉", value: "watermelon" },
-    { label: "Pear 🍐", value: "pear" },
-    { label: "Apple 🍎", value: "apple" },
-    { label: "Tangerine 🍊", value: "tangerine" },
-    { label: "Pineapple 🍍", value: "pineapple" },
-    { label: "Peach 🍑", value: "peach" },
-  ];
-
   // The states to be shown on the plot.
   const [selectedStates, setSelectedStates] = useState([]);
 
+  // When the options are set, select all the states.
   useEffect(() => {
-    console.log(selectedStates);
-  }, [selectedStates]);
+    if (params.selectedStatesOptions.length > 0) {
+      setSelectedStates(params.selectedStatesOptions);
+    }
+  }, [params.selectedStatesOptions]);
 
   return (
     <ChildFlexContainer
@@ -66,7 +57,7 @@ function OptionsSidebar(params) {
     >
       <h5>Selected States</h5>
       <StyledMultiSelect
-        options={options}
+        options={params.selectedStatesOptions}
         value={selectedStates}
         onChange={setSelectedStates}
         labelledBy="Select"

@@ -55,8 +55,25 @@ function PlotPage() {
   // Hold error text.
   const [error, setError] = useState('');
 
-    // Hold loading boolean.
-    const [loading, setLoading] = useState(true);
+  // Hold loading boolean.
+  const [loading, setLoading] = useState(true);
+
+  // All of the states available on the plot.
+  const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
+
+  // Setting the state options.
+  useEffect(() => {
+    if (distinctStates !== undefined) {
+      let options = [];
+      distinctStates.forEach((state) => {
+        options.push({
+          label: state.State,
+          value: state.State
+        });
+      });
+      setSelectedStatesOptions(options);
+    }
+  }, [distinctStates]);
 
   // Submit the options shown on the sidebar.
   const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam) => {
@@ -65,7 +82,7 @@ function PlotPage() {
     setTypeCount(typeCountParam);
     setStartDate(startDateParam);
     setEndDate(endDateParam);
-  }, [setTypeCount, setStartDate, setEndDate])
+  }, [setTypeCount, setStartDate, setEndDate]);
 
   // Get the states data.
   useEffect(() => {
@@ -159,6 +176,7 @@ function PlotPage() {
   return (
     <FlexContainer>
       <OptionsSidebar
+        selectedStatesOptions={selectedStatesOptions}
         onSubmit={submitOptions}
       />
       <ChildFlexContainer
