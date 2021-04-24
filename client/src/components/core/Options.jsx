@@ -1,7 +1,8 @@
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TypeCount } from '../../api/StateCount';
 import Button from './Button';
+import StyledMultiSelect from './Select';
 import { ChildFlexContainer } from './Container';
 import getFormattedDate from '../../util/Utility';
 import ErrorMessage from './Error';
@@ -40,12 +41,41 @@ function OptionsSidebar(params) {
   // Hold error text.
   const [error, setError] = useState('');
 
+  const options = [
+    { label: "Grapes 🍇", value: "grapes" },
+    { label: "Mango 🥭", value: "mango" },
+    { label: "Strawberry 🍓", value: "strawberry" },
+    { label: "Watermelon 🍉", value: "watermelon" },
+    { label: "Pear 🍐", value: "pear" },
+    { label: "Apple 🍎", value: "apple" },
+    { label: "Tangerine 🍊", value: "tangerine" },
+    { label: "Pineapple 🍍", value: "pineapple" },
+    { label: "Peach 🍑", value: "peach" },
+  ];
+
+  // The states to be shown on the plot.
+  const [selectedStates, setSelectedStates] = useState([]);
+
+  useEffect(() => {
+    console.log(selectedStates);
+  }, [selectedStates]);
+
   return (
-    <ChildFlexContainer>
+    <ChildFlexContainer
+      flex={3}
+    >
+      <h5>Selected States</h5>
+      <StyledMultiSelect
+        options={options}
+        value={selectedStates}
+        onChange={setSelectedStates}
+        labelledBy="Select"
+      />
+      
       <h5>Date Range</h5>
 
-      <Label htmlFor="start-date-input">Start</Label>
-      <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+      <Label>Start</Label>
+      <Input type="date" value={getFormattedDate(startDate)} onChange={(e) => {
         setError('');
         let newDate = new Date(e.target.value);
         newDate.setDate(newDate.getDate() + 1);
@@ -56,8 +86,8 @@ function OptionsSidebar(params) {
         }
       }} />
 
-      <Label htmlFor="end-date-input" >End</Label>
-      <Input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
+      <Label>End</Label>
+      <Input type="date" value={getFormattedDate(endDate)} onChange={(e) => {
         setError('');
         let newDate = new Date(e.target.value);
         newDate.setDate(newDate.getDate() + 1);

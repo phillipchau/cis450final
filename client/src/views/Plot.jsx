@@ -58,11 +58,6 @@ function PlotPage() {
     // Hold loading boolean.
     const [loading, setLoading] = useState(true);
 
-  // Load and plot the data on initial plot load.
-  // useEffect(() => {
-  //   getPlotData(TypeCount.CASES, firstDay, lastDay);
-  // }, []);
-
   // Submit the options shown on the sidebar.
   const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam) => {
     setError('');
@@ -166,7 +161,9 @@ function PlotPage() {
       <OptionsSidebar
         onSubmit={submitOptions}
       />
-      <ChildFlexContainer>
+      <ChildFlexContainer
+        flex={7}
+      >
         { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
         { !loading && plotData !== undefined ?
           <Chart
