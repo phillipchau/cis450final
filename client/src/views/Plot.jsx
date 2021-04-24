@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
+import Button from '../components/core/Button';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
@@ -217,6 +218,7 @@ function PlotPage() {
             onChange={() => setTypeCount(TypeCount.DEATHS)}
           />
         </MinimalLabel>
+        <Button>Submit</Button>
         { error ? <ErrorMessage message={error} /> : null }
       </ChildFlexContainer>
       <ChildFlexContainer>
