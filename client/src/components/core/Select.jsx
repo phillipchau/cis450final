@@ -8,30 +8,3 @@ const StyledMultiSelect = styled(MultiSelect)`
 `;
 
 export default StyledMultiSelect;
-
-const MultipleSelect = () => {
-  const options = [
-    { label: "Grapes 🍇", value: "grapes" },
-    { label: "Mango 🥭", value: "mango" },
-    { label: "Strawberry 🍓", value: "strawberry" },
-    { label: "Watermelon 🍉", value: "watermelon" },
-    { label: "Pear 🍐", value: "pear" },
-    { label: "Apple 🍎", value: "apple" },
-    { label: "Tangerine 🍊", value: "tangerine" },
-    { label: "Pineapple 🍍", value: "pineapple" },
-    { label: "Peach 🍑", value: "peach" },
-  ];
-
-  const [selected, setSelected] = useState([]);
-
-  return (
-    <div>
-      <MultiSelect
-        options={options}
-        value={selected}
-        onChange={setSelected}
-        labelledBy="Select"
-      />
-    </div>
-  );
-};

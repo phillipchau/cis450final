@@ -109,7 +109,18 @@ function OptionsSidebar(params) {
           onChange={() => setTypeCount(TypeCount.DEATHS)}
         />
       </MinimalLabel>
-      <Button onClick={() => params.onSubmit(typeCount, startDate, endDate)}>Submit</Button>
+      <Button 
+        onClick={() => {
+          if (selectedStates.length === 0) {
+            setError('There must be at least one selected state.');
+          } else {
+            setError('');
+            params.onSubmit(typeCount, startDate, endDate, selectedStates);
+          }
+        }}
+      >
+        Submit
+      </Button>
       { error ? <ErrorMessage message={error} /> : null }
     </ChildFlexContainer>
   );

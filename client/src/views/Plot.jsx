@@ -58,6 +58,9 @@ function PlotPage() {
   // Hold loading boolean.
   const [loading, setLoading] = useState(true);
 
+  // The states to shown on the plot.
+  const [selectedStates, setSelectedStates] = useState([]);
+  
   // All of the states available on the plot.
   const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
 
@@ -72,41 +75,56 @@ function PlotPage() {
         });
       });
       setSelectedStatesOptions(options);
+
+      // Initially, include all states.
+      setSelectedStates(options);
     }
   }, [distinctStates]);
 
   // Submit the options shown on the sidebar.
-  const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam) => {
+  const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
     setError('');
     setLoading(true);
     setTypeCount(typeCountParam);
     setStartDate(startDateParam);
     setEndDate(endDateParam);
-  }, [setTypeCount, setStartDate, setEndDate]);
+    setSelectedStates(selectedStatesParam);
+  }, [setTypeCount, setStartDate, setEndDate, setSelectedStates]);
 
   // Get the states data.
   useEffect(() => {
-    // Get the distinct states to be displayed.
-    getDistinctStates().then((res) => {
-      console.log(res);
-      setDistinctStates(res);
-    }).catch((err) => {
-      setError(err.message);
-    });
+    if (distinctStates === undefined) {
+      // Get the distinct states to be displayed.
+      getDistinctStates().then((res) => {
+        console.log(res);
+        setDistinctStates(res);
+        setSelectedStates(res);
+      }).catch((err) => {
+        setError(err.message);
+      });
+    } else if (selectedStates.length > 0) {
+      // Format the selected states.
+      let selectedStatesList = [];
+      selectedStates.forEach((state) => {
+        selectedStatesList.push(state.value);
+      });
+      let selectedStatesStr = `'${selectedStatesList.join("', '")}'`;
 
-    // Get the count data.
-    let params = {
-      typeCount: typeCount,
-      startDate: getFormattedDate(startDate),
-      endDate: getFormattedDate(endDate),
-    };
-    getCountPerStateDate(params).then((res) => {
-      console.log(res);
-      setCountPerStateDate(res);
-    }).catch((err) => {
-      setError(err.message);
-    });
-  }, [typeCount, startDate, endDate]);
+      // Get the count data.
+      let params = {
+        typeCount: typeCount,
+        startDate: getFormattedDate(startDate),
+        endDate: getFormattedDate(endDate),
+        selectedStatesStr: selectedStatesStr,
+      };
+      getCountPerStateDate(params).then((res) => {
+        console.log(res);
+        setCountPerStateDate(res);
+      }).catch((err) => {
+        setError(err.message);
+      });
+    }
+  }, [typeCount, startDate, endDate, selectedStates, distinctStates]);
 
   // Helper method to add the state's count.
   const addStateCount = (states, currentStateIndex, data, count) => {
