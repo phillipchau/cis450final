@@ -29,7 +29,7 @@ export const FlexContainer = styled.div`
 
 export const ChildFlexContainer = styled.div`
   flex: ${props => props.flex ? props.flex : 1};
-  max-height: 450px;
+  height: 450px;
   overflow: auto;
   margin: 0 1rem;
   background: white;
