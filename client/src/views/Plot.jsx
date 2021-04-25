@@ -1,7 +1,8 @@
 import styled from 'styled-components';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
+import OptionsSidebar from '../components/core/Options';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
@@ -13,25 +14,6 @@ function sameDay(d1, d2) {
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 }
-
-const Label = styled.label`
-  display: block;
-  margin: 1rem 0 0.25rem 0;
-`;
-
-const Input = styled.input`
-  display: block;
-`;
-
-const MinimalLabel = styled.label`
-  display: block;
-  margin: 0.25rem 0;
-`;
-
-const InlineInput = styled.input`
-  display: inline-block;
-  margin-left: 5px;
-`;
 
 const LoadingChart = styled.div`
   background: white;
@@ -56,59 +38,34 @@ function PlotPage() {
 
   // Hold the data retrieved by the database.
   const [distinctStates, setDistinctStates] = useState();
-  
-  // Hold the data retrieved by the database.
-  const [countPerStateDate, setCountPerStateDate] = useState();
-
-  // Specifies whether the plot holds cases or deaths information.
-  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
 
   // Hold the formatted plot data to be displayed.
   const [plotData, setPlotData] = useState();
 
-  // Hold the starting and ending dates.
-  const [startDate, setStartDate] = useState(firstDay);
-  const [endDate, setEndDate] = useState(lastDay);
-
-  // Hold loading boolean.
-  const [loading, setLoading] = useState(true);
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
 
   // Hold error text.
   const [error, setError] = useState('');
 
-  // Get the states data.
-  useEffect(() => {
-    setError('');
-    setLoading(true);
-
-    // Get the distinct states to be displayed.
-    getDistinctStates().then((res) => {
-      console.log(res);
-      setDistinctStates(res);
-    }).catch((err) => {
-      setError(err.message);
-    });
-
-    // Get the count data.
-    let params = {
-      typeCount: typeCount,
-      startDate: getFormattedDate(startDate),
-      endDate: getFormattedDate(endDate),
-    };
-    getCountPerStateDate(params).then((res) => {
-      console.log(res);
-      setCountPerStateDate(res);
-    }).catch((err) => {
-      setError(err.message);
-    });
-  }, [typeCount, startDate, endDate]);
+  // Hold loading boolean.
+  const [loading, setLoading] = useState(true);
+  
+  // All of the states available on the plot.
+  const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
 
   // Helper method to add the state's count.
-  const addStateCount = (states, currentStateIndex, data, count) => {
+  const addStateCount = (states, currentStateIndex, data, count, currentDate) => {
     // Add 0 until we get to the correct state.
     while (states[currentStateIndex] !== data.State) {
       count.push(0);
       currentStateIndex++;
+      if (states.indexOf(data.State) < currentStateIndex) {
+        console.log(states.indexOf(data.State));
+        console.log(currentStateIndex);
+        console.log(currentDate);
+        return 0;
+      }
     }
 
     // Add the current state's count, and increment.
@@ -118,108 +75,121 @@ function PlotPage() {
   };
 
   // Construct the plot data to be displayed.
-  useEffect(() => {
-    // Only load the plot once all variables are defined.
-    if (startDate !== undefined && endDate !== undefined && distinctStates !== undefined && countPerStateDate !== undefined) {
-      // The plot data to be saved.
-      let newPlotData = [];
+  const displayPlotData = useCallback((startDateParam, selectedStatesParam, countPerStateDateParam) => {
+    // The plot data to be saved.
+    let newPlotData = [];
 
-      // Get the list of states to be included. This can be modified.
-      let states = [];
-      distinctStates.forEach((data) => {
-        states.push(data.State);
-      });
+    // Get the list of states to be included. This can be modified.
+    let states = [];
+    selectedStatesParam.forEach((state) => {
+      states.push(state.value);
+    });
+    states.sort();
 
-      // Add the 'Date' as the first entry for x-axis description.
-      states.unshift('Date');
-      newPlotData.push(states);
+    // Add the 'Date' as the first entry for x-axis description.
+    states.unshift('Date');
+    newPlotData.push(states);
 
-      // Iterate through the plot data, for every new date, construct the list.
-      let currentDate = startDate;
-      let currentStateIndex = 1;
-      let count = [currentDate];
-      countPerStateDate.forEach((data) => {
-        if (sameDay(currentDate, new Date(data.Date))) {
-          currentStateIndex = addStateCount(states, currentStateIndex, data, count);
-        } else {
-          // Add 0 until there is no state date left to add.
-          while (currentStateIndex < states.length) {
-            count.push(0);
-            currentStateIndex++;
-          }
-
-          // Reset variables, then add new state.
-          newPlotData.push(count);
-          currentDate = new Date(data.Date);
-          currentStateIndex = 1;
-          count = [currentDate];
-          currentStateIndex = addStateCount(states, currentStateIndex, data, count);
+    // Iterate through the plot data, for every new date, construct the list.
+    let currentDate = new Date(startDateParam);
+    currentDate.setDate(currentDate.getDate() - 1);
+    let currentStateIndex = 1;
+    let count = [currentDate];
+    countPerStateDateParam.forEach((data) => {
+      if (sameDay(currentDate, new Date(data.Date))) {
+        currentStateIndex = addStateCount(states, currentStateIndex, data, count, currentDate);
+      } else {
+        // Add 0 until there is no state date left to add.
+        while (currentStateIndex < states.length) {
+          count.push(0);
+          currentStateIndex++;
         }
+
+        // Reset variables, then add new state.
+        newPlotData.push(count);
+        currentDate = new Date(data.Date);
+        currentStateIndex = 1;
+        count = [currentDate];
+        currentStateIndex = addStateCount(states, currentStateIndex, data, count, currentDate);
+      }
+    });
+
+    // Print to console for debugging.
+    console.log(newPlotData);
+
+    // Set the new plot data.
+    setPlotData(newPlotData);
+
+    // Display the plot.
+    setLoading(false);
+  }, [setPlotData]);
+
+  // Get the states data.
+  const getCountStateData = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
+    // Format the selected states.
+    let selectedStatesList = [];
+    selectedStatesParam.forEach((state) => {
+      selectedStatesList.push(state.value);
+    });
+    let selectedStatesStr = `'${selectedStatesList.join("', '")}'`;
+
+    // Get the count data.
+    let params = {
+      typeCount: typeCountParam,
+      startDate: getFormattedDate(startDateParam),
+      endDate: getFormattedDate(endDateParam),
+      selectedStatesStr: selectedStatesStr,
+    };
+    getCountPerStateDate(params).then((res) => {
+      console.log(res);
+      displayPlotData(startDateParam, selectedStatesParam, res);
+    }).catch((err) => {
+      setError(err.message);
+    });
+  }, [displayPlotData]);
+
+  // Submit the options shown on the sidebar.
+  const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
+    setError('');
+    setLoading(true);
+    setTypeCount(typeCountParam);
+    getCountStateData(typeCountParam, startDateParam, endDateParam, selectedStatesParam);
+  }, [setTypeCount, getCountStateData]);
+
+  // Setting the state options.
+  useEffect(() => {
+    if (distinctStates !== undefined) {
+      let options = [];
+      distinctStates.forEach((state) => {
+        options.push({
+          label: state.State,
+          value: state.State
+        });
       });
+      setSelectedStatesOptions(options);
 
-      // Print to console for debugging.
-      console.log(newPlotData);
-
-      // Set the new plot data.
-      setPlotData(newPlotData);
-
-      // Display the plot.
-      setLoading(false);
+      // Create the initial graph.
+      submitOptions(TypeCount.CASES, firstDay, lastDay, options);
+    } else {
+      // Get the distinct states to be displayed.
+      getDistinctStates().then((res) => {
+        console.log(res);
+        setDistinctStates(res);
+      }).catch((err) => {
+        setError(err.message);
+      });
     }
-  }, [setPlotData, distinctStates, countPerStateDate, startDate, endDate]);
+  }, [distinctStates, submitOptions]);
 
   return (
     <FlexContainer>
-      <ChildFlexContainer>
-        <h5>Date Range</h5>
-
-        <Label htmlFor="start-date-input">Start</Label>
-        <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
-          setError('');
-          let newDate = new Date(e.target.value);
-          newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDate) {
-            setStartDate(newDate);
-          } else {
-            setError('The date must have data in the database and be before the ending date.');
-          }
-        }} />
-
-        <Label htmlFor="end-date-input" >End</Label>
-        <Input type="date" value={getFormattedDate(endDate)} id="end-date-input" onChange={(e) => {
-          setError('');
-          let newDate = new Date(e.target.value);
-          newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDate) {
-            setEndDate(newDate);
-          } else {
-            setError('The date must have data in the database and be after the starting date.');
-          }
-        }} />
-
-        <br></br>
-        <h5>Filters</h5>
-        <MinimalLabel>
-          Count Cases
-          <InlineInput
-            name="Count Cases"
-            type="checkbox"
-            checked={typeCount === TypeCount.CASES}
-            onChange={() => setTypeCount(TypeCount.CASES)}
-          />
-        </MinimalLabel>
-        <MinimalLabel>
-          Count Deaths
-          <InlineInput
-            name="Count Deaths"
-            type="checkbox"
-            checked={typeCount === TypeCount.DEATHS}
-            onChange={() => setTypeCount(TypeCount.DEATHS)}
-          />
-        </MinimalLabel>
-        { error ? <ErrorMessage message={error} /> : null }
-      </ChildFlexContainer>
-      <ChildFlexContainer>
+      <OptionsSidebar
+        selectedStatesOptions={selectedStatesOptions}
+        onSubmit={submitOptions}
+      />
+      <ChildFlexContainer
+        flex={7}
+      >
         { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
         { !loading && plotData !== undefined ?
           <Chart
@@ -247,6 +217,7 @@ function PlotPage() {
           />
           : null
         }
+        { error ? <ErrorMessage message={error} /> : null }
       </ChildFlexContainer>
     </FlexContainer>
   );

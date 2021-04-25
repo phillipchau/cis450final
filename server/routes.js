@@ -386,6 +386,7 @@ function getCountPerStateDate(req, res) {
   var query = `
     SELECT Date, State, SUM(${req.query.typeCount}) AS Count
     FROM covid
+    WHERE State IN (${req.query.selectedStatesStr})
     GROUP BY Date, State
     HAVING Date >= '${req.query.startDate}' AND Date <= '${req.query.endDate}'
     ORDER BY Date ASC, State ASC;
