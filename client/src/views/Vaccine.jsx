@@ -4,7 +4,7 @@ import Chart from 'react-google-charts';
 import { getVaccineData, getRecentCovidVaccineTweets } from '../api/Vaccine';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
-import { LandingHeaderText } from '../components/core/Text';
+import { Text, LandingHeaderText } from '../components/core/Text';
 import {MapContainer, TileLayer, useMap} from 'react-leaflet';
 import L from 'leaflet';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
@@ -45,7 +45,8 @@ function ChangeView() {
 
 function VaccinePage() {
     const [vaccine, setVaccine] = useState([])
-    const [vaccineTweetIds, setVaccineTweetIds] = useState([])
+    const [vaccineTweetIds, setVaccineTweetIds] = useState([]);
+    const [vaccineTweetIndex, setVaccineTweetIndex] = useState(0);
     useEffect(() => {
       getVaccineData().then((res) => {
         setVaccine(res);
@@ -70,14 +71,22 @@ function VaccinePage() {
     return (
       <>
         { vaccineTweetIds !== undefined ?
-          vaccineTweetIds.map((tweetId, index) => {
-            return (
-              <TwitterTweetEmbed
-                key={tweetId}
-                tweetId={tweetId}
-              />
-            );
-          }) : null
+          <>
+            <h5>COVID Vaccines on Twitter</h5>
+            <TwitterTweetEmbed
+              key={vaccineTweetIds[vaccineTweetIndex]}
+              tweetId={vaccineTweetIds[vaccineTweetIndex]}
+              options={{ hide_thread: true }}
+            />
+            <div>
+              <Text
+                onClick={() => setVaccineTweetIndex(vaccineTweetIndex - 1)}
+              >Previous</Text>
+              <Text
+                onClick={() => setVaccineTweetIndex(vaccineTweetIndex + 1)}
+              >Next</Text>
+            </div>
+          </> : null
         }
         <MapContainer
           style={{ height: '100vh', width: '100%' }}
