@@ -5,6 +5,7 @@ import { axiosErrorHandler } from './Error';
 const basePath = 'http://localhost:8081';
 const routes = {
   getVaccineData: `${basePath}/vaccine`,
+  getRecentCovidVaccineTweets: `${basePath}/recent-covid-vaccine-tweets`,
 };
 
 export const getVaccineData = () => axios.get(routes.getVaccineData)
@@ -12,3 +13,16 @@ export const getVaccineData = () => axios.get(routes.getVaccineData)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
+
+export const getRecentCovidVaccineTweets = () => {
+  return axios.get(routes.getRecentCovidVaccineTweets)
+  .then((res) => {
+    return res.data;
+  })
+  .catch((err) => {
+    console.log(err);
+    throw axiosErrorHandler(err);
+  });
+};
+
+getRecentCovidVaccineTweets();

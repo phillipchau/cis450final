@@ -448,6 +448,29 @@ function getTotalCovidState(req, res) {
   })
 }
 
+// Get the recent COVID Vaccine tweets.
+function getRecentCovidVaccineTweets(req, res) {
+  var config = {
+    params: {
+      query: 'COVID Vaccine',
+      'tweet.fields': 'lang',
+    },
+    headers: {
+      'User-Agent': 'v2RecentSearchJS',
+      'authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+    },
+  };
+
+  axios.get('https://api.twitter.com/2/tweets/search/recent', config)
+  .then((data) => {
+    console.log(data.data.data);
+    res.json(data.data.data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+}
+
 // The exported functions, which can be accessed in index.js.
 module.exports = {
   getVaccineData: getVaccineData,
@@ -465,5 +488,6 @@ module.exports = {
   getPovertyQ4: getPovertyQ4,
   getTotalCovid: getTotalCovid,
   getLatestCovidArticles: getLatestCovidArticles,
-  getTotalCovidState: getTotalCovidState
+  getTotalCovidState: getTotalCovidState,
+  getRecentCovidVaccineTweets: getRecentCovidVaccineTweets,
 }

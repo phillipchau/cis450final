@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
-import { getVaccineData } from '../api/Vaccine';
+import { getVaccineData, getRecentCovidVaccineTweets } from '../api/Vaccine';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { LandingHeaderText } from '../components/core/Text';
 import {MapContainer, TileLayer, useMap} from 'react-leaflet';
 import L from 'leaflet';
+import { TwitterTweetEmbed } from 'react-twitter-embed';
 
 const geodata = require('../api/us-states')
 
@@ -44,18 +45,40 @@ function ChangeView() {
 
 function VaccinePage() {
     const [vaccine, setVaccine] = useState([])
+    const [vaccineTweetIds, setVaccineTweetIds] = useState([])
     useEffect(() => {
       getVaccineData().then((res) => {
         setVaccine(res);
       }).catch((err) => {
         console.log(err)
       });
-    }, [])
-
-    console.log(vaccine)
+      
+      getRecentCovidVaccineTweets().then((res) => {
+        let tweetIds = [];
+        res.forEach((tweet) => {
+          // Only select the English-language tweets.
+          if (tweet.lang === 'en') {
+            tweetIds.push(tweet.id);
+          }
+        })
+        setVaccineTweetIds(tweetIds);
+      }).catch((err) => {
+        console.log(err);
+      });
+    }, []);
 
     return (
       <>
+        { vaccineTweetIds !== undefined ?
+          vaccineTweetIds.map((tweetId, index) => {
+            return (
+              <TwitterTweetEmbed
+                key={tweetId}
+                tweetId={tweetId}
+              />
+            );
+          }) : null
+        }
         <MapContainer
           style={{ height: '100vh', width: '100%' }}
         >
@@ -64,7 +87,6 @@ function VaccinePage() {
              id='mapbox/light-v9'
           />
         </MapContainer>
-        
       </>
     )
 }
