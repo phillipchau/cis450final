@@ -55,6 +55,7 @@ function OptionsSidebar(params) {
     <ChildFlexContainer
       flex={3}
     >
+      { error ? <ErrorMessage message={error} /> : null }
       <h5>Selected States</h5>
       <StyledMultiSelect
         options={params.selectedStatesOptions}
@@ -121,7 +122,6 @@ function OptionsSidebar(params) {
       >
         Submit
       </Button>
-      { error ? <ErrorMessage message={error} /> : null }
     </ChildFlexContainer>
   );
 }

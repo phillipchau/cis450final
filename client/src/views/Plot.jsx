@@ -38,9 +38,6 @@ function PlotPage() {
 
   // Hold the data retrieved by the database.
   const [distinctStates, setDistinctStates] = useState();
-  
-  // Hold the data retrieved by the database.
-  const [countPerStateDate, setCountPerStateDate] = useState();
 
   // Hold the formatted plot data to be displayed.
   const [plotData, setPlotData] = useState();
@@ -48,18 +45,11 @@ function PlotPage() {
   // Specifies whether the plot holds cases or deaths information.
   const [typeCount, setTypeCount] = useState(TypeCount.CASES);
 
-  // Hold the starting and ending dates.
-  const [startDate, setStartDate] = useState(firstDay);
-  const [endDate, setEndDate] = useState(lastDay);
-
   // Hold error text.
   const [error, setError] = useState('');
 
   // Hold loading boolean.
   const [loading, setLoading] = useState(true);
-
-  // The states to shown on the plot.
-  const [selectedStates, setSelectedStates] = useState([]);
   
   // All of the states available on the plot.
   const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
@@ -75,9 +65,6 @@ function PlotPage() {
         });
       });
       setSelectedStatesOptions(options);
-
-      // Initially, include all states.
-      setSelectedStates(options);
 
       // Create the initial graph.
       submitOptions(TypeCount.CASES, firstDay, lastDay, options);
@@ -161,7 +148,8 @@ function PlotPage() {
     newPlotData.push(states);
 
     // Iterate through the plot data, for every new date, construct the list.
-    let currentDate = startDateParam;
+    let currentDate = new Date(startDateParam);
+    currentDate.setDate(currentDate.getDate() - 1);
     let currentStateIndex = 1;
     let count = [currentDate];
     countPerStateDateParam.forEach((data) => {
