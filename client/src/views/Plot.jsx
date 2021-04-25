@@ -54,63 +54,6 @@ function PlotPage() {
   // All of the states available on the plot.
   const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
 
-  // Setting the state options.
-  useEffect(() => {
-    if (distinctStates !== undefined) {
-      let options = [];
-      distinctStates.forEach((state) => {
-        options.push({
-          label: state.State,
-          value: state.State
-        });
-      });
-      setSelectedStatesOptions(options);
-
-      // Create the initial graph.
-      submitOptions(TypeCount.CASES, firstDay, lastDay, options);
-    } else {
-      // Get the distinct states to be displayed.
-      getDistinctStates().then((res) => {
-        console.log(res);
-        setDistinctStates(res);
-      }).catch((err) => {
-        setError(err.message);
-      });
-    }
-  }, [distinctStates]);
-
-  // Submit the options shown on the sidebar.
-  const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
-    setError('');
-    setLoading(true);
-    setTypeCount(typeCountParam);
-    getCountStateData(typeCountParam, startDateParam, endDateParam, selectedStatesParam);
-  }, [setTypeCount]);
-
-  // Get the states data.
-  const getCountStateData = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
-    // Format the selected states.
-    let selectedStatesList = [];
-    selectedStatesParam.forEach((state) => {
-      selectedStatesList.push(state.value);
-    });
-    let selectedStatesStr = `'${selectedStatesList.join("', '")}'`;
-
-    // Get the count data.
-    let params = {
-      typeCount: typeCountParam,
-      startDate: getFormattedDate(startDateParam),
-      endDate: getFormattedDate(endDateParam),
-      selectedStatesStr: selectedStatesStr,
-    };
-    getCountPerStateDate(params).then((res) => {
-      console.log(res);
-      displayPlotData(startDateParam, selectedStatesParam, res);
-    }).catch((err) => {
-      setError(err.message);
-    });
-  }, []);
-
   // Helper method to add the state's count.
   const addStateCount = (states, currentStateIndex, data, count, currentDate) => {
     // Add 0 until we get to the correct state.
@@ -180,6 +123,63 @@ function PlotPage() {
     // Display the plot.
     setLoading(false);
   }, [setPlotData]);
+
+  // Get the states data.
+  const getCountStateData = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
+    // Format the selected states.
+    let selectedStatesList = [];
+    selectedStatesParam.forEach((state) => {
+      selectedStatesList.push(state.value);
+    });
+    let selectedStatesStr = `'${selectedStatesList.join("', '")}'`;
+
+    // Get the count data.
+    let params = {
+      typeCount: typeCountParam,
+      startDate: getFormattedDate(startDateParam),
+      endDate: getFormattedDate(endDateParam),
+      selectedStatesStr: selectedStatesStr,
+    };
+    getCountPerStateDate(params).then((res) => {
+      console.log(res);
+      displayPlotData(startDateParam, selectedStatesParam, res);
+    }).catch((err) => {
+      setError(err.message);
+    });
+  }, [displayPlotData]);
+
+  // Submit the options shown on the sidebar.
+  const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
+    setError('');
+    setLoading(true);
+    setTypeCount(typeCountParam);
+    getCountStateData(typeCountParam, startDateParam, endDateParam, selectedStatesParam);
+  }, [setTypeCount, getCountStateData]);
+
+  // Setting the state options.
+  useEffect(() => {
+    if (distinctStates !== undefined) {
+      let options = [];
+      distinctStates.forEach((state) => {
+        options.push({
+          label: state.State,
+          value: state.State
+        });
+      });
+      setSelectedStatesOptions(options);
+
+      // Create the initial graph.
+      submitOptions(TypeCount.CASES, firstDay, lastDay, options);
+    } else {
+      // Get the distinct states to be displayed.
+      getDistinctStates().then((res) => {
+        console.log(res);
+        setDistinctStates(res);
+      }).catch((err) => {
+        setError(err.message);
+      });
+    }
+  }, [distinctStates, submitOptions]);
 
   return (
     <FlexContainer>
