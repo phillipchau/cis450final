@@ -22,25 +22,25 @@ export const getStateCoords = (state) => axios.get(`${basePath}/statecoords/${st
     throw axiosErrorHandler(err);
 });
 
-export const getPovertyQ1 = (state) => axios.get(`${basePath}/poverty/q1?state=${state}`)
+export const getPovertyQ1 = (state, startdate) => axios.get(`${basePath}/poverty/q1?state=${state}&startdate=${startdate}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
 
-export const getPovertyQ2 = (state) => axios.get(`${basePath}/poverty/q2?state=${state}`)
+export const getPovertyQ2 = (state, startdate) => axios.get(`${basePath}/poverty/q2?state=${state}&startdate=${startdate}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
 
-export const getPovertyQ3 = (state) => axios.get(`${basePath}/poverty/q3?state=${state}`)
+export const getPovertyQ3 = (state, startdate) => axios.get(`${basePath}/poverty/q3?state=${state}&startdate=${startdate}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
 
-export const getPovertyQ4 = (state) => axios.get(`${basePath}/poverty/q4?state=${state}`)
+export const getPovertyQ4 = (state, startdate) => axios.get(`${basePath}/poverty/q4?state=${state}&startdate=${startdate}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { getStates, getCounties } from '../api/MapData';
+import getFormattedDate from '../util/Utility';
 
 const Bar = styled.div`
 height: 100%;
@@ -9,11 +10,28 @@ padding:20px;
 border: 3px solid black;
 `;
 
-function Options({statefilter, modefilter}) {
+const Label = styled.label`
+  display: block;
+  margin: 1rem 0 0.25rem 0;
+`;
+
+const Input = styled.input`
+  display: block;
+`;
+
+// These are the dates available in the COVID database.
+const firstDay = new Date(2020, 0, 20);
+const lastDay = new Date(2021, 3, 1);
+
+function Options({statefilter, modefilter, setStart}) {
     const [states, setStates] = useState([])
     const [currState, setCurrState] = useState('Alabama')
     const [mode, setMode] = useState('')
     const [popmode, setPopMode] = useState('country')
+    // Hold the starting and ending dates.
+    const [startDate, setStartDate] = useState(firstDay);
+    // Hold error text.
+    const [error, setError] = useState('');
 
     useEffect(() => {
       getStates().then((res) => {
@@ -32,9 +50,9 @@ function Options({statefilter, modefilter}) {
       statefilter(currState)
     }
     modefilter(mode)
+    setStart(startDate)
   }
 
-  console.log(popmode)
   return (
     <>
       <Bar id="options">
@@ -45,22 +63,21 @@ function Options({statefilter, modefilter}) {
           setMode(mode)
         }}
         >
-        <h5>Date Range</h5>
-        <div class="form-group row">
-          <label for="start-date-input" class="col-2 col-form-label">Start</label>
-          <div class="col-8">
-            <input class="form-control" type="date" value="2011-08-19" id="start-date-input" />
-          </div>
-        </div>
+         <h5>Date Selector</h5>
 
-        <div class="form-group row">
-          <label for="end-date-input" class="col-2 col-form-label">End</label>
-          <div class="col-8">
-            <input class="form-control" type="date" value="2011-08-19" id="end-date-input" />
-          </div>
-        </div>
+        <Label htmlFor="start-date-input">Current Date</Label>
+        <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= firstDay && newDate <= lastDay) {
+            setStartDate(newDate);
+          } else {
+            setError('The date must have data in the database and be before the ending date.');
+          }
+        }} />
 
-        <h5>Population Level</h5>
+        <h5 style={{marginTop: 20}}>Population Level</h5>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="filterPop" value="country" id="defaultcheckpop" checked={popmode === "country"} onChange={e => setPopMode(e.target.value)}/>
             <label class="form-check-label" for="defaultcheck" style={{marginRight:50}}>

@@ -38,7 +38,7 @@ function getIncomeQ1(req, res) {
   WITH covidByCounty AS (
     SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
     FROM covid c 
-    WHERE Date = '2021-04-01'
+    WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
     SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
@@ -75,7 +75,7 @@ function getIncomeQ2(req, res) {
   WITH covidByCounty AS (
     SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
     FROM covid c 
-    WHERE Date = '2021-04-01'
+    WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
     SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
@@ -113,7 +113,7 @@ function getIncomeQ3(req, res) {
   WITH covidByCounty AS (
     SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
     FROM covid c 
-    WHERE Date = '2021-04-01'
+    WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
     SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
@@ -151,7 +151,7 @@ function getIncomeQ4(req, res) {
   WITH covidByCounty AS (
     SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
     FROM covid c 
-    WHERE Date = '2021-04-01'
+    WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
     SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
@@ -189,7 +189,7 @@ function getPovertyQ1(req, res) {
   WITH covidByCounty AS (
     SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
     FROM covid c 
-    WHERE Date = '2021-04-01'
+    WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
     SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
@@ -226,7 +226,7 @@ function getPovertyQ2(req, res) {
   WITH covidByCounty AS (
     SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
     FROM covid c 
-    WHERE Date = '2021-04-01'
+    WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
     SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
@@ -264,7 +264,7 @@ function getPovertyQ3(req, res) {
   WITH covidByCounty AS (
     SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
     FROM covid c 
-    WHERE Date = '2021-04-01'
+    WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
     SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
@@ -302,7 +302,7 @@ function getPovertyQ4(req, res) {
   WITH covidByCounty AS (
     SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
     FROM covid c 
-    WHERE Date = '2021-04-01'
+    WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
     SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County

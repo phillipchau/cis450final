@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { TextBlockLink } from '../components/core/Link';
-import { LandingHeaderText } from '../components/core/Text';
+import {useMapEvents} from "react-leaflet";
 import { getIncomeDataQ1, getIncomeDataQ2, getIncomeDataQ3, getIncomeDataQ4 } from '../api/Income';
-import { getPovertyQ1, getPovertyQ2, getPovertyQ3, getPovertyQ4, getTotalCovid, getTotalCovidState, getStateCoords } from '../api/MapData';
+import { getPovertyQ1, getPovertyQ2, getPovertyQ3, getPovertyQ4, getTotalCovidState, getStateCoords } from '../api/MapData';
 import {MapContainer, CircleMarker, TileLayer, Tooltip, useMap} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-function ChangeView({center, zoom}) {
+function ChangeView({center, zoom, setZoom, setRadius, filterstate}) {
   const map = useMap()
   map.setView(center, zoom)
+  /*const mapEvents = useMapEvents({
+    zoomend: () => {
+        let z = mapEvents.getZoom();
+        console.log(z)
+        setZoom(z)
+        setRadius(5000*(1.05*z))
+    },
+  });*/
+ 
   return null
 }
 
-function MapPage({statefilter, modefilter}) {
+function MapPage({statefilter, modefilter, date}) {
   //sets income data for various quarters if the income option is toggled
   const [groupDataQ1, setGroupDataQ1] = useState([])
   const [groupDataQ2, setGroupDataQ2] = useState([])
@@ -23,6 +31,8 @@ function MapPage({statefilter, modefilter}) {
   const[filterstate, setFilterState] = useState('')
   //tracks the filter we are applying
   const[filtermode, setFilterMode] = useState('')
+
+  const [startdate, setStartDate] = useState(date)
 
   const defaultPosition = [37.0902, -100]; // center of US position
   const defaultZoom = 5
@@ -43,6 +53,11 @@ function MapPage({statefilter, modefilter}) {
     console.log(statefilter)
     setFilterState(statefilter)
   }
+
+  if (startdate !== date) {
+    setStartDate(date)
+  }
+
   //if we specify a state, change map parameters
   useEffect(() => {
     if (filterstate !== 'none') {
@@ -52,7 +67,7 @@ function MapPage({statefilter, modefilter}) {
         newCoor.push(res[0].Lon)
         setZoom(6.3)
         setCenter(newCoor)
-        setRadius(10000)
+        setRadius(12000)
       })
     }
     else {
@@ -65,25 +80,26 @@ function MapPage({statefilter, modefilter}) {
     if (filtermode === 'income') {
       setMetric('DeathsRate')
       setRadius(defaultRadius)
-      getIncomeDataQ1(filterstate).then((res) => {
+      getIncomeDataQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
+        console.log(res)
         setGroupDataQ1(res);
         }).catch((err) => {
           console.log(err)
         });
   
-      getIncomeDataQ2(filterstate).then((res) => {
+      getIncomeDataQ2(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         setGroupDataQ2(res);
         }).catch((err) => {
           console.log(err)
         });
   
-      getIncomeDataQ3(filterstate).then((res) => {
+      getIncomeDataQ3(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         setGroupDataQ3(res);
         }).catch((err) => {
           console.log(err)
         });
   
-      getIncomeDataQ4(filterstate).then((res) => {
+      getIncomeDataQ4(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         setGroupDataQ4(res);
         }).catch((err) => {
           console.log(err)
@@ -92,26 +108,26 @@ function MapPage({statefilter, modefilter}) {
       setMetric('DeathsRate')
       setRadius(defaultRadius)
       console.log(filterstate)
-      getPovertyQ1(filterstate).then((res) => {
+      getPovertyQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         console.log(res)
         setGroupDataQ1(res);
         }).catch((err) => {
           console.log(err)
       });
 
-      getPovertyQ2(filterstate).then((res) => {
+      getPovertyQ2(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         setGroupDataQ2(res);
         }).catch((err) => {
           console.log(err)
       });
 
-      getPovertyQ3(filterstate).then((res) => {
+      getPovertyQ3(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         setGroupDataQ3(res);
         }).catch((err) => {
           console.log(err)
       });
 
-      getPovertyQ4(filterstate).then((res) => {
+      getPovertyQ4(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         setGroupDataQ4(res);
         }).catch((err) => {
           console.log(err)
@@ -139,7 +155,7 @@ function MapPage({statefilter, modefilter}) {
       setGroupDataQ3([])
       setGroupDataQ4([])
     }
-  }, [filtermode, filterstate]);
+  }, [filtermode, filterstate, startdate]);
 
   return(
     <>
@@ -149,7 +165,7 @@ function MapPage({statefilter, modefilter}) {
         zoom={zoom}
         style={{ height: '100vh', width: '100%' }}
       >
-        <ChangeView center={center} zoom={zoom} /> 
+        <ChangeView center={center} zoom={zoom} setZoom={setZoom} setRadius={setRadius} filterstate={filterstate}/> 
         <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {groupDataQ1.map((city, k) => {
             return (
