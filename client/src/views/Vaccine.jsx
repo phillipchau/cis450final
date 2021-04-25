@@ -75,7 +75,6 @@ function VaccinePage() {
               <TwitterTweetEmbed
                 key={tweetId}
                 tweetId={tweetId}
-                hide_thread={true}
               />
             );
           }) : null

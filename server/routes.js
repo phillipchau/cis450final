@@ -453,7 +453,7 @@ function getRecentCovidVaccineTweets(req, res) {
   var config = {
     params: {
       query: 'COVID Vaccine',
-      'tweet.fields': 'lang,author_id',
+      'tweet.fields': 'lang',
     },
     headers: {
       'User-Agent': 'v2RecentSearchJS',
@@ -470,25 +470,6 @@ function getRecentCovidVaccineTweets(req, res) {
     console.log(err);
   });
 }
-
-var config = {
-  params: {
-    query: 'COVID Vaccine',
-    'tweet.fields': 'lang,author_id',
-  },
-  headers: {
-    'User-Agent': 'v2RecentSearchJS',
-    'authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
-  },
-};
-
-axios.get('https://api.twitter.com/2/tweets/search/recent', config)
-.then((data) => {
-  res.json(data.data.data);
-})
-.catch((err) => {
-  console.log(err);
-});
 
 // The exported functions, which can be accessed in index.js.
 module.exports = {
