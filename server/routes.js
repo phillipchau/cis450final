@@ -570,6 +570,7 @@ function getMaskQ4(req, res) {
       res.json(rows)
     }
   })
+}
 // Get the recent COVID Vaccine tweets.
 function getRecentCovidVaccineTweets(req, res) {
   var config = {

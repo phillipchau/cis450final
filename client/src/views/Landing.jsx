@@ -29,26 +29,19 @@ const ArticleContainer = styled.div`
 `;
 
 const ImageContainer = styled.div`
-  flex: 2;
-  padding: 1rem;
-  position: relative;
+  width: '100%';
+  height: '12rem'
 `;
 
 const Image = styled.img`
-  width: 200px;
-  max-height: 133px;
+  width: 100%;
+  height: 12rem;
   object-fit: cover;
-  border-radius: 0.25rem;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 `;
 
-const DescriptionContainer = styled.div`
-  flex: 3;
-  padding: 1rem;
-  text-align: left;
+const Description = styled.p`
+  color: gray;
+  font-size: 18px;
 `;
 
 const ArticleTitle = styled.p`
@@ -57,24 +50,10 @@ const ArticleTitle = styled.p`
   margin: 0.25rem 0 0 0;
 `;
 
-const ArticlePublishDate = styled.p`
-  font-style: italic;
-  margin: 0.5rem 0 0 0;
-`;
-
-const ArticleSnippet = styled.p`
-  margin: 0.5rem 0 0 0;
-`;
-
-const ArticleAuthor = styled.p`
-  font-style: italic;
-  margin: 1rem 0 0 0;
-`;
-
 const Grid = styled.div`
 margin-top: 20px;
 display: grid;
-grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 grid-gap: 2rem;
 `
 
@@ -183,11 +162,11 @@ function LandingPage() {
         latestArticles.map((article, index) => {
           return (
             <div className = "card" style={{textDecoration: 'none', padding: '10px'}} key={article.title} onClick={() => window.open(article.link)}>
-              <div style={{width: '100%', height: '12rem'}}>
-                <img style={{width: '100%', height: '12rem', objectFit: 'cover' } }src={article.image} alt="Image for article" />
-              </div>
+              <ImageContainer >
+                <Image src={article.image} alt="Image for article" />
+              </ImageContainer>
               <ArticleTitle>{article.title.length > 30 ? `${article.title.substring(0, 30)}...` : article.title}</ArticleTitle>
-              <p style={{color: 'gray', fontSize: '18px'}}>{getFormattedDate(article.publishDate)} | {article.author}</p>
+              <Description>{getFormattedDate(article.publishDate)} | {article.author}</Description>
               <p>{article.snippet.length > 60 ? `${article.snippet.substring(0, 60)}...` : article.snippet}</p>
             </div>
           );
