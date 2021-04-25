@@ -570,6 +570,27 @@ function getMaskQ4(req, res) {
       res.json(rows)
     }
   })
+// Get the recent COVID Vaccine tweets.
+function getRecentCovidVaccineTweets(req, res) {
+  var config = {
+    params: {
+      query: 'COVID Vaccine',
+      'tweet.fields': 'lang',
+    },
+    headers: {
+      'User-Agent': 'v2RecentSearchJS',
+      'authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+    },
+  };
+
+  axios.get('https://api.twitter.com/2/tweets/search/recent', config)
+  .then((data) => {
+    console.log(data.data.data);
+    res.json(data.data.data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 }
 
 // The exported functions, which can be accessed in index.js.
@@ -593,5 +614,6 @@ module.exports = {
   getMaskQ1: getMaskQ1,
   getMaskQ2: getMaskQ2,
   getMaskQ3: getMaskQ3,
-  getMaskQ4: getMaskQ4
+  getMaskQ4: getMaskQ4,
+  getRecentCovidVaccineTweets: getRecentCovidVaccineTweets,
 }
