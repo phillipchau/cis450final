@@ -53,6 +53,7 @@ const DescriptionContainer = styled.div`
 
 const ArticleTitle = styled.p`
   font-weight: 700;
+  font-size: 28px;
   margin: 0.25rem 0 0 0;
 `;
 
@@ -69,6 +70,34 @@ const ArticleAuthor = styled.p`
   font-style: italic;
   margin: 1rem 0 0 0;
 `;
+
+const Grid = styled.div`
+margin-top: 20px;
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+grid-gap: 2rem;
+`
+
+const Wall = styled.div`
+position: relative; 
+height: 100vh;
+width: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+background-image: url('https://www.cdc.gov/media/dpk/diseases-and-conditions/coronavirus/images/outbreak-coronavirus-world-1024x506px.jpg');
+background-size: cover;
+
+&:before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  background-color: rgba(0,0,0,0.70);
+}
+`
 
 function LandingPage() {
 
@@ -145,26 +174,26 @@ function LandingPage() {
       <LandingHeaderText>
         Welcome to the CIS 450 Final Project from Group 36!
       </LandingHeaderText>
+      <Wall>
+        <h1 style={{color: 'white', display: 'block', position: 'relative'}}>Analyzing Socioeconomic Impacts on COVID19</h1>
+      </Wall>
+      <h2 style={{marginTop: 50}}>Latest News</h2>
+      <Grid>
       { latestArticles !== undefined ?
         latestArticles.map((article, index) => {
           return (
-            <ArticleContainer
-              key={article.title}
-              onClick={() => window.open(article.link)}
-            >
-              <ImageContainer>
-                <Image src={article.image} alt="Image for the Article" />
-              </ImageContainer>
-              <DescriptionContainer>
-                <ArticleTitle>{article.title.length > 30 ? `${article.title.substring(0, 30)}...` : article.title}</ArticleTitle>
-                <ArticlePublishDate>{getFormattedDate(article.publishDate)}</ArticlePublishDate>
-                <ArticleSnippet>{article.snippet.length > 60 ? `${article.snippet.substring(0, 60)}...` : article.snippet}</ArticleSnippet>
-                <ArticleAuthor>By {article.author}</ArticleAuthor>
-              </DescriptionContainer>
-            </ArticleContainer>
+            <div className = "card" style={{textDecoration: 'none', padding: '10px'}} key={article.title} onClick={() => window.open(article.link)}>
+              <div style={{width: '100%', height: '12rem'}}>
+                <img style={{width: '100%', height: '12rem', objectFit: 'cover' } }src={article.image} alt="Image for article" />
+              </div>
+              <ArticleTitle>{article.title.length > 30 ? `${article.title.substring(0, 30)}...` : article.title}</ArticleTitle>
+              <p style={{color: 'gray', fontSize: '18px'}}>{getFormattedDate(article.publishDate)} | {article.author}</p>
+              <p>{article.snippet.length > 60 ? `${article.snippet.substring(0, 60)}...` : article.snippet}</p>
+            </div>
           );
         }) : null
       }
+      </Grid>
       { error ? <ErrorMessage message={error} /> : null }
       <TableElement>
         <TableHead>
@@ -175,25 +204,7 @@ function LandingPage() {
           </TableRowElement>
         </TableHead>
         <TableBody>
-          {vaccineData === undefined ?
-            (
-              loading ? (
-                <TableRowElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                </TableRowElement>
-              ) : null
-            )
-            :
-            vaccineData.map((vaccine, index) => (
-              <TableRowElement key={index}>
-                <TableDataElement>{vaccine.Date}</TableDataElement>
-                <TableDataElement>{vaccine.State}</TableDataElement>
-                <TableDataElement>{vaccine.Vaccinated}</TableDataElement>
-              </TableRowElement>
-            ))
-          }
+          
         </TableBody>
       </TableElement>
     </>

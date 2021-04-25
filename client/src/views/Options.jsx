@@ -23,15 +23,20 @@ const Input = styled.input`
 const firstDay = new Date(2020, 0, 20);
 const lastDay = new Date(2021, 3, 1);
 
-function Options({statefilter, modefilter, setStart}) {
+function Options({statefilter, modefilter, setStart, modemetric}) {
     const [states, setStates] = useState([])
     const [currState, setCurrState] = useState('Alabama')
+    //determines the state of the filter that can be applied
     const [mode, setMode] = useState('')
+    //determines the population level mode
     const [popmode, setPopMode] = useState('country')
     // Hold the starting and ending dates.
     const [startDate, setStartDate] = useState(firstDay);
     // Hold error text.
     const [error, setError] = useState('');
+
+    //determines the metric 
+    const [metric, setMetric] = useState('deaths')
 
     useEffect(() => {
       getStates().then((res) => {
@@ -51,6 +56,7 @@ function Options({statefilter, modefilter, setStart}) {
     }
     modefilter(mode)
     setStart(startDate)
+    modemetric(metric)
   }
 
   return (
@@ -76,7 +82,17 @@ function Options({statefilter, modefilter, setStart}) {
             setError('The date must have data in the database and be before the ending date.');
           }
         }} />
-
+        <h5 style={{marginTop: 20}}>Metric</h5>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="metric" value="cases" id="defaultmetriccases" checked={metric === "cases"} onChange={e => setMetric(e.target.value)}/>
+            <label class="form-check-label" for="defaultmetriccases" style={{marginRight:50}}>
+                Cases
+            </label>
+            <input class="form-check-input" type="radio" name="metric" value="deaths" id="defaultmetricdeaths" checked={metric === "deaths"} onChange={e => setMetric(e.target.value)}/>
+            <label class="form-check-label" for="defaultmetricdeaths">
+                Deaths
+            </label>
+        </div>
         <h5 style={{marginTop: 20}}>Population Level</h5>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="filterPop" value="country" id="defaultcheckpop" checked={popmode === "country"} onChange={e => setPopMode(e.target.value)}/>
@@ -119,9 +135,9 @@ function Options({statefilter, modefilter, setStart}) {
             </label>
         </div>
         <div class="form-check">
-            <input class="form-check-input" type="radio" value="race" name="filter" id="racecheck"  checked={mode === 'race'} onChange={e => setMode(e.target.value)} />
-            <label class="form-check-label" for="racecheck">
-                Race
+            <input class="form-check-input" type="radio" value="mask" name="filter" id="maskcheck"  checked={mode === 'mask'} onChange={e => setMode(e.target.value)} />
+            <label class="form-check-label" for="maskcheck">
+                Mask Usage
             </label>
         </div>
         </div>

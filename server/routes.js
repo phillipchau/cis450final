@@ -448,6 +448,130 @@ function getTotalCovidState(req, res) {
   })
 }
 
+// the routes below take in the quartile death counts for mask usage
+function getMaskQ1(req, res) {
+  var condition = ''
+  if (req.query.state !== 'none') {
+    condition = `WHERE m.State = '${req.query.state}'`
+  }
+  var query = `
+  WITH cov AS (
+    SELECT c.State, c.County, SUM(c.CaseCount) AS Cases, (SUM(c.DeathCount) / e.TotalPop) AS DeathPercentage
+    FROM covid c JOIN census e ON c.State = e.State AND c.County = e.County
+    GROUP BY State, County
+  ), masks AS (
+    SELECT State, County, MaskUsagePercentage
+    FROM mask
+    ORDER BY MaskUsagePercentage ASC
+    LIMIT 413
+  )
+  SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
+  FROM masks m JOIN cov c 
+  ON m.State = c.State AND m.County = c.County
+  JOIN income i ON m.State = i.State AND m.County = i.County;
+  `
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  })
+}
+
+function getMaskQ2(req, res) {
+  var condition = ''
+  if (req.query.state !== 'none') {
+    condition = `WHERE m.State = '${req.query.state}'`
+  }
+  var query = `
+  WITH cov AS (
+    SELECT c.State, c.County, SUM(c.CaseCount) AS Cases, (SUM(c.DeathCount) / e.TotalPop) AS DeathPercentage
+    FROM covid c JOIN census e ON c.State = e.State AND c.County = e.County
+    GROUP BY State, County
+  ), masks AS (
+    SELECT State, County, MaskUsagePercentage
+    FROM mask
+    ORDER BY MaskUsagePercentage ASC
+    LIMIT 413
+    OFFSET 413
+  )
+  SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
+  FROM masks m JOIN cov c 
+  ON m.State = c.State AND m.County = c.County
+  JOIN income i ON m.State = i.State AND m.County = i.County;
+  `
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  })
+}
+
+function getMaskQ3(req, res) {
+  var condition = ''
+  if (req.query.state !== 'none') {
+    condition = `WHERE m.State = '${req.query.state}'`
+  }
+  var query = `
+  WITH cov AS (
+    SELECT c.State, c.County, SUM(c.CaseCount) AS Cases, (SUM(c.DeathCount) / e.TotalPop) AS DeathPercentage
+    FROM covid c JOIN census e ON c.State = e.State AND c.County = e.County
+    GROUP BY State, County
+  ), masks AS (
+    SELECT State, County, MaskUsagePercentage
+    FROM mask
+    ORDER BY MaskUsagePercentage ASC
+    LIMIT 413
+    OFFSET 816
+  )
+  SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
+  FROM masks m JOIN cov c 
+  ON m.State = c.State AND m.County = c.County
+  JOIN income i ON m.State = i.State AND m.County = i.County;
+  `
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  })
+}
+
+function getMaskQ4(req, res) {
+  var condition = ''
+  if (req.query.state !== 'none') {
+    condition = `WHERE m.State = '${req.query.state}'`
+  }
+  var query = `
+  WITH cov AS (
+    SELECT c.State, c.County, SUM(c.CaseCount) AS Cases, (SUM(c.DeathCount) / e.TotalPop) AS DeathPercentage
+    FROM covid c JOIN census e ON c.State = e.State AND c.County = e.County
+    GROUP BY State, County
+  ), masks AS (
+    SELECT State, County, MaskUsagePercentage
+    FROM mask
+    ORDER BY MaskUsagePercentage ASC
+    LIMIT 413
+    OFFSET 1229
+  )
+  SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
+  FROM masks m JOIN cov c 
+  ON m.State = c.State AND m.County = c.County
+  JOIN income i ON m.State = i.State AND m.County = i.County;
+  `
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  })
+}
+
 // The exported functions, which can be accessed in index.js.
 module.exports = {
   getVaccineData: getVaccineData,
@@ -465,5 +589,9 @@ module.exports = {
   getPovertyQ4: getPovertyQ4,
   getTotalCovid: getTotalCovid,
   getLatestCovidArticles: getLatestCovidArticles,
-  getTotalCovidState: getTotalCovidState
+  getTotalCovidState: getTotalCovidState,
+  getMaskQ1: getMaskQ1,
+  getMaskQ2: getMaskQ2,
+  getMaskQ3: getMaskQ3,
+  getMaskQ4: getMaskQ4
 }

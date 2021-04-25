@@ -57,3 +57,27 @@ export const getTotalCovidState = () => axios.get(routes.totalCovidState)
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
+
+export const getMaskQ1 = (state, startdate) => axios.get(`${basePath}/mask/q1?state=${state}&startdate=${startdate}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})
+
+export const getMaskQ2 = (state, startdate) => axios.get(`${basePath}/mask/q2?state=${state}&startdate=${startdate}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})
+
+export const getMaskQ3 = (state, startdate) => axios.get(`${basePath}/mask/q3?state=${state}&startdate=${startdate}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})
+
+export const getMaskQ4 = (state, startdate) => axios.get(`${basePath}/mask/q4?state=${state}&startdate=${startdate}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})

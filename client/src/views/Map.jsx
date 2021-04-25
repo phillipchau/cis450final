@@ -1,26 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import {useMapEvents} from "react-leaflet";
 import { getIncomeDataQ1, getIncomeDataQ2, getIncomeDataQ3, getIncomeDataQ4 } from '../api/Income';
-import { getPovertyQ1, getPovertyQ2, getPovertyQ3, getPovertyQ4, getTotalCovidState, getStateCoords } from '../api/MapData';
+import { getPovertyQ1, getPovertyQ2, getPovertyQ3, getPovertyQ4, 
+  getTotalCovidState, getStateCoords, getMaskQ1, getMaskQ2, getMaskQ3, getMaskQ4 } from '../api/MapData';
 import {MapContainer, CircleMarker, TileLayer, Tooltip, useMap} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-function ChangeView({center, zoom, setZoom, setRadius, filterstate}) {
+function ChangeView({center, zoom}) {
   const map = useMap()
   map.setView(center, zoom)
-  /*const mapEvents = useMapEvents({
-    zoomend: () => {
-        let z = mapEvents.getZoom();
-        console.log(z)
-        setZoom(z)
-        setRadius(5000*(1.05*z))
-    },
-  });*/
  
   return null
 }
 
-function MapPage({statefilter, modefilter, date}) {
+
+function MapPage({statefilter, modefilter, date, modemetric}) {
   //sets income data for various quarters if the income option is toggled
   const [groupDataQ1, setGroupDataQ1] = useState([])
   const [groupDataQ2, setGroupDataQ2] = useState([])
@@ -28,15 +22,18 @@ function MapPage({statefilter, modefilter, date}) {
   const [groupDataQ4, setGroupDataQ4] = useState([])
 
   //state variables to track change of state from form submission
-  const[filterstate, setFilterState] = useState('')
+  const[filterstate, setFilterState] = useState('none')
   //tracks the filter we are applying
   const[filtermode, setFilterMode] = useState('')
 
   const [startdate, setStartDate] = useState(date)
 
+  //tracks the metric filter we are applying 
+  const [filtermetric, setFilterMetric] = useState('deaths')
+
   const defaultPosition = [37.0902, -100]; // center of US position
   const defaultZoom = 5
-  const defaultRadius = 5000
+  const defaultRadius = 7000
 
   //changes map parameters based on if a certain state is chosen
   const[zoom, setZoom] = useState(defaultZoom)
@@ -50,12 +47,16 @@ function MapPage({statefilter, modefilter, date}) {
   }
 
   if (filterstate !== statefilter) {
-    console.log(statefilter)
     setFilterState(statefilter)
   }
 
   if (startdate !== date) {
     setStartDate(date)
+  }
+
+  if (filtermetric !== modemetric) {
+    console.log(modemetric)
+    setFilterMetric(modemetric)
   }
 
   //if we specify a state, change map parameters
@@ -67,7 +68,11 @@ function MapPage({statefilter, modefilter, date}) {
         newCoor.push(res[0].Lon)
         setZoom(6.3)
         setCenter(newCoor)
-        setRadius(12000)
+        if (filtermetric === 'deaths') {
+          setRadius(20000)
+        } else {
+          setRadius(1000)
+        }
       })
     }
     else {
@@ -78,8 +83,13 @@ function MapPage({statefilter, modefilter, date}) {
   
   useEffect(() => {
     if (filtermode === 'income') {
-      setMetric('DeathsRate')
-      setRadius(defaultRadius)
+      if (filtermetric === 'deaths') {
+        setMetric('DeathsRate')
+        setRadius(defaultRadius)
+      } else {
+        setMetric('CasesRate')
+        setRadius(300)
+      }
       getIncomeDataQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         console.log(res)
         setGroupDataQ1(res);
@@ -105,8 +115,13 @@ function MapPage({statefilter, modefilter, date}) {
           console.log(err)
         });
     } else if (filtermode === 'poverty') {
-      setMetric('DeathsRate')
-      setRadius(defaultRadius)
+      if (filtermetric === 'deaths') {
+        setMetric('DeathsRate')
+        setRadius(defaultRadius)
+      } else {
+        setMetric('CasesRate')
+        setRadius(500)
+      }
       console.log(filterstate)
       getPovertyQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         console.log(res)
@@ -135,12 +150,15 @@ function MapPage({statefilter, modefilter, date}) {
     }
     else if (filtermode === 'total') {
       //change radius to account for total
-      setMetric('sum_deaths')
+      if (filtermetric === 'deaths') {
+        setMetric('sum_deaths')
+      } else {
+        setMetric('sum_cases')
+      }
       setRadius(0.00006)
       getTotalCovidState().then((res) => {
         console.log(res)
         setGroupDataQ1(res);
-        //setGroupDataQ1([]);
         setGroupDataQ2([])
         setGroupDataQ3([])
         setGroupDataQ4([])
@@ -149,13 +167,46 @@ function MapPage({statefilter, modefilter, date}) {
       })
         
     }
+    else if (filtermode === 'mask') {
+      if (filtermetric === 'deaths') {
+        setMetric('DeathsRate')
+        setRadius(50)
+      } else {
+        setMetric('CasesRate')
+        setRadius(50)
+      }
+      getMaskQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
+        console.log(res)
+        setGroupDataQ1(res);
+        }).catch((err) => {
+          console.log(err)
+      });
+      getMaskQ2(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
+        console.log(res)
+        setGroupDataQ2(res);
+        }).catch((err) => {
+          console.log(err)
+      });
+      getMaskQ3(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
+        console.log(res)
+        setGroupDataQ3(res);
+        }).catch((err) => {
+          console.log(err)
+      });
+      getMaskQ4(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
+        console.log(res)
+        setGroupDataQ4(res);
+        }).catch((err) => {
+          console.log(err)
+      });
+    }
     else {
       setGroupDataQ1([])
       setGroupDataQ2([])
       setGroupDataQ3([])
       setGroupDataQ4([])
     }
-  }, [filtermode, filterstate, startdate]);
+  }, [filtermode, filterstate, startdate, filtermetric]);
 
   return(
     <>
@@ -165,7 +216,7 @@ function MapPage({statefilter, modefilter, date}) {
         zoom={zoom}
         style={{ height: '100vh', width: '100%' }}
       >
-        <ChangeView center={center} zoom={zoom} setZoom={setZoom} setRadius={setRadius} filterstate={filterstate}/> 
+        {filterstate !== 'none' && (<ChangeView center={center} zoom={zoom} /> )}
         <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {groupDataQ1.map((city, k) => {
             return (
@@ -178,7 +229,7 @@ function MapPage({statefilter, modefilter, date}) {
                 fillColor='blue'
               >
                 <Tooltip direction="right" offset={[-8, -2]} opacity={1}>
-                  <span>{city["County"] + ": " + "Deaths" + " " + city[metric]}</span>
+                  <span>{city["County"] + ": " + metric + " " + city[metric]}</span>
                 </Tooltip>
               </CircleMarker>
             );
@@ -194,7 +245,7 @@ function MapPage({statefilter, modefilter, date}) {
                 fillColor='red'
               >
                 <Tooltip direction="right" offset={[-8, -2]} opacity={1}>
-                  <span>{city["County"] + ": " + "Deaths" + " " + city[metric]}</span>
+                  <span>{city["County"] + ": " + metric + " " + city[metric]}</span>
                 </Tooltip>
               </CircleMarker>
             );
@@ -210,7 +261,7 @@ function MapPage({statefilter, modefilter, date}) {
                 fillColor='green'
               >
                 <Tooltip direction="right" offset={[-8, -2]} opacity={1}>
-                  <span>{city["County"] + ": " + "Deaths" + " " + city[metric]}</span>
+                  <span>{city["County"] + ": " + metric + " " + city[metric]}</span>
                 </Tooltip>
               </CircleMarker>
             );
@@ -226,7 +277,7 @@ function MapPage({statefilter, modefilter, date}) {
                 fillColor='black'
               >
                 <Tooltip direction="right" offset={[-8, -2]} opacity={1}>
-                  <span>{city["County"] + ": " + "Deaths" + " " + city[metric]}</span>
+                  <span>{city["County"] + ": " + metric + " " + city[metric]}</span>
                 </Tooltip>
               </CircleMarker>
             );

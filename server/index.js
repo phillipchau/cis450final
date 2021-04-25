@@ -27,6 +27,12 @@ app.get('/poverty/q2', routes.getPovertyQ2)
 app.get('/poverty/q3', routes.getPovertyQ3)
 app.get('/poverty/q4', routes.getPovertyQ4)
 
+
+app.get('/mask/q1', routes.getMaskQ1)
+app.get('/mask/q2', routes.getMaskQ2)
+app.get('/mask/q3', routes.getMaskQ3)
+app.get('/mask/q4', routes.getMaskQ4)
+
 app.get('/state/', routes.getState);
 app.get('/statecoords/:state', routes.getStateCoords)
 app.get('/states', routes.getDistinctStates);
