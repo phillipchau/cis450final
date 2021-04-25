@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import { TypeCount } from '../../api/StateCount';
-import Button from './Button';
+import { Button } from './Button';
 import StyledMultiSelect from './Select';
 import { ChildFlexContainer } from './Container';
 import getFormattedDate from '../../util/Utility';

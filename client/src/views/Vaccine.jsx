@@ -2,14 +2,35 @@ import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getVaccineData, getRecentCovidVaccineTweets } from '../api/Vaccine';
-import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
+import { FlexContainer } from '../components/core/Container';
+import { Text, LoadingContainerText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
-import { Text, LandingHeaderText } from '../components/core/Text';
+import { TopMarginButton } from '../components/core/Button';
 import {MapContainer, TileLayer, useMap} from 'react-leaflet';
 import L from 'leaflet';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
 
-const geodata = require('../api/us-states')
+const geodata = require('../api/us-states');
+
+const TweetContainer = styled.div`
+  margin: 0 auto;
+  width: 325px;
+`;
+
+const TweetIndexText = styled(Text)`
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  margin: 1rem 0 0 0;
+`;
+
+const TweetLoadingContainer = styled.div`
+  height: 200px;
+  width: 325px;
+  position: relative;
+  border: 1px solid rgb(196, 207, 214);
+  border-radius: 12px;
+  background: ${({ theme }) => theme.colors.white};
+  margin: 1rem 0;
+`;
 
 console.log(geodata)
 
@@ -71,22 +92,32 @@ function VaccinePage() {
     return (
       <>
         { vaccineTweetIds !== undefined ?
-          <>
-            <h5>COVID Vaccines on Twitter</h5>
+          <TweetContainer>
+            <h3>COVID Vaccines on Twitter</h3>
+            <FlexContainer>
+              <TopMarginButton
+                onClick={() => {
+                  setVaccineTweetIndex(vaccineTweetIndex - 1);
+                }}
+              >
+                Prev
+              </TopMarginButton>
+              <TweetIndexText>{vaccineTweetIndex + 1}/{vaccineTweetIds.length}</TweetIndexText>
+              <TopMarginButton
+                onClick={() => {
+                  setVaccineTweetIndex(vaccineTweetIndex + 1);
+                }}
+              >
+                Next
+              </TopMarginButton>
+            </FlexContainer>
             <TwitterTweetEmbed
-              key={vaccineTweetIds[vaccineTweetIndex]}
-              tweetId={vaccineTweetIds[vaccineTweetIndex]}
-              options={{ hide_thread: true }}
+              key={vaccineTweetIds[vaccineTweetIndex] || 0}
+              tweetId={vaccineTweetIds[vaccineTweetIndex] || 0}
+              placeholder={<TweetLoadingContainer><LoadingContainerText>Loading...</LoadingContainerText></TweetLoadingContainer>}
+              options={{ width: 325, conversation: 'none', cards: 'hidden', align: 'center' }}
             />
-            <div>
-              <Text
-                onClick={() => setVaccineTweetIndex(vaccineTweetIndex - 1)}
-              >Previous</Text>
-              <Text
-                onClick={() => setVaccineTweetIndex(vaccineTweetIndex + 1)}
-              >Next</Text>
-            </div>
-          </> : null
+          </TweetContainer> : null
         }
         <MapContainer
           style={{ height: '100vh', width: '100%' }}
