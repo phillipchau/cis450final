@@ -93,12 +93,13 @@ function VaccinePage() {
       <>
         { vaccineTweetIds !== undefined ?
           <TweetContainer>
-            <h3>COVID Vaccines on Twitter</h3>
+            <h4>COVID Vaccines: Twitter</h4>
             <FlexContainer>
               <TopMarginButton
                 onClick={() => {
                   setVaccineTweetIndex(vaccineTweetIndex - 1);
                 }}
+                disabled={vaccineTweetIndex < 1}
               >
                 Prev
               </TopMarginButton>
@@ -107,6 +108,7 @@ function VaccinePage() {
                 onClick={() => {
                   setVaccineTweetIndex(vaccineTweetIndex + 1);
                 }}
+                disabled={vaccineTweetIndex >= vaccineTweetIds.length - 1}
               >
                 Next
               </TopMarginButton>
