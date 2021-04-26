@@ -382,22 +382,22 @@ function getCountPerStateDate(req, res) {
   if (req.query.typeCount !== 'CaseCount' && req.query.typeCount !== 'DeathCount') {
     console.log('The request must specify a valid typeCount. Default to CaseCount.');
     req.params.typeCount = 'CaseCount';
+  } else {
+    var query = `
+      SELECT Date, State, SUM(${req.query.typeCount}) AS Count
+      FROM covid
+      WHERE State IN (${req.query.selectedStatesStr})
+      GROUP BY Date, State
+      HAVING Date >= '${req.query.startDate}' AND Date <= '${req.query.endDate}'
+      ORDER BY Date ASC, State ASC;
+    `;
+    connection.query(query, function(err, rows, fields) {
+      if (err) console.log(err);
+      else {
+        res.json(rows);
+      }
+    });
   }
-
-  var query = `
-    SELECT Date, State, SUM(${req.query.typeCount}) AS Count
-    FROM covid
-    WHERE State IN (${req.query.selectedStatesStr})
-    GROUP BY Date, State
-    HAVING Date >= '${req.query.startDate}' AND Date <= '${req.query.endDate}'
-    ORDER BY Date ASC, State ASC;
-  `;
-  connection.query(query, function(err, rows, fields) {
-    if (err) console.log(err);
-    else {
-      res.json(rows);
-    }
-  });
 }
 
 //gets the aggregation for all days
@@ -572,6 +572,56 @@ function getMaskQ4(req, res) {
     }
   })
 }
+
+function getCaseEthnicityQuantiles(req, res) {
+  // The list of hardcoded valid ethnicities to prevent SQL injection.
+  var validEthnicities = ['Hispanic', 'White', 'Black', 'Native', 'Asian', 'Pacific'];
+
+  if (!validEthnicities.includes(req.query.ethnicity)) {
+    console.log('The provided ethnicity is not in our database.');
+  } else if (req.query.quantile < 1 || req.query.quantile > 5) {
+    console.log('The provided quantile is invalid.');
+  } else {
+    var query = `
+      WITH covidByState AS (
+        SELECT Date, State, SUM(CaseCount) AS Cases, SUM(DeathCount) AS Deaths
+        FROM covid 
+        GROUP BY Date, State
+      ), totalPopByState AS (
+        SELECT State, SUM(TotalPop) AS totalpopstate
+        FROM census
+        GROUP BY State
+      ), covidRateByCounty AS (
+        SELECT cov.Date, cov.State, cov.Cases/cen.totalpopstate AS CasesRate, cov.Deaths/cen.totalpopstate AS DeathsRate
+        FROM covidByState cov JOIN totalPopByState cen ON cov.State = cen.State
+      ), raceByState AS (
+        SELECT State, (AVG(${req.query.ethnicity}) / 100) AS AvgRaceState
+        FROM census
+        GROUP BY State
+        ORDER BY AvgRaceState ASC
+        LIMIT 10
+        OFFSET ${req.query.quantile * 10}
+      ), quantile AS (
+        SELECT cov.Date, r.State, r.AvgRaceState, cov.CasesRate AS StateCaseRate, cov.DeathsRate AS StateDeathRate
+        FROM raceByState r JOIN covidRateByCounty cov
+        ON r.State = cov.State
+      )
+      SELECT Date, AVG(StateCaseRate), AVG(StateDeathRate)
+      FROM quantile
+      GROUP BY Date
+      ORDER BY Date ASC;
+    `;
+
+    connection.query(query, function(err, rows, fields) {
+      if (err) console.log(err)
+      else {
+        res.json(rows)
+      }
+    });
+  }
+}
+
+
 // Get the recent COVID Vaccine tweets.
 function getRecentCovidVaccineTweets(req, res) {
   var config = {
