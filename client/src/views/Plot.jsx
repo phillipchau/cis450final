@@ -28,14 +28,28 @@ const lastDay = new Date(2021, 3, 1);
 
 function PlotPage() {
 
-  // Hold the data retrieved by the database.
-  const [distinctStates, setDistinctStates] = useState();
+  /**
+   * States Tab
+   */
 
-  // Hold the formatted plot data to be displayed.
-  const [plotData, setPlotData] = useState();
+  // Hold the data retrieved by the database.
+  const [distinctStates, setDistinctStates] = useState();  
 
   // Specifies whether the plot holds cases or deaths information.
   const [typeCount, setTypeCount] = useState(TypeCount.CASES);
+
+  // All of the states available on the plot.
+  const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
+
+  /**
+   * Demographics Tab
+   */
+
+  // Specifies the ethnicity that the plot describes.
+  const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
+
+  // Hold the formatted plot data to be displayed.
+  const [plotData, setPlotData] = useState();
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -43,9 +57,6 @@ function PlotPage() {
   // Hold loading boolean.
   const [loading, setLoading] = useState(true);
   
-  // All of the states available on the plot.
-  const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
-
   // Helper method to add the state's count.
   const addStateCount = (states, currentStateIndex, data, count, currentDate) => {
     // Add 0 until we get to the correct state.
@@ -66,8 +77,8 @@ function PlotPage() {
     return currentStateIndex;
   };
 
-  // Construct the plot data to be displayed.
-  const displayPlotData = useCallback((startDateParam, selectedStatesParam, countPerStateDateParam) => {
+  // Construct the plot data to be displayed for the states tab.
+  const displayStatesPlotData = useCallback((startDateParam, selectedStatesParam, countPerStateDateParam) => {
     // The plot data to be saved.
     let newPlotData = [];
 
@@ -134,18 +145,25 @@ function PlotPage() {
     };
     getCountPerStateDate(params).then((res) => {
       console.log(res);
-      displayPlotData(startDateParam, selectedStatesParam, res);
+      displayStatesPlotData(startDateParam, selectedStatesParam, res);
     }).catch((err) => {
       setError(err.message);
     });
   }, [displayPlotData]);
 
-  // Submit the options shown on the sidebar.
-  const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
+  // Submit the options shown on the sidebar states tab.
+  const submitStatesOptions = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
     setError('');
     setLoading(true);
     setTypeCount(typeCountParam);
     getCountStateData(typeCountParam, startDateParam, endDateParam, selectedStatesParam);
+  }, [setTypeCount, getCountStateData]);
+
+  // Submit the options shown on the sidebar demographics tab.
+  const submitDemographicsOptions = useCallback((ethnicityParam, startDateParam, endDateParam) => {
+    setError('');
+    setLoading(true);
+    setEthnicity(ethnicityParam);
   }, [setTypeCount, getCountStateData]);
 
   // Setting the state options.
@@ -177,7 +195,8 @@ function PlotPage() {
     <FlexContainer>
       <OptionsSidebar
         selectedStatesOptions={selectedStatesOptions}
-        onSubmit={submitOptions}
+        onStatesSubmit={submitStatesOptions}
+        onDemographicsSubmit={submitDemographicsOptions}
       />
       <ChildFlexContainer
         flex={7}
