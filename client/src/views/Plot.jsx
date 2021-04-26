@@ -197,16 +197,33 @@ function PlotPage() {
   const getCaseEthnicityQuantiles = useCallback((ethnicityParam, startDateParam, endDateParam) => {
     // Get the count data.
     let params = {
-      quantile: 1,
       ethnicity: ethnicityParam,
       startDate: getFormattedDate(startDateParam),
       endDate: getFormattedDate(endDateParam),
     };
 
-    // Do a for loop and resolve all of these promises in a Promise.all.
-    getCaseEthnicityQuantile(params).then((res) => {
+    // For loop to get all the quantiles.
+    let quantile;
+    const promises = [];
+    for (quantile = 1; quantile <= 5; quantile++) {
+      params.quantile = quantile;
+      promises.push(getCaseEthnicityQuantile(params));
+    }
+    
+    // Resolve all promises and call function to display the data.
+    Promise.all(promises).then((res) => {
+      // Transform each array to a map with a date key and ratio value.
       console.log(res);
-      displayDemographicsPlotData(startDateParam, res);
+      const caseEthnicityQuantiles = [];
+      res.forEach((quantileData) => {
+        const quantileMap = new Map();
+        quantileData.forEach((data) => {
+          // TODO: Add ability to distinguish between cases and deaths here.
+          quantileMap.set(new Date(data.Date), data.CaseRate);
+        });
+        caseEthnicityQuantiles.push(quantileMap);
+      });
+      console.log(caseEthnicityQuantiles);
     }).catch((err) => {
       setError(err.message);
     });
