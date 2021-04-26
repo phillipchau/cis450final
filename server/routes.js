@@ -1,6 +1,7 @@
 var config = require('./db-config.json');
 var mysql = require('mysql');
 var axios = require('axios');
+var db = require('./dynamo.js');
 
 config.connectionLimit = 10;
 var connection = mysql.createPool(config);
@@ -594,6 +595,55 @@ function getRecentCovidVaccineTweets(req, res) {
   });
 }
 
+// login routes
+const signup = function(req, res) {
+  let info = req.body;
+  db.profileInfo(info, function(err, data) {
+    if (err) {
+      console.log(err)
+    } else {
+      console.log('success')
+      req.session.username = info.username
+      res.send('success')
+    }
+  })
+}
+
+const login = function(req, res) {
+  let info = req.body
+  db.loginLookup(info.username, info.password, function(err, data) {
+    if (err) {
+      console.log(err)
+    } else if (data) {
+      req.session.username = info.username
+      res.send(req.session.username)
+    } else {
+      console.log('failed to login')
+    }
+  })
+}
+
+const userFind = function(req, res) {
+  let username = req.params.username
+  db.userLookup(username, function(err, data) {
+    if (err) {
+      console.log(err)
+    } else if (data) {
+      res.json(data)
+    }
+  })
+}
+
+const logout = function(req, res) {
+  req.session.destroy();
+  res.send(req.session);
+}
+
+const getLogin = function(req, res) {
+  let username = req.session.username
+  res.send(username); 
+}
+
 // The exported functions, which can be accessed in index.js.
 module.exports = {
   getVaccineData: getVaccineData,
@@ -617,4 +667,9 @@ module.exports = {
   getMaskQ3: getMaskQ3,
   getMaskQ4: getMaskQ4,
   getRecentCovidVaccineTweets: getRecentCovidVaccineTweets,
+  signup: signup,
+  logout: logout,
+  getLogin: getLogin,
+  login: login,
+  userFind: userFind
 }

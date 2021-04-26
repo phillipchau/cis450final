@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
+import axios from 'axios';
+import { useHistory, Link } from 'react-router-dom'
 
 const Content = styled.div`
   height: 50px;
@@ -27,6 +29,14 @@ const RightHeader = styled(NavbarLink)`
 // Note: Can also create a center header with simply display: inline-block
 
 function Header() {
+  const history = useHistory();
+  const logout = () => {
+    axios.get('http://localhost:8081/logout', {withCredentials: true})
+      .then((res) => history.push('/login'))
+      .catch((err) => {
+        console.log(err)
+    });
+  }
   return (
     <Content>
       <nav>
@@ -45,6 +55,7 @@ function Header() {
         <RightHeader to="/">
           Dashboard
         </RightHeader>
+        <button onClick={logout}type="button" class="btn btn-success">Logout</button>
       </nav>
     </Content>
   );

@@ -2,10 +2,21 @@ const bodyParser = require('body-parser');
 const express = require('express');
 var routes = require("./routes.js");
 const cors = require('cors');
-
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
 const app = express();
 
+app.use(cookieParser());
+app.use(session({
+	secret: 'secret', 
+	resave: false, 
+	cookie: {httpOnly: false, secure: false},
+	saveUninitialized: true}));
+
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -16,6 +27,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 /* ---- (Landing Page) ---- */
 // The route localhost:8081/vaccine is registered to the function
 // routes.getAllPeople, specified in routes.js.
+//login routes
+
+app.post('/signup', routes.signup)
+app.get('/logout', routes.logout)
+app.get('/getlogin', routes.getLogin)
+app.post('/login', routes.login)
+app.get('/user/:username', routes.userFind)
+
 app.get('/vaccine', routes.getVaccineData);
 app.get('/income/q1', routes.getIncomeDataQ1);
 app.get('/income/q2', routes.getIncomeDataQ2);

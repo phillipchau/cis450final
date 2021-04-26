@@ -1,9 +1,11 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import { getVaccineData } from '../api/Vaccine';
+import { getLogin, getUser } from '../api/Home';
 import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
 import { LandingHeaderText } from '../components/core/Text';
+import { useHistory, Link } from 'react-router-dom'
 import {
   TableElement,
   TableHead,
@@ -79,7 +81,7 @@ background-size: cover;
 `
 
 function LandingPage() {
-
+  const history = useHistory()
   // Hold the vaccine data.
   const [vaccineData, setVaccineData] = useState();
 
@@ -92,6 +94,30 @@ function LandingPage() {
   // Hold error text.
   const [error, setError] = useState('');
 
+  //tracks the user logged in 
+  const [login, setLogin] = useState()
+
+  //tracks the user information
+  const [user, setUser] = useState()
+
+  //initially load who is logged in 
+  useEffect(() => {
+    getLogin().then((res) => {
+      console.log(res)
+      if (!res) {
+        history.push('/login')
+      } else {
+        setLogin(res);
+        getUser(res).then((response) => {
+          setUser(response)
+        }).catch((error) => {
+          setError(error.message)
+        });
+      }
+    }).catch((err) => {
+      setError(err.message);
+    });
+  }, [])
   // Get the vaccine data.
   useEffect(() => {
     setLoading(true);
@@ -120,7 +146,6 @@ function LandingPage() {
 
     let newArticle = {};
     res.docs.forEach((article) => {
-      console.log(article);
       newArticle.title = article.headline.main;
       newArticle.snippet = article.snippet;
       newArticle.publishDate = new Date(article.pub_date);
@@ -150,9 +175,16 @@ function LandingPage() {
 
   return (
     <>
+     {user !== undefined ? 
+      <LandingHeaderText>
+        Welcome {user.name} to the CIS 450 Final Project from Group 36!
+      </LandingHeaderText> 
+        : 
       <LandingHeaderText>
         Welcome to the CIS 450 Final Project from Group 36!
       </LandingHeaderText>
+      }
+
       <Wall>
         <h1 style={{color: 'white', display: 'block', position: 'relative'}}>Analyzing Socioeconomic Impacts on COVID19</h1>
       </Wall>
