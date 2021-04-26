@@ -6,7 +6,7 @@ import OptionsSidebar from '../components/core/Options';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
-import { LandingHeaderText } from '../components/core/Text';
+import { LoadingContainerText } from '../components/core/Text';
 
 // Helper function to determine if two dates are the same.
 function sameDay(d1, d2) {
@@ -20,14 +20,6 @@ const LoadingChart = styled.div`
   position: relative;
   width: 600px;
   height: 400px;
-`;
-
-const LoadingChartText = styled(LandingHeaderText)`
-  vertical-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 `;
 
 // These are the dates available in the COVID database.
@@ -190,13 +182,13 @@ function PlotPage() {
       <ChildFlexContainer
         flex={7}
       >
-        { loading ? <LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart> : null }
+        { loading ? <LoadingChart><LoadingContainerText>Loading Chart...</LoadingContainerText></LoadingChart> : null }
         { !loading && plotData !== undefined ?
           <Chart
             width={'600px'}
             height={'400px'}
             chartType="LineChart"
-            loader={<LoadingChart><LoadingChartText>Loading Chart...</LoadingChartText></LoadingChart>}
+            loader={<LoadingChart><LoadingContainerText>Loading Chart...</LoadingContainerText></LoadingChart>}
             data={plotData}
             options={{
               title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,

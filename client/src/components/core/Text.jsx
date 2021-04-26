@@ -13,6 +13,14 @@ export const LandingHeaderText = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.large};
 `;
 
+export const LoadingContainerText = styled(LandingHeaderText)`
+  vertical-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
 export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
