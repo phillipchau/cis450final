@@ -587,7 +587,6 @@ function getRecentCovidVaccineTweets(req, res) {
 
   axios.get('https://api.twitter.com/2/tweets/search/recent', config)
   .then((data) => {
-    console.log(data.data.data);
     res.json(data.data.data);
   })
   .catch((err) => {

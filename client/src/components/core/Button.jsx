@@ -1,16 +1,19 @@
 import styled from 'styled-components';
 
-const Button = styled.button`
+export const Button = styled.button`
   margin: 1rem 0;
   padding: 0.25rem 1rem;
-  background: #96CDFF;
+  background: ${({ theme }) => theme.colors.lightBlue};
   border-radius: 0.25rem;
   border: none;
   box-shadow: rgb(149 157 165 / 20%) 0px 8px 24px;
 
   &:hover {
-    background: #70BAFF;
+    background: ${({ theme }) => theme.colors.lightBlueEmphasis};
   }
 `;
 
-export default Button;
+export const TopMarginButton = styled(Button)`
+  margin: 1rem 0 0 0;
+`;
+

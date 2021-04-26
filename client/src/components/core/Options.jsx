@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import { TypeCount } from '../../api/StateCount';
-import Button from './Button';
+import { Button } from './Button';
 import StyledMultiSelect from './Select';
 import { ChildFlexContainer } from './Container';
 import getFormattedDate from '../../util/Utility';
+import { Text } from './Text';
 import ErrorMessage from './Error';
 
 const Label = styled.label`
@@ -26,11 +27,34 @@ const InlineInput = styled.input`
   margin-left: 5px;
 `;
 
+const OptionsTab = Object.freeze({ STATES: 'States', DEMOGRAPHICS: 'Demographics' });
+
+const OptionsTabContainer = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+`;
+
+const OptionsTabText = styled(Text)`
+  display: inline-block;
+  cursor: pointer;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.lightBlue};
+  padding: 0.1rem 0.2rem;
+  background: ${({ enabled, theme }) => (enabled ? theme.colors.lightBlueBackground : theme.colors.white)};
+  border-radius: 5px 5px 0 0;
+
+  &:hover {
+    border-bottom: 2px solid ${({ theme }) => theme.colors.lightBlueEmphasis};
+  }
+`;
+
 // These are the dates available in the COVID database.
 const firstDay = new Date(2020, 0, 20);
 const lastDay = new Date(2021, 3, 1);
 
 function OptionsSidebar(params) {
+  // Specifies the parameters in the options sidebar.
+  const [optionsTab, setOptionsTab] = useState(OptionsTab.STATES);
+
   // Specifies whether the plot holds cases or deaths information.
   const [typeCount, setTypeCount] = useState(TypeCount.CASES);
 
@@ -51,79 +75,139 @@ function OptionsSidebar(params) {
     }
   }, [params.selectedStatesOptions]);
 
-  return (
-    <ChildFlexContainer
-      flex={3}
-    >
-      { error ? <ErrorMessage message={error} /> : null }
-      <h5>Selected States</h5>
-      <StyledMultiSelect
-        options={params.selectedStatesOptions}
-        value={selectedStates}
-        onChange={setSelectedStates}
-        labelledBy="Select"
-      />
-      
-      <h5>Date Range</h5>
-
-      <Label>Start</Label>
-      <Input type="date" value={getFormattedDate(startDate)} onChange={(e) => {
-        setError('');
-        let newDate = new Date(e.target.value);
-        newDate.setDate(newDate.getDate() + 1);
-        if (newDate >= firstDay && newDate <= lastDay && newDate <= endDate) {
-          setStartDate(newDate);
-        } else {
-          setError('The date must have data in the database and be before the ending date.');
-        }
-      }} />
-
-      <Label>End</Label>
-      <Input type="date" value={getFormattedDate(endDate)} onChange={(e) => {
-        setError('');
-        let newDate = new Date(e.target.value);
-        newDate.setDate(newDate.getDate() + 1);
-        if (newDate >= firstDay && newDate <= lastDay && newDate >= startDate) {
-          setEndDate(newDate);
-        } else {
-          setError('The date must have data in the database and be after the starting date.');
-        }
-      }} />
-
-      <br></br>
-      <h5>Filters</h5>
-      <MinimalLabel>
-        Count Cases
-        <InlineInput
-          name="Count Cases"
-          type="checkbox"
-          checked={typeCount === TypeCount.CASES}
-          onChange={() => setTypeCount(TypeCount.CASES)}
-        />
-      </MinimalLabel>
-      <MinimalLabel>
-        Count Deaths
-        <InlineInput
-          name="Count Deaths"
-          type="checkbox"
-          checked={typeCount === TypeCount.DEATHS}
-          onChange={() => setTypeCount(TypeCount.DEATHS)}
-        />
-      </MinimalLabel>
-      <Button 
-        onClick={() => {
-          if (selectedStates.length === 0) {
-            setError('There must be at least one selected state.');
-          } else {
-            setError('');
-            params.onSubmit(typeCount, startDate, endDate, selectedStates);
-          }
-        }}
+  // Display the state count tab.
+  if (optionsTab === OptionsTab.STATES) {
+    return (
+      <ChildFlexContainer
+        flex={3}
       >
-        Submit
-      </Button>
-    </ChildFlexContainer>
-  );
+        <OptionsTabContainer>
+          <OptionsTabText
+            onClick={() => setOptionsTab(OptionsTab.STATES)}
+            enabled={optionsTab === OptionsTab.STATES}
+          >
+            {OptionsTab.STATES}
+          </OptionsTabText>
+          <OptionsTabText
+            onClick={() => setOptionsTab(OptionsTab.DEMOGRAPHICS)}
+            enabled={optionsTab === OptionsTab.DEMOGRAPHICS}
+          >
+            {OptionsTab.DEMOGRAPHICS}
+          </OptionsTabText>
+        </OptionsTabContainer>
+        { error ? <ErrorMessage message={error} /> : null }
+        <h5>Selected States</h5>
+        <StyledMultiSelect
+          options={params.selectedStatesOptions}
+          value={selectedStates}
+          onChange={setSelectedStates}
+          labelledBy="Select"
+        />
+        
+        <h5>Date Range</h5>
+  
+        <Label>Start</Label>
+        <Input type="date" value={getFormattedDate(startDate)} onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDate) {
+            setStartDate(newDate);
+          } else {
+            setError('The date must have data in the database and be before the ending date.');
+          }
+        }} />
+  
+        <Label>End</Label>
+        <Input type="date" value={getFormattedDate(endDate)} onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDate) {
+            setEndDate(newDate);
+          } else {
+            setError('The date must have data in the database and be after the starting date.');
+          }
+        }} />
+  
+        <br></br>
+        <h5>Filters</h5>
+        <MinimalLabel>
+          Count Cases
+          <InlineInput
+            name="Count Cases"
+            type="checkbox"
+            checked={typeCount === TypeCount.CASES}
+            onChange={() => setTypeCount(TypeCount.CASES)}
+          />
+        </MinimalLabel>
+        <MinimalLabel>
+          Count Deaths
+          <InlineInput
+            name="Count Deaths"
+            type="checkbox"
+            checked={typeCount === TypeCount.DEATHS}
+            onChange={() => setTypeCount(TypeCount.DEATHS)}
+          />
+        </MinimalLabel>
+        <Button 
+          onClick={() => {
+            if (selectedStates.length === 0) {
+              setError('There must be at least one selected state.');
+            } else {
+              setError('');
+              params.onSubmit(typeCount, startDate, endDate, selectedStates);
+            }
+          }}
+        >
+          Submit
+        </Button>
+      </ChildFlexContainer>
+    );
+  } else if (optionsTab === OptionsTab.DEMOGRAPHICS) {
+    return (
+      <ChildFlexContainer
+        flex={3}
+      >
+        <OptionsTabContainer>
+          <OptionsTabText
+            onClick={() => setOptionsTab(OptionsTab.STATES)}
+            enabled={optionsTab === OptionsTab.STATES}
+          >
+            {OptionsTab.STATES}
+          </OptionsTabText>
+          <OptionsTabText
+            onClick={() => setOptionsTab(OptionsTab.DEMOGRAPHICS)}
+            enabled={optionsTab === OptionsTab.DEMOGRAPHICS}
+          >
+            {OptionsTab.DEMOGRAPHICS}
+          </OptionsTabText>
+        </OptionsTabContainer>
+        <Button 
+          onClick={() => {
+            if (selectedStates.length === 0) {
+              setError('There must be at least one selected state.');
+            } else {
+              setError('');
+              params.onSubmit(typeCount, startDate, endDate, selectedStates);
+            }
+          }}
+        >
+          Submit
+        </Button>
+      </ChildFlexContainer>
+    )
+  } else {
+    return (
+      <ChildFlexContainer
+        flex={3}
+      >
+        <ErrorMessage message={'This is an invalid tab, return to a previous setting.'} />
+      </ChildFlexContainer>
+    )
+  }
+
+  
 }
 
 export default OptionsSidebar;
