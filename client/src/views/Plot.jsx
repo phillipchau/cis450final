@@ -221,8 +221,6 @@ function PlotPage() {
       promises.push(getCaseEthnicityQuantile(params));
     }
     
-    console.log(startDateParam);
-    console.log(new Date(startDateParam));
     // Resolve all promises and call function to display the data.
     Promise.all(promises).then((res) => {
       // Transform each array to a map with a date key and ratio value.
@@ -242,8 +240,8 @@ function PlotPage() {
       displayDemographicsPlotData(startDateParam, endDateParam, caseEthnicityQuantiles);
     }).catch((err) => {
       setError(err.message);
+      setLoading(false);
     });
-    setLoading(false);
   }, []);
 
   // Submit the options shown on the sidebar demographics tab.

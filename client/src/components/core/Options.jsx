@@ -199,6 +199,7 @@ export function OptionsSidebar(params) {
             {OptionsTab.DEMOGRAPHICS}
           </OptionsTabText>
         </OptionsTabContainer>
+        { error ? <ErrorMessage message={error} /> : null }
 
         <h5>Date Range</h5>
   
