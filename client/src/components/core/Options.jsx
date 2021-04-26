@@ -28,7 +28,7 @@ const InlineInput = styled.input`
   margin-left: 5px;
 `;
 
-const OptionsTab = Object.freeze({ STATES: 'States', DEMOGRAPHICS: 'Demographics' });
+export const OptionsTab = Object.freeze({ STATES: 'States', DEMOGRAPHICS: 'Demographics' });
 
 const OptionsTabContainer = styled.div`
   display: flex;
@@ -52,7 +52,7 @@ const OptionsTabText = styled(Text)`
 const firstDay = new Date(2020, 0, 20);
 const lastDay = new Date(2021, 3, 1);
 
-function OptionsSidebar(params) {
+export function OptionsSidebar(params) {
   // Specifies the parameters in the options sidebar.
   const [optionsTab, setOptionsTab] = useState(OptionsTab.STATES);
 
@@ -172,7 +172,7 @@ function OptionsSidebar(params) {
               setError('There must be at least one selected state.');
             } else {
               setError('');
-              params.onStatesSubmit(typeCount, startDateStates, endDateStates, selectedStates);
+              params.onStatesSubmit(optionsTab, typeCount, startDateStates, endDateStates, selectedStates);
             }
           }}
         >
@@ -247,7 +247,7 @@ function OptionsSidebar(params) {
         <Button 
           onClick={() => {
             setError('');
-            params.onDemographicsSubmit(ethnicity, startDateDemographics, endDateDemographics);
+            params.onDemographicsSubmit(optionsTab, ethnicity, startDateDemographics, endDateDemographics);
           }}
         >
           Submit
@@ -266,5 +266,3 @@ function OptionsSidebar(params) {
 
   
 }
-
-export default OptionsSidebar;

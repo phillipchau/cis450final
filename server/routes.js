@@ -379,12 +379,13 @@ function getDistinctStates(req, res) {
 function getCountPerStateDate(req, res) {
 
   // Hard-code valid values to prevent SQL injection.
-  if (req.query.typeCount !== 'CaseCount' && req.query.typeCount !== 'DeathCount') {
-    console.log('The request must specify a valid typeCount. Default to CaseCount.');
-    req.params.typeCount = 'CaseCount';
+  if (req.query.typeCount !== 'Cases' && req.query.typeCount !== 'Deaths') {
+    console.log('The request must specify a valid typeCount.');
   } else {
+    let typeCount = (req.query.typeCount === 'Cases') ? 'CaseCount' : 'DeathCount';
+
     var query = `
-      SELECT Date, State, SUM(${req.query.typeCount}) AS Count
+      SELECT Date, State, SUM(${typeCount}) AS Count
       FROM covid
       WHERE State IN (${req.query.selectedStatesStr})
       GROUP BY Date, State
@@ -607,7 +608,7 @@ function getCaseEthnicityQuantiles(req, res) {
         FROM raceByState r JOIN covidRateByCounty cov
         ON r.State = cov.State
       )
-      SELECT Date, AVG(StateCaseRate), AVG(StateDeathRate)
+      SELECT Date, AVG(StateCaseRate) AS CaseRate, AVG(StateDeathRate) AS DeathRate
       FROM quantile
       GROUP BY Date
       ORDER BY Date ASC;
