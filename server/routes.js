@@ -585,8 +585,9 @@ function getCaseEthnicityQuantiles(req, res) {
     var query = `
       WITH covidByState AS (
         SELECT Date, State, SUM(CaseCount) AS Cases, SUM(DeathCount) AS Deaths
-        FROM covid 
+        FROM covid
         GROUP BY Date, State
+        HAVING Date >= '${req.query.startDate}' AND Date <= '${req.query.endDate}'
       ), totalPopByState AS (
         SELECT State, SUM(TotalPop) AS totalpopstate
         FROM census
@@ -620,7 +621,6 @@ function getCaseEthnicityQuantiles(req, res) {
     });
   }
 }
-
 
 // Get the recent COVID Vaccine tweets.
 function getRecentCovidVaccineTweets(req, res) {
@@ -720,5 +720,6 @@ module.exports = {
   logout: logout,
   getLogin: getLogin,
   login: login,
-  userFind: userFind
+  userFind: userFind,
+  getCaseEthnicityQuantiles: getCaseEthnicityQuantiles
 }
