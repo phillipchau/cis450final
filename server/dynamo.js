@@ -1,6 +1,12 @@
 var AWS = require('aws-sdk')
 var bcrypt = require('bcrypt');
-var config = require('./config')
+require('dotenv').config();
+var config = {
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  sessionToken: process.env.AWS_SESSION_TOKEN,
+  region: process.env.AWS_REGION,
+}
 AWS.config.update(config);
 var db = new AWS.DynamoDB.DocumentClient();
 
