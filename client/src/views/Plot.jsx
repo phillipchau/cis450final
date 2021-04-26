@@ -165,23 +165,34 @@ function PlotPage() {
   }, [setTypeCount, getCountStateData]);
 
   // Construct the plot data to be displayed for the demographics tab.
-  const displayDemographicsPlotData = useCallback((startDateParam, caseEthnicityQuantile) => {
+  const displayDemographicsPlotData = useCallback((startDateParam, endDateParam, caseEthnicityQuantiles) => {
     // The plot data to be saved.
     let newPlotData = [];
 
-    // Get the list of quantiles to be included.
-    let quantiles = ['Quantile 1'];
+    // Get the list of quantiles to be included, with 'Date' for x-axis.
+    let plotAttributes = ['Date', 'Quantile 1', 'Quantile 2', 'Quantile 3', 'Quantile 4', 'Quantile 5'];
+    newPlotData.push(plotAttributes);
 
-    // Add the 'Date' as the first entry for x-axis description.
-    quantiles.unshift('Date');
-    newPlotData.push(quantiles);
+    // Add data for all dates indicated by options.
+    let currentDate = new Date(startDateParam);
+    while (!sameDay(currentDate, new Date(endDateParam))) {
+      let index;
+      let ratios = [];
+      ratios.push(new Date(currentDate));
+      for (index = 0; index < 5; index++) {
+        // Add the ratio for the specific quantile at that date.
+        if (!caseEthnicityQuantiles[index].has(getFormattedDate(currentDate))) {
+          ratios.push(0);
+        } else {
+          ratios.push(caseEthnicityQuantiles[index].get(getFormattedDate(currentDate)));
+        }
+      }
+      newPlotData.push(ratios);
 
-    caseEthnicityQuantile.forEach((data) => {
-      let count = [];
-      count.push(new Date(data.Date));
-      count.push(data.CaseRate);
-      newPlotData.push(count);
-    });
+      // Increment the current date.
+      currentDate.setDate(currentDate.getDate() + 1);
+      console.log(currentDate);
+    }
 
     // Print to console for debugging.
     console.log(newPlotData);
@@ -210,20 +221,25 @@ function PlotPage() {
       promises.push(getCaseEthnicityQuantile(params));
     }
     
+    console.log(startDateParam);
+    console.log(new Date(startDateParam));
     // Resolve all promises and call function to display the data.
     Promise.all(promises).then((res) => {
       // Transform each array to a map with a date key and ratio value.
-      console.log(res);
       const caseEthnicityQuantiles = [];
       res.forEach((quantileData) => {
         const quantileMap = new Map();
         quantileData.forEach((data) => {
           // TODO: Add ability to distinguish between cases and deaths here.
-          quantileMap.set(new Date(data.Date), data.CaseRate);
+          quantileMap.set(data.Date, data.CaseRate);
         });
         caseEthnicityQuantiles.push(quantileMap);
       });
+
+      // Print to console for debugging.
       console.log(caseEthnicityQuantiles);
+      
+      displayDemographicsPlotData(startDateParam, endDateParam, caseEthnicityQuantiles);
     }).catch((err) => {
       setError(err.message);
     });
