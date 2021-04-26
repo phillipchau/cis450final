@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import React, { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
+import { Ethnicities, getCaseEthnicityQuantile } from '../api/CaseDemographics';
 import OptionsSidebar from '../components/core/Options';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import getFormattedDate from '../util/Utility';
@@ -149,7 +150,7 @@ function PlotPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [displayPlotData]);
+  }, [displayStatesPlotData]);
 
   // Submit the options shown on the sidebar states tab.
   const submitStatesOptions = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
@@ -159,11 +160,31 @@ function PlotPage() {
     getCountStateData(typeCountParam, startDateParam, endDateParam, selectedStatesParam);
   }, [setTypeCount, getCountStateData]);
 
+  // Get the demographics data.
+  const getCaseEthnicityQuantiles = useCallback((ethnicityParam, startDateParam, endDateParam) => {
+    // Get the count data.
+    let params = {
+      quantile: 1,
+      ethnicity: ethnicityParam,
+      startDate: getFormattedDate(startDateParam),
+      endDate: getFormattedDate(endDateParam),
+    };
+
+    // Do a for loop and resolve all of these promises in a Promise.all.
+    getCaseEthnicityQuantile(params).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      setError(err.message);
+    });
+    setLoading(false);
+  }, []);
+
   // Submit the options shown on the sidebar demographics tab.
   const submitDemographicsOptions = useCallback((ethnicityParam, startDateParam, endDateParam) => {
     setError('');
     setLoading(true);
     setEthnicity(ethnicityParam);
+    getCaseEthnicityQuantiles(ethnicityParam, startDateParam, endDateParam);
   }, [setTypeCount, getCountStateData]);
 
   // Setting the state options.
@@ -179,7 +200,7 @@ function PlotPage() {
       setSelectedStatesOptions(options);
 
       // Create the initial graph.
-      submitOptions(TypeCount.CASES, firstDay, lastDay, options);
+      submitStatesOptions(TypeCount.CASES, firstDay, lastDay, options);
     } else {
       // Get the distinct states to be displayed.
       getDistinctStates().then((res) => {
@@ -189,7 +210,7 @@ function PlotPage() {
         setError(err.message);
       });
     }
-  }, [distinctStates, submitOptions]);
+  }, [distinctStates, submitStatesOptions]);
 
   return (
     <FlexContainer>

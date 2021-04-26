@@ -32,7 +32,7 @@ const ArticleContainer = styled.div`
 
 const ImageContainer = styled.div`
   width: '100%';
-  height: '12rem'
+  height: '12rem';
 `;
 
 const Image = styled.img`

@@ -172,7 +172,7 @@ function OptionsSidebar(params) {
               setError('There must be at least one selected state.');
             } else {
               setError('');
-              params.onSubmit(typeCount, startDateStates, endDateStates, selectedStates);
+              params.onStatesSubmit(typeCount, startDateStates, endDateStates, selectedStates);
             }
           }}
         >
@@ -228,68 +228,26 @@ function OptionsSidebar(params) {
 
         <br></br>
         <h5>Filters</h5>
-        <MinimalLabel>
-          Hispanic
-          <InlineInput
-            name="Hispanic"
-            type="checkbox"
-            checked={ethnicity === Ethnicities.HISPANIC}
-            onChange={() => setEthnicity(Ethnicities.HISPANIC)}
-          />
-        </MinimalLabel>
-        <MinimalLabel>
-          White
-          <InlineInput
-            name="White"
-            type="checkbox"
-            checked={ethnicity === Ethnicities.WHITE}
-            onChange={() => setEthnicity(Ethnicities.WHITE)}
-          />
-        </MinimalLabel>
-        <MinimalLabel>
-          Black
-          <InlineInput
-            name="Black"
-            type="checkbox"
-            checked={ethnicity === Ethnicities.BLACK}
-            onChange={() => setEthnicity(Ethnicities.BLACK)}
-          />
-        </MinimalLabel>
-        <MinimalLabel>
-          Native
-          <InlineInput
-            name="Native"
-            type="checkbox"
-            checked={ethnicity === Ethnicities.NATIVE}
-            onChange={() => setEthnicity(Ethnicities.NATIVE)}
-          />
-        </MinimalLabel>
-        <MinimalLabel>
-          Asian
-          <InlineInput
-            name="Asian"
-            type="checkbox"
-            checked={ethnicity === Ethnicities.ASIAN}
-            onChange={() => setEthnicity(Ethnicities.ASIAN)}
-          />
-        </MinimalLabel>
-        <MinimalLabel>
-          Pacific
-          <InlineInput
-            name="Pacific"
-            type="checkbox"
-            checked={typeCount === TypeCount.PACIFIC}
-            onChange={() => setTypeCount(TypeCount.PACIFIC)}
-          />
-        </MinimalLabel>
+        { Object.values(Ethnicities).map((ethnicityType, index) => {
+            return (
+              <MinimalLabel
+                key={ethnicityType}
+              >
+                {ethnicityType}
+                <InlineInput
+                  name={ethnicityType}
+                  type="checkbox"
+                  checked={ethnicity === ethnicityType}
+                  onChange={() => setEthnicity(ethnicityType)}
+                />
+              </MinimalLabel>
+            );
+          })
+        }
         <Button 
           onClick={() => {
-            if (selectedStates.length === 0) {
-              setError('There must be at least one selected state.');
-            } else {
-              setError('');
-              params.onSubmit(typeCount, startDateStates, endDateStates, selectedStates);
-            }
+            setError('');
+            params.onDemographicsSubmit(ethnicity, startDateDemographics, endDateDemographics);
           }}
         >
           Submit
