@@ -580,7 +580,7 @@ function getCaseEthnicityQuantiles(req, res) {
 
   if (!validEthnicities.includes(req.query.ethnicity)) {
     console.log('The provided ethnicity is not in our database.');
-  } else if (req.query.quantile < 1 || req.query.quantile > 5) {
+  } else if (req.query.quantile < 0 || req.query.quantile > 4) {
     console.log('The provided quantile is invalid.');
   } else {
     var query = `

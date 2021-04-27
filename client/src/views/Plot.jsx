@@ -219,7 +219,7 @@ function PlotPage() {
     // For loop to get all the quantiles.
     let quantile;
     const promises = [];
-    for (quantile = 1; quantile <= 5; quantile++) {
+    for (quantile = 0; quantile < 5; quantile++) {
       params.quantile = quantile;
       promises.push(getCaseEthnicityQuantile(params));
     }
@@ -248,7 +248,7 @@ function PlotPage() {
       setError(err.message);
       setLoading(false);
     });
-  }, []);
+  }, [displayDemographicsPlotData]);
 
   // Submit the options shown on the sidebar demographics tab.
   const submitDemographicsOptions = useCallback((optionsTabParam, typeCountParam, ethnicityParam, startDateParam, endDateParam) => {
@@ -258,7 +258,7 @@ function PlotPage() {
     setTypeCountDemographics(typeCountParam);
     setEthnicity(ethnicityParam);
     getCaseEthnicityQuantiles(ethnicityParam, typeCountParam, startDateParam, endDateParam);
-  }, [setTypeCountStates, getCountStateData]);
+  }, [getCaseEthnicityQuantiles]);
 
   // Setting the state options.
   useEffect(() => {
