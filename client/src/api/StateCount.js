@@ -8,7 +8,7 @@ const routes = {
   getCountPerStateDate: `${basePath}/state-date-count`,
 };
 
-export const TypeCount = Object.freeze({ CASES: 'CaseCount', DEATHS: 'DeathCount' });
+export const TypeCount = Object.freeze({ CASES: 'Cases', DEATHS: 'Deaths' });
 
 // Function used to get the number of cases or deaths per state for every date.
 export const getDistinctStates = () => axios.get(routes.getDistinctStates)

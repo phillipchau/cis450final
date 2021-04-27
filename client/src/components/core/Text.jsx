@@ -13,6 +13,13 @@ export const LandingHeaderText = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.large};
 `;
 
+export const SubHeaderText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  margin: 0.5rem 0;
+  font-weight: 700;
+  text-decoration: underline;
+`;
+
 export const LoadingContainerText = styled(LandingHeaderText)`
   vertical-align: center;
   position: absolute;

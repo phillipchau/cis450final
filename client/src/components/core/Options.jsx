@@ -1,11 +1,12 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import { TypeCount } from '../../api/StateCount';
+import { Ethnicities } from '../../api/CaseDemographics';
 import { Button } from './Button';
 import StyledMultiSelect from './Select';
 import { ChildFlexContainer } from './Container';
 import getFormattedDate from '../../util/Utility';
-import { Text } from './Text';
+import { Text, SubHeaderText } from './Text';
 import ErrorMessage from './Error';
 
 const Label = styled.label`
@@ -27,7 +28,7 @@ const InlineInput = styled.input`
   margin-left: 5px;
 `;
 
-const OptionsTab = Object.freeze({ STATES: 'States', DEMOGRAPHICS: 'Demographics' });
+export const OptionsTab = Object.freeze({ STATES: 'States', DEMOGRAPHICS: 'Demographics' });
 
 const OptionsTabContainer = styled.div`
   display: flex;
@@ -51,22 +52,40 @@ const OptionsTabText = styled(Text)`
 const firstDay = new Date(2020, 0, 20);
 const lastDay = new Date(2021, 3, 1);
 
-function OptionsSidebar(params) {
+export function OptionsSidebar(params) {
   // Specifies the parameters in the options sidebar.
   const [optionsTab, setOptionsTab] = useState(OptionsTab.STATES);
-
-  // Specifies whether the plot holds cases or deaths information.
-  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
-
-  // Hold the starting and ending dates.
-  const [startDate, setStartDate] = useState(firstDay);
-  const [endDate, setEndDate] = useState(lastDay);
 
   // Hold error text.
   const [error, setError] = useState('');
 
+  /**
+   * States Tab
+   */
+
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCountStates, setTypeCountStates] = useState(TypeCount.CASES);
+
+  // Hold the starting and ending dates.
+  const [startDateStates, setStartDateStates] = useState(firstDay);
+  const [endDateStates, setEndDateStates] = useState(lastDay);
+
   // The states to be shown on the plot.
   const [selectedStates, setSelectedStates] = useState([]);
+
+  /**
+   * Demographics Tab
+   */
+
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCountDemographics, setTypeCountDemographics] = useState(TypeCount.CASES);
+
+  // Specifies the ethnicity that the plot describes.
+  const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
+
+  // Hold the starting and ending dates.
+  const [startDateDemographics, setStartDateDemographics] = useState(firstDay);
+  const [endDateDemographics, setEndDateDemographics] = useState(lastDay);
 
   // When the options are set, select all the states.
   useEffect(() => {
@@ -107,24 +126,24 @@ function OptionsSidebar(params) {
         <h5>Date Range</h5>
   
         <Label>Start</Label>
-        <Input type="date" value={getFormattedDate(startDate)} onChange={(e) => {
+        <Input type="date" value={getFormattedDate(startDateStates)} onChange={(e) => {
           setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDate) {
-            setStartDate(newDate);
+          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDateStates) {
+            setStartDateStates(newDate);
           } else {
             setError('The date must have data in the database and be before the ending date.');
           }
         }} />
   
         <Label>End</Label>
-        <Input type="date" value={getFormattedDate(endDate)} onChange={(e) => {
+        <Input type="date" value={getFormattedDate(endDateStates)} onChange={(e) => {
           setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDate) {
-            setEndDate(newDate);
+          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDateStates) {
+            setEndDateStates(newDate);
           } else {
             setError('The date must have data in the database and be after the starting date.');
           }
@@ -132,13 +151,14 @@ function OptionsSidebar(params) {
   
         <br></br>
         <h5>Filters</h5>
+        <SubHeaderText>Count Type</SubHeaderText>
         <MinimalLabel>
           Count Cases
           <InlineInput
             name="Count Cases"
             type="checkbox"
-            checked={typeCount === TypeCount.CASES}
-            onChange={() => setTypeCount(TypeCount.CASES)}
+            checked={typeCountStates === TypeCount.CASES}
+            onChange={() => setTypeCountStates(TypeCount.CASES)}
           />
         </MinimalLabel>
         <MinimalLabel>
@@ -146,8 +166,8 @@ function OptionsSidebar(params) {
           <InlineInput
             name="Count Deaths"
             type="checkbox"
-            checked={typeCount === TypeCount.DEATHS}
-            onChange={() => setTypeCount(TypeCount.DEATHS)}
+            checked={typeCountStates === TypeCount.DEATHS}
+            onChange={() => setTypeCountStates(TypeCount.DEATHS)}
           />
         </MinimalLabel>
         <Button 
@@ -156,7 +176,7 @@ function OptionsSidebar(params) {
               setError('There must be at least one selected state.');
             } else {
               setError('');
-              params.onSubmit(typeCount, startDate, endDate, selectedStates);
+              params.onStatesSubmit(optionsTab, typeCountStates, startDateStates, endDateStates, selectedStates);
             }
           }}
         >
@@ -183,14 +203,76 @@ function OptionsSidebar(params) {
             {OptionsTab.DEMOGRAPHICS}
           </OptionsTabText>
         </OptionsTabContainer>
+        { error ? <ErrorMessage message={error} /> : null }
+
+        <h5>Date Range</h5>
+  
+        <Label>Start</Label>
+        <Input type="date" value={getFormattedDate(startDateDemographics)} onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDateStates) {
+            setStartDateDemographics(newDate);
+          } else {
+            setError('The date must have data in the database and be before the ending date.');
+          }
+        }} />
+  
+        <Label>End</Label>
+        <Input type="date" value={getFormattedDate(endDateDemographics)} onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDateStates) {
+            setEndDateDemographics(newDate);
+          } else {
+            setError('The date must have data in the database and be after the starting date.');
+          }
+        }} />
+
+        <br></br>
+        <h5>Filters</h5>
+        <SubHeaderText>Count Type</SubHeaderText>
+        <MinimalLabel>
+          Count Cases
+          <InlineInput
+            name="Count Cases"
+            type="checkbox"
+            checked={typeCountDemographics === TypeCount.CASES}
+            onChange={() => setTypeCountDemographics(TypeCount.CASES)}
+          />
+        </MinimalLabel>
+        <MinimalLabel>
+          Count Deaths
+          <InlineInput
+            name="Count Deaths"
+            type="checkbox"
+            checked={typeCountDemographics === TypeCount.DEATHS}
+            onChange={() => setTypeCountDemographics(TypeCount.DEATHS)}
+          />
+        </MinimalLabel>
+        <SubHeaderText>Ethnicities</SubHeaderText>
+        { Object.values(Ethnicities).map((ethnicityType, index) => {
+            return (
+              <MinimalLabel
+                key={ethnicityType}
+              >
+                {ethnicityType}
+                <InlineInput
+                  name={ethnicityType}
+                  type="checkbox"
+                  checked={ethnicity === ethnicityType}
+                  onChange={() => setEthnicity(ethnicityType)}
+                />
+              </MinimalLabel>
+            );
+          })
+        }
         <Button 
           onClick={() => {
-            if (selectedStates.length === 0) {
-              setError('There must be at least one selected state.');
-            } else {
-              setError('');
-              params.onSubmit(typeCount, startDate, endDate, selectedStates);
-            }
+            setError('');
+            params.onDemographicsSubmit(optionsTab, typeCountDemographics, ethnicity, startDateDemographics, endDateDemographics);
           }}
         >
           Submit
@@ -209,5 +291,3 @@ function OptionsSidebar(params) {
 
   
 }
-
-export default OptionsSidebar;

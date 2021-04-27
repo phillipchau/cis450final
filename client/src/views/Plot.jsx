@@ -2,7 +2,8 @@ import styled from 'styled-components';
 import React, { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
-import OptionsSidebar from '../components/core/Options';
+import { Ethnicities, getCaseEthnicityQuantile } from '../api/CaseDemographics';
+import { OptionsSidebar, OptionsTab } from '../components/core/Options';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
@@ -28,23 +29,40 @@ const lastDay = new Date(2021, 3, 1);
 
 function PlotPage() {
 
-  // Hold the data retrieved by the database.
-  const [distinctStates, setDistinctStates] = useState();
-
-  // Hold the formatted plot data to be displayed.
-  const [plotData, setPlotData] = useState();
-
-  // Specifies whether the plot holds cases or deaths information.
-  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
-
   // Hold error text.
   const [error, setError] = useState('');
 
   // Hold loading boolean.
   const [loading, setLoading] = useState(true);
-  
+
+  // Hold the formatted plot data to be displayed.
+  const [plotData, setPlotData] = useState();
+
+  // Hold the formatted plot data to be displayed.
+  const [optionsTab, setOptionsTab] = useState(OptionsTab.STATES);
+
+  /**
+   * States Tab
+   */
+
+  // Hold the data retrieved by the database.
+  const [distinctStates, setDistinctStates] = useState();  
+
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCountStates, setTypeCountStates] = useState(TypeCount.CASES);
+
   // All of the states available on the plot.
   const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
+
+  /**
+   * Demographics Tab
+   */
+
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCountDemographics, setTypeCountDemographics] = useState(TypeCount.CASES);
+
+  // Specifies the ethnicity that the plot describes.
+  const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
 
   // Helper method to add the state's count.
   const addStateCount = (states, currentStateIndex, data, count, currentDate) => {
@@ -66,8 +84,8 @@ function PlotPage() {
     return currentStateIndex;
   };
 
-  // Construct the plot data to be displayed.
-  const displayPlotData = useCallback((startDateParam, selectedStatesParam, countPerStateDateParam) => {
+  // Construct the plot data to be displayed for the states tab.
+  const displayStatesPlotData = useCallback((startDateParam, selectedStatesParam, countPerStateDateParam) => {
     // The plot data to be saved.
     let newPlotData = [];
 
@@ -134,19 +152,113 @@ function PlotPage() {
     };
     getCountPerStateDate(params).then((res) => {
       console.log(res);
-      displayPlotData(startDateParam, selectedStatesParam, res);
+      displayStatesPlotData(startDateParam, selectedStatesParam, res);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [displayPlotData]);
+  }, [displayStatesPlotData]);
 
-  // Submit the options shown on the sidebar.
-  const submitOptions = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
+  // Submit the options shown on the sidebar states tab.
+  const submitStatesOptions = useCallback((optionsTabParam, typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
     setError('');
     setLoading(true);
-    setTypeCount(typeCountParam);
+    setOptionsTab(optionsTabParam);
+    setTypeCountStates(typeCountParam);
     getCountStateData(typeCountParam, startDateParam, endDateParam, selectedStatesParam);
-  }, [setTypeCount, getCountStateData]);
+  }, [setTypeCountStates, getCountStateData]);
+
+  // Construct the plot data to be displayed for the demographics tab.
+  const displayDemographicsPlotData = useCallback((startDateParam, endDateParam, caseEthnicityQuantiles) => {
+    // The plot data to be saved.
+    let newPlotData = [];
+
+    // Get the list of quantiles to be included, with 'Date' for x-axis.
+    let plotAttributes = ['Date', 'Quantile 1', 'Quantile 2', 'Quantile 3', 'Quantile 4', 'Quantile 5'];
+    newPlotData.push(plotAttributes);
+
+    // Add data for all dates indicated by options.
+    let currentDate = new Date(startDateParam);
+    while (!sameDay(currentDate, new Date(endDateParam))) {
+      let index;
+      let ratios = [];
+      ratios.push(new Date(currentDate));
+      for (index = 0; index < 5; index++) {
+        // Add the ratio for the specific quantile at that date.
+        if (!caseEthnicityQuantiles[index].has(getFormattedDate(currentDate))) {
+          ratios.push(0);
+        } else {
+          ratios.push(caseEthnicityQuantiles[index].get(getFormattedDate(currentDate)));
+        }
+      }
+      newPlotData.push(ratios);
+
+      // Increment the current date.
+      currentDate.setDate(currentDate.getDate() + 1);
+      console.log(currentDate);
+    }
+
+    // Print to console for debugging.
+    console.log(newPlotData);
+
+    // Set the new plot data.
+    setPlotData(newPlotData);
+
+    // Display the plot.
+    setLoading(false);
+  }, [setPlotData]);
+
+  // Get the demographics data.
+  const getCaseEthnicityQuantiles = useCallback((ethnicityParam, typeCountParam, startDateParam, endDateParam) => {
+    // Get the count data.
+    let params = {
+      ethnicity: ethnicityParam,
+      startDate: getFormattedDate(startDateParam),
+      endDate: getFormattedDate(endDateParam),
+    };
+
+    // For loop to get all the quantiles.
+    let quantile;
+    const promises = [];
+    for (quantile = 0; quantile < 5; quantile++) {
+      params.quantile = quantile;
+      promises.push(getCaseEthnicityQuantile(params));
+    }
+    
+    // Resolve all promises and call function to display the data.
+    Promise.all(promises).then((res) => {
+      // Transform each array to a map with a date key and ratio value.
+      const caseEthnicityQuantiles = [];
+      res.forEach((quantileData) => {
+        const quantileMap = new Map();
+        quantileData.forEach((data) => {
+          // Add the data to a map.
+          quantileMap.set(
+            data.Date, 
+            (typeCountParam === TypeCount.CASES ? data.CaseRate : data.DeathRate)
+          );
+        });
+        caseEthnicityQuantiles.push(quantileMap);
+      });
+
+      // Print to console for debugging.
+      console.log(caseEthnicityQuantiles);
+      
+      displayDemographicsPlotData(startDateParam, endDateParam, caseEthnicityQuantiles);
+    }).catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
+  }, [displayDemographicsPlotData]);
+
+  // Submit the options shown on the sidebar demographics tab.
+  const submitDemographicsOptions = useCallback((optionsTabParam, typeCountParam, ethnicityParam, startDateParam, endDateParam) => {
+    setError('');
+    setLoading(true);
+    setOptionsTab(optionsTabParam);
+    setTypeCountDemographics(typeCountParam);
+    setEthnicity(ethnicityParam);
+    getCaseEthnicityQuantiles(ethnicityParam, typeCountParam, startDateParam, endDateParam);
+  }, [getCaseEthnicityQuantiles]);
 
   // Setting the state options.
   useEffect(() => {
@@ -161,7 +273,7 @@ function PlotPage() {
       setSelectedStatesOptions(options);
 
       // Create the initial graph.
-      submitOptions(TypeCount.CASES, firstDay, lastDay, options);
+      submitStatesOptions(OptionsTab.STATES, TypeCount.CASES, firstDay, lastDay, options);
     } else {
       // Get the distinct states to be displayed.
       getDistinctStates().then((res) => {
@@ -171,13 +283,14 @@ function PlotPage() {
         setError(err.message);
       });
     }
-  }, [distinctStates, submitOptions]);
+  }, [distinctStates, submitStatesOptions]);
 
   return (
     <FlexContainer>
       <OptionsSidebar
         selectedStatesOptions={selectedStatesOptions}
-        onSubmit={submitOptions}
+        onStatesSubmit={submitStatesOptions}
+        onDemographicsSubmit={submitDemographicsOptions}
       />
       <ChildFlexContainer
         flex={7}
@@ -191,12 +304,12 @@ function PlotPage() {
             loader={<LoadingChart><LoadingContainerText>Loading Chart...</LoadingContainerText></LoadingChart>}
             data={plotData}
             options={{
-              title: `${typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'} by State over Time`,
+              title: `${optionsTab === OptionsTab.STATES ? `${typeCountStates} by State over Time` : `Covid ${typeCountDemographics} for ${ethnicity} Quantiles`}`,
               hAxis: {
                 title: 'Date',
               },
               vAxis: {
-                title: (typeCount === TypeCount.CASES ? 'Cases' : 'Deaths'),
+                title: `${optionsTab === OptionsTab.STATES ? `${typeCountStates}` : `Ratio of Covid ${typeCountDemographics} to Total U.S. Population`}`,
                 viewWindow: {
                   min: 0,
                 },
