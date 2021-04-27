@@ -49,7 +49,7 @@ function PlotPage() {
   const [distinctStates, setDistinctStates] = useState();  
 
   // Specifies whether the plot holds cases or deaths information.
-  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
+  const [typeCountStates, setTypeCountStates] = useState(TypeCount.CASES);
 
   // All of the states available on the plot.
   const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
@@ -57,6 +57,9 @@ function PlotPage() {
   /**
    * Demographics Tab
    */
+
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCountDemographics, setTypeCountDemographics] = useState(TypeCount.CASES);
 
   // Specifies the ethnicity that the plot describes.
   const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
@@ -160,9 +163,9 @@ function PlotPage() {
     setError('');
     setLoading(true);
     setOptionsTab(optionsTabParam);
-    setTypeCount(typeCountParam);
+    setTypeCountStates(typeCountParam);
     getCountStateData(typeCountParam, startDateParam, endDateParam, selectedStatesParam);
-  }, [setTypeCount, getCountStateData]);
+  }, [setTypeCountStates, getCountStateData]);
 
   // Construct the plot data to be displayed for the demographics tab.
   const displayDemographicsPlotData = useCallback((startDateParam, endDateParam, caseEthnicityQuantiles) => {
@@ -205,7 +208,7 @@ function PlotPage() {
   }, [setPlotData]);
 
   // Get the demographics data.
-  const getCaseEthnicityQuantiles = useCallback((ethnicityParam, startDateParam, endDateParam) => {
+  const getCaseEthnicityQuantiles = useCallback((ethnicityParam, typeCountParam, startDateParam, endDateParam) => {
     // Get the count data.
     let params = {
       ethnicity: ethnicityParam,
@@ -228,8 +231,11 @@ function PlotPage() {
       res.forEach((quantileData) => {
         const quantileMap = new Map();
         quantileData.forEach((data) => {
-          // TODO: Add ability to distinguish between cases and deaths here.
-          quantileMap.set(data.Date, data.CaseRate);
+          // Add the data to a map.
+          quantileMap.set(
+            data.Date, 
+            (typeCountParam === TypeCount.CASES ? data.CaseRate : data.DeathRate)
+          );
         });
         caseEthnicityQuantiles.push(quantileMap);
       });
@@ -245,13 +251,14 @@ function PlotPage() {
   }, []);
 
   // Submit the options shown on the sidebar demographics tab.
-  const submitDemographicsOptions = useCallback((optionsTabParam, ethnicityParam, startDateParam, endDateParam) => {
+  const submitDemographicsOptions = useCallback((optionsTabParam, typeCountParam, ethnicityParam, startDateParam, endDateParam) => {
     setError('');
     setLoading(true);
     setOptionsTab(optionsTabParam);
+    setTypeCountDemographics(typeCountParam);
     setEthnicity(ethnicityParam);
-    getCaseEthnicityQuantiles(ethnicityParam, startDateParam, endDateParam);
-  }, [setTypeCount, getCountStateData]);
+    getCaseEthnicityQuantiles(ethnicityParam, typeCountParam, startDateParam, endDateParam);
+  }, [setTypeCountStates, getCountStateData]);
 
   // Setting the state options.
   useEffect(() => {
@@ -297,12 +304,12 @@ function PlotPage() {
             loader={<LoadingChart><LoadingContainerText>Loading Chart...</LoadingContainerText></LoadingChart>}
             data={plotData}
             options={{
-              title: `${optionsTab === OptionsTab.STATES ? `${typeCount} by State over Time` : `Covid ${typeCount} for ${ethnicity} Quantiles`}`,
+              title: `${optionsTab === OptionsTab.STATES ? `${typeCountStates} by State over Time` : `Covid ${typeCountDemographics} for ${ethnicity} Quantiles`}`,
               hAxis: {
                 title: 'Date',
               },
               vAxis: {
-                title: `${optionsTab === OptionsTab.STATES ? `${typeCount}` : `Ratio of Covid ${typeCount} to Total U.S. Population`}`,
+                title: `${optionsTab === OptionsTab.STATES ? `${typeCountStates}` : `Ratio of Covid ${typeCountDemographics} to Total U.S. Population`}`,
                 viewWindow: {
                   min: 0,
                 },

@@ -6,7 +6,7 @@ import { Button } from './Button';
 import StyledMultiSelect from './Select';
 import { ChildFlexContainer } from './Container';
 import getFormattedDate from '../../util/Utility';
-import { Text } from './Text';
+import { Text, SubHeaderText } from './Text';
 import ErrorMessage from './Error';
 
 const Label = styled.label`
@@ -64,7 +64,7 @@ export function OptionsSidebar(params) {
    */
 
   // Specifies whether the plot holds cases or deaths information.
-  const [typeCount, setTypeCount] = useState(TypeCount.CASES);
+  const [typeCountStates, setTypeCountStates] = useState(TypeCount.CASES);
 
   // Hold the starting and ending dates.
   const [startDateStates, setStartDateStates] = useState(firstDay);
@@ -76,6 +76,9 @@ export function OptionsSidebar(params) {
   /**
    * Demographics Tab
    */
+
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCountDemographics, setTypeCountDemographics] = useState(TypeCount.CASES);
 
   // Specifies the ethnicity that the plot describes.
   const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
@@ -148,13 +151,14 @@ export function OptionsSidebar(params) {
   
         <br></br>
         <h5>Filters</h5>
+        <SubHeaderText>Count Type</SubHeaderText>
         <MinimalLabel>
           Count Cases
           <InlineInput
             name="Count Cases"
             type="checkbox"
-            checked={typeCount === TypeCount.CASES}
-            onChange={() => setTypeCount(TypeCount.CASES)}
+            checked={typeCountStates === TypeCount.CASES}
+            onChange={() => setTypeCountStates(TypeCount.CASES)}
           />
         </MinimalLabel>
         <MinimalLabel>
@@ -162,8 +166,8 @@ export function OptionsSidebar(params) {
           <InlineInput
             name="Count Deaths"
             type="checkbox"
-            checked={typeCount === TypeCount.DEATHS}
-            onChange={() => setTypeCount(TypeCount.DEATHS)}
+            checked={typeCountStates === TypeCount.DEATHS}
+            onChange={() => setTypeCountStates(TypeCount.DEATHS)}
           />
         </MinimalLabel>
         <Button 
@@ -172,7 +176,7 @@ export function OptionsSidebar(params) {
               setError('There must be at least one selected state.');
             } else {
               setError('');
-              params.onStatesSubmit(optionsTab, typeCount, startDateStates, endDateStates, selectedStates);
+              params.onStatesSubmit(optionsTab, typeCountStates, startDateStates, endDateStates, selectedStates);
             }
           }}
         >
@@ -229,6 +233,26 @@ export function OptionsSidebar(params) {
 
         <br></br>
         <h5>Filters</h5>
+        <SubHeaderText>Count Type</SubHeaderText>
+        <MinimalLabel>
+          Count Cases
+          <InlineInput
+            name="Count Cases"
+            type="checkbox"
+            checked={typeCountDemographics === TypeCount.CASES}
+            onChange={() => setTypeCountDemographics(TypeCount.CASES)}
+          />
+        </MinimalLabel>
+        <MinimalLabel>
+          Count Deaths
+          <InlineInput
+            name="Count Deaths"
+            type="checkbox"
+            checked={typeCountDemographics === TypeCount.DEATHS}
+            onChange={() => setTypeCountDemographics(TypeCount.DEATHS)}
+          />
+        </MinimalLabel>
+        <SubHeaderText>Ethnicities</SubHeaderText>
         { Object.values(Ethnicities).map((ethnicityType, index) => {
             return (
               <MinimalLabel
@@ -248,7 +272,7 @@ export function OptionsSidebar(params) {
         <Button 
           onClick={() => {
             setError('');
-            params.onDemographicsSubmit(optionsTab, ethnicity, startDateDemographics, endDateDemographics);
+            params.onDemographicsSubmit(optionsTab, typeCountDemographics, ethnicity, startDateDemographics, endDateDemographics);
           }}
         >
           Submit
