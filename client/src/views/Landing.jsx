@@ -24,26 +24,30 @@ grid-gap: 2rem;
 `
 
 const Wall = styled.div`
-position: relative; 
-margin-left: -6%;
-height: 100vh;
-width: 112%;
-display: flex;
-align-items: center;
-justify-content: center;
-background-image: url('https://www.cdc.gov/media/dpk/diseases-and-conditions/coronavirus/images/outbreak-coronavirus-world-1024x506px.jpg');
-background-size: cover;
+  position: relative; 
+  margin-left: -6%;
+  height: 100vh;
+  width: 112%;
+  background-image: url('https://www.cdc.gov/media/dpk/diseases-and-conditions/coronavirus/images/outbreak-coronavirus-world-1024x506px.jpg');
+  background-size: cover;
 
-&:before {
-  content: "";
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: rgba(0,0,0,0.70);
+  }
+`;
+
+const WallText = styled.div`
   position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-  background-color: rgba(0,0,0,0.70);
-}
-`
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
 
 function LandingPage() {
   const history = useHistory()
@@ -201,7 +205,11 @@ function LandingPage() {
       }
 
       <Wall>
-        <h1 style={{color: 'white', display: 'block', position: 'relative'}}>Analyzing Socioeconomic Impacts on COVID19</h1>
+        <WallText>
+          <h1 style={{color: 'white'}}>Analyzing Socioeconomic Impacts on COVID19</h1>
+          <br></br>
+          <h3 style={{color: 'white'}}>This is some subtext. This is the longest the subtext can go before wrapping around.</h3>
+        </WallText>
       </Wall>
       <h2 style={{marginTop: 50}}>Latest News</h2>
       <Grid>
