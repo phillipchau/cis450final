@@ -33,7 +33,7 @@ export const ChildFlexContainer = styled.div`
   overflow: auto;
   margin: 0 1rem;
   background: white;
-  padding: 1rem;
+  padding: 0.5rem;
   text-align: left;
   border-radius: 1rem;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;

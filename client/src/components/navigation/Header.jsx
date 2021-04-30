@@ -7,24 +7,29 @@ import { useHistory, Link } from 'react-router-dom';
 
 const Content = styled.div`
   height: 50px;
-  padding: 20px;
+  padding: 40px;
   text-align: center;
+  background-color:#054A91;
 `;
 
 const LeftHeader = styled(NavbarLink)`
   float: left;
   margin-left: 50px;
   font-weight: bold;
+  color:white;
+  font-size:30px;
 `;
 
 const RightEdgeHeaderButton = styled(NavbarButton)`
   float: right;
   margin-right: 50px;
+  color:white;
 `;
 
 const RightHeader = styled(NavbarLink)`
   float: right;
   margin-right: 20px;
+  color:white;
 
   @media (max-width: 1000px) {
     margin-right: 10px;
@@ -46,7 +51,7 @@ function Header() {
     <Content>
       <nav>
         <LeftHeader to="/">
-          CIS 450 Final Project
+          COVID Dashboard
         </LeftHeader>
         <RightEdgeHeaderButton
           onClick={logout}

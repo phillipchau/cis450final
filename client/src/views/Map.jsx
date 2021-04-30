@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {useMapEvents} from "react-leaflet";
+import { getUser, getLogin } from '../api/Home';
 import { getIncomeDataQ1, getIncomeDataQ2, getIncomeDataQ3, getIncomeDataQ4 } from '../api/Income';
 import { getPovertyQ1, getPovertyQ2, getPovertyQ3, getPovertyQ4, 
   getTotalCovidState, getStateCoords, getMaskQ1, getMaskQ2, getMaskQ3, getMaskQ4 } from '../api/MapData';
 import {MapContainer, CircleMarker, TileLayer, Tooltip, useMap} from 'react-leaflet';
+import ErrorMessage from '../components/core/Error';
 import 'leaflet/dist/leaflet.css';
 
 function ChangeView({center, zoom}) {
@@ -12,7 +13,6 @@ function ChangeView({center, zoom}) {
  
   return null
 }
-
 
 function MapPage({statefilter, modefilter, date, modemetric}) {
   //sets income data for various quarters if the income option is toggled
@@ -25,7 +25,6 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
   const[filterstate, setFilterState] = useState('none')
   //tracks the filter we are applying
   const[filtermode, setFilterMode] = useState('')
-
   const [startdate, setStartDate] = useState(date)
 
   //tracks the metric filter we are applying 
@@ -39,6 +38,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
   const[zoom, setZoom] = useState(defaultZoom)
   const [center, setCenter] = useState(defaultPosition)
   const [radius, setRadius] = useState(defaultRadius)
+  const [error, setError] = useState('');
   const [metric, setMetric] = useState('')
 
   //updates the filter if changed from the form
@@ -58,7 +58,6 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
     console.log(modemetric)
     setFilterMetric(modemetric)
   }
-
   //if we specify a state, change map parameters
   useEffect(() => {
     if (filterstate !== 'none') {
@@ -69,6 +68,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
         setZoom(6.3)
         setCenter(newCoor)
         if (filtermetric === 'deaths') {
+          console.log(filtermetric)
           setRadius(20000)
         } else {
           setRadius(1000)
@@ -84,14 +84,15 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
   useEffect(() => {
     if (filtermode === 'income') {
       if (filtermetric === 'deaths') {
+        console.log(radius)
         setMetric('DeathsRate')
         setRadius(defaultRadius)
       } else {
         setMetric('CasesRate')
         setRadius(300)
       }
+      console.log(radius)
       getIncomeDataQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
-        console.log(res)
         setGroupDataQ1(res);
         }).catch((err) => {
           console.log(err)
@@ -284,6 +285,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
           })}
       </MapContainer>
     </div>
+    { error ? <ErrorMessage message={error} /> : null }
     </>
   );
 }

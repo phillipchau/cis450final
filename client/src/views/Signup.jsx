@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
+import { getStates } from '../api/MapData';
 import { useHistory, Link } from 'react-router-dom'
 
 const Signup = () => {
@@ -8,6 +9,7 @@ const Signup = () => {
   const [fname, setFName] = useState('')
   const [lname, setLName] = useState('')
   const [state, setState] = useState('')
+  const [stateList, setStateList] = useState([])
 
   const history = useHistory()
   const signup = async () => {
@@ -21,6 +23,15 @@ const Signup = () => {
       history.push('/')
     }
   }
+
+  useEffect(() => {
+    getStates().then((res) => {
+      setStateList(res);
+      setState(res[0].State)
+    }).catch((err) => {
+      console.log(err)
+    });
+  }, [])
   return (
     <>
       <div>
@@ -60,13 +71,21 @@ const Signup = () => {
                       <input className="form-control" type="text" id="password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
                     </div>
                     <div className="form-group">
-                      <label id="textlabel" htmlFor="textbox">Favorite State: </label>
-                      <textarea className="form-control" value={state} onChange={e => setState(e.target.value)} id="textbox" rows="3" required />
+                      <label htmlFor="stateselector"> My Home State: </label>
+                      <br/>
+                      <select id="stateselector" class="form-select" aria-label="State Selector" value={state} onChange={e => setState(e.target.value)}>
+                        {stateList.map((place, k) => {
+                          return (
+                            <>
+                              <option key={k} value={place.State}>{place.State}</option>
+                            </>
+                          )})}
+                      </select>
                     </div>
                     <div className="form-group">
                       <p className="signup-margin text-secondary">
                         Already have an account?
-                        <Link to="/"> Return to login page</Link>
+                        <Link to="/login"> Return to login page</Link>
                       </p>
                       <button className="btn btn-primary float-right" type="submit">Submit</button>
                     </div>
