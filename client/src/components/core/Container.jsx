@@ -8,7 +8,12 @@ const createContainer = (Container, props) => {
 
 const StyledMainContainer = styled.div`
   margin: 0 auto;
-  padding: 8vw 0;
+  padding: 4vw 0;
+  width: 90%;
+`;
+
+const StyledHomeContainer = styled.div`
+  margin: 0 auto;
   width: 90%;
 `;
 
@@ -19,6 +24,8 @@ const StyledMinimalContainer = styled.div`
 `;
 
 export const MainContainer = (props) => createContainer(StyledMainContainer, props);
+
+export const HomeContainer = (props) => createContainer(StyledHomeContainer, props);
 
 export const MinimalContainer = (props) => createContainer(StyledMinimalContainer, props);
 

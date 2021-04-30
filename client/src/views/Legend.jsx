@@ -2,11 +2,13 @@ import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 
 const LegendContainer = styled.div`
-height: 100px;
-width:97%;
+height: 10%;
+width:100%;
 text-align: left;
 padding:20px;
-position: absolute;
+margin-top: 10px;
+margin-bottom:10px;
+
 
 border: 3px solid black;
 `;

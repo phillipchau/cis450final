@@ -67,6 +67,9 @@ function Header() {
         <RightHeader to="/vaccinepage">
           Vaccine
         </RightHeader>
+        <RightHeader to="/user">
+          My Profile
+        </RightHeader>
         <RightHeader to="/">
           Dashboard
         </RightHeader>
