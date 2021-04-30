@@ -12,6 +12,10 @@ export const NavbarLink = styled(Link)`
     background: ${({ theme }) => theme.colors.navbarBlue};
     border-radius: 0.25rem;
   }
+
+  @media (max-width: 1000px) {
+    padding: 0.25rem 0.25rem;
+  }
 `;
 
 export const TextLink = styled(Link)`

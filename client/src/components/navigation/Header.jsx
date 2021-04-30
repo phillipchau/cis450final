@@ -25,6 +25,10 @@ const RightEdgeHeaderButton = styled(NavbarButton)`
 const RightHeader = styled(NavbarLink)`
   float: right;
   margin-right: 20px;
+
+  @media (max-width: 1000px) {
+    margin-right: 10px;
+  }
 `;
 
 // Note: Can also create a center header with simply display: inline-block
