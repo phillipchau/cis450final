@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
+import { NavbarButton } from '../core/Button';
 import axios from 'axios';
-import { useHistory, Link } from 'react-router-dom'
+import { useHistory, Link } from 'react-router-dom';
 
 const Content = styled.div`
   height: 50px;
@@ -19,7 +20,7 @@ const LeftHeader = styled(NavbarLink)`
   font-size:30px;
 `;
 
-const RightEdgeHeader = styled(NavbarLink)`
+const RightEdgeHeaderButton = styled(NavbarButton)`
   float: right;
   margin-right: 50px;
   color:white;
@@ -29,6 +30,10 @@ const RightHeader = styled(NavbarLink)`
   float: right;
   margin-right: 20px;
   color:white;
+
+  @media (max-width: 1000px) {
+    margin-right: 10px;
+  }
 `;
 
 // Note: Can also create a center header with simply display: inline-block
@@ -48,9 +53,14 @@ function Header() {
         <LeftHeader to="/">
           COVID Dashboard
         </LeftHeader>
-        <RightEdgeHeader to="/plot">
+        <RightEdgeHeaderButton
+          onClick={logout}
+        >
+          Logout
+        </RightEdgeHeaderButton>
+        <RightHeader to="/plot">
           Plot
-        </RightEdgeHeader>
+        </RightHeader>
         <RightHeader to="/map">
           Map
         </RightHeader>
@@ -60,7 +70,6 @@ function Header() {
         <RightHeader to="/">
           Dashboard
         </RightHeader>
-        <button onClick={logout}type="button" class="btn btn-success">Logout</button>
       </nav>
     </Content>
   );

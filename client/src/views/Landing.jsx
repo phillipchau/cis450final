@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { getVaccineData } from '../api/Vaccine';
 import { getLogin, getUser } from '../api/Home';
 import ErrorMessage from '../components/core/Error';
-import { LandingHeaderText } from '../components/core/Text';
+import { Text, LandingHeaderText } from '../components/core/Text';
 import { useHistory, Link } from 'react-router-dom'
 import ArticleWrapper from './ArticleWrapper'
 import {
@@ -25,9 +25,14 @@ grid-gap: 2rem;
 
 const Wall = styled.div`
 position: relative; 
+margin-left: -6%;
 height: 100vh;
+<<<<<<< HEAD
 width: 100%;
 padding: -1rem;
+=======
+width: 112%;
+>>>>>>> 13fd0806ba5d20adb8e66c27c30f4ee4fb7f44e2
 display: flex;
 align-items: center;
 justify-content: center;
@@ -66,7 +71,7 @@ function LandingPage() {
   const [user, setUser] = useState()
 
   //all favorite articles
-  const [favArticles, setFavArticles] = useState()
+  const [favArticles, setFavArticles] = useState([]);
 
   //boolean to update liked articles
   const [like, setLike] = useState(false)
@@ -214,15 +219,21 @@ function LandingPage() {
       }
       </Grid>
       <h2 style={{marginTop: 50}}>My Favorite News</h2>
-      <Grid>
-      { favArticles !== undefined ?
-        favArticles.map((article, index) => {
-          return (
-            <ArticleWrapper user={user} article={article} update={setLike} type="favorite" />
-          ); 
-        }) : null
+      
+      { favArticles !== undefined && favArticles.length > 0 ?
+        (
+        <Grid>
+          {
+            favArticles.map((article, index) => {
+              return (
+                <ArticleWrapper user={user} article={article} update={setLike} type="favorite" />
+              ); 
+            })
+          }
+        </Grid>
+        ) : <Text>You don't have any favorited news articles yet!</Text>
       }
-      </Grid>
+      
       { error ? <ErrorMessage message={error} /> : null }
     </>
   );

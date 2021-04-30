@@ -13,6 +13,17 @@ export const Button = styled.button`
   }
 `;
 
+export const NavbarButton = styled(Button)`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  margin: 0;
+  background: ${({ theme }) => theme.colors.lightRed};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.lightRedEmphasis};
+  }
+`;
+
 export const TopMarginButton = styled(Button)`
   margin: 1rem 0 0 0;
 `;

@@ -28,8 +28,9 @@ const ArticleTitle = styled.p`
   font-weight: 700;
   font-size: 28px;
   margin: 0.25rem 0 0 0;
-  &: hover {
-    color: red;
+  &:hover {
+    color: ${({ theme }) => theme.colors.darkBlue};
+    cursor: pointer;
   }
 `;
 
