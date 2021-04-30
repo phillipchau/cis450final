@@ -27,6 +27,7 @@ const Wall = styled.div`
 position: relative; 
 height: 100vh;
 width: 100%;
+padding: -1rem;
 display: flex;
 align-items: center;
 justify-content: center;
@@ -223,18 +224,6 @@ function LandingPage() {
       }
       </Grid>
       { error ? <ErrorMessage message={error} /> : null }
-      <TableElement>
-        <TableHead>
-          <TableRowElement>
-            <TableHeadElement>Date</TableHeadElement>
-            <TableHeadElement>State</TableHeadElement>
-            <TableHeadElement>Vaccinated</TableHeadElement>
-          </TableRowElement>
-        </TableHead>
-        <TableBody>
-          
-        </TableBody>
-      </TableElement>
     </>
   );
 }

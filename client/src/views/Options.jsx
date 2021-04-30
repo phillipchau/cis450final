@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
-import { getStates, getCounties } from '../api/MapData';
+import { getStates } from '../api/MapData';
 import getFormattedDate from '../util/Utility';
 
 const Bar = styled.div`
@@ -23,15 +23,15 @@ const Input = styled.input`
 const firstDay = new Date(2020, 0, 20);
 const lastDay = new Date(2021, 3, 1);
 
-function Options({statefilter, modefilter, setStart, modemetric}) {
+function Options({statefilter, modefilter, setStart, modemetric, userState}) {
     const [states, setStates] = useState([])
-    const [currState, setCurrState] = useState('Alabama')
+    const [currState, setCurrState] = useState(userState)
     //determines the state of the filter that can be applied
-    const [mode, setMode] = useState('')
+    const [mode, setMode] = useState('income')
     //determines the population level mode
-    const [popmode, setPopMode] = useState('country')
+    const [popmode, setPopMode] = useState('state')
     // Hold the starting and ending dates.
-    const [startDate, setStartDate] = useState(firstDay);
+    const [startDate, setStartDate] = useState(lastDay);
     // Hold error text.
     const [error, setError] = useState('');
 
@@ -41,7 +41,7 @@ function Options({statefilter, modefilter, setStart, modemetric}) {
     useEffect(() => {
       getStates().then((res) => {
         setStates(res);
-        setCurrState(res[0].State)
+        //setCurrState(res[0].State)
       }).catch((err) => {
         console.log(err)
       });
@@ -58,6 +58,7 @@ function Options({statefilter, modefilter, setStart, modemetric}) {
     setStart(startDate)
     modemetric(metric)
   }
+  console.log(userState)
 
   return (
     <>
