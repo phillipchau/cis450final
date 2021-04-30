@@ -425,6 +425,15 @@ function getLatestCovidArticles(req, res) {
   });
 }
 
+function getCovidArticleById(req, res) {
+  const id = req.query.id
+  axios.get(`https://api.nytimes.com/svc/search/v2/articlesearch.json?fq=_id%3A"${id}"&api-key=${process.env.NYT_API_KEY}`)
+  .then((articles) => res.json(articles.data.response))
+  .catch((err) => {
+    console.log(err);
+  });
+}
+
 //gets the aggregation for all days of the total covid cases by county
 function getTotalCovidState(req, res) {
   var query = `
@@ -694,6 +703,28 @@ const getLogin = function(req, res) {
   res.send(username); 
 }
 
+const articleAppend = function(req, res) {
+  let { username, article } = req.body
+  db.addArticle(username, article, function(err, data) {
+    if (err) {
+      console.log(err)
+    } else {
+      res.send('success')
+    }
+  })
+}
+
+const articleRemove = function(req, res) {
+  let { username, index } = req.body
+  db.removeArticle(username, index, function(err, data) {
+    if (err) {
+      console.log(err)
+    } else {
+      res.send('success')
+    }
+  })
+}
+
 // The exported functions, which can be accessed in index.js.
 module.exports = {
   getVaccineData: getVaccineData,
@@ -722,5 +753,8 @@ module.exports = {
   getLogin: getLogin,
   login: login,
   userFind: userFind,
-  getCaseEthnicityQuantiles: getCaseEthnicityQuantiles
+  getCaseEthnicityQuantiles: getCaseEthnicityQuantiles,
+  articleAppend: articleAppend,
+  getCovidArticleById: getCovidArticleById,
+  articleRemove: articleRemove
 }

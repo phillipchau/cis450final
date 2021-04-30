@@ -2,10 +2,10 @@ import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import { getVaccineData } from '../api/Vaccine';
 import { getLogin, getUser } from '../api/Home';
-import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
 import { LandingHeaderText } from '../components/core/Text';
 import { useHistory, Link } from 'react-router-dom'
+import ArticleWrapper from './ArticleWrapper'
 import {
   TableElement,
   TableHead,
@@ -14,43 +14,7 @@ import {
   TableHeadElement,
   TableDataElement,
 } from '../components/core/Table';
-import { getLatestCovidArticles } from '../api/NYTData';
-
-const ArticleContainer = styled.div`
-  display: flex;
-  margin: 1rem auto;
-  width: 600px;
-  height: 225px;
-  border-radius: 1rem;
-  background: white;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const ImageContainer = styled.div`
-  width: '100%';
-  height: '12rem';
-`;
-
-const Image = styled.img`
-  width: 100%;
-  height: 12rem;
-  object-fit: cover;
-`;
-
-const Description = styled.p`
-  color: gray;
-  font-size: 18px;
-`;
-
-const ArticleTitle = styled.p`
-  font-weight: 700;
-  font-size: 28px;
-  margin: 0.25rem 0 0 0;
-`;
+import { getLatestCovidArticles, getCovidArticle } from '../api/NYTData';
 
 const Grid = styled.div`
 margin-top: 20px;
@@ -100,6 +64,12 @@ function LandingPage() {
   //tracks the user information
   const [user, setUser] = useState()
 
+  //all favorite articles
+  const [favArticles, setFavArticles] = useState()
+
+  //boolean to update liked articles
+  const [like, setLike] = useState(false)
+
   //initially load who is logged in 
   useEffect(() => {
     getLogin().then((res) => {
@@ -110,6 +80,10 @@ function LandingPage() {
         setLogin(res);
         getUser(res).then((response) => {
           setUser(response)
+          getCovidArticle(response.articles)
+            .then(data => {
+              addFavoriteArticles(data)
+            })
         }).catch((error) => {
           setError(error.message)
         });
@@ -117,7 +91,8 @@ function LandingPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [])
+    setLike(false)
+  }, [like])
   // Get the vaccine data.
   useEffect(() => {
     setLoading(true);
@@ -142,6 +117,7 @@ function LandingPage() {
 
   // Helper method to organize the latest COVID article information.
   const addLatestArticles = (res) => {
+    console.log(res)
     let articleList = [];
 
     let newArticle = {};
@@ -166,12 +142,50 @@ function LandingPage() {
         newArticle.image = `https://static01.nyt.com/${article.multimedia[0].url}`;
       }
 
+      newArticle._id = article._id
+
       articleList.push(newArticle);
       newArticle = {};
     });
 
     setLatestArticles(articleList);
   };
+
+  const addFavoriteArticles = (articles) => {
+    let articleList = [];
+
+    let newArticle = {};
+    articles.forEach(res => {
+      res.docs.forEach((article) => {
+        newArticle.title = article.headline.main;
+        newArticle.snippet = article.snippet;
+        newArticle.publishDate = new Date(article.pub_date);
+  
+        // Handle no author provided.
+        if (article.byline.person.length === 0) {
+          newArticle.author = 'An Unknown Author';
+        } else {
+          newArticle.author = `${article.byline.person[0].firstname} ${article.byline.person[0].lastname}`;
+        }
+  
+        newArticle.link = article.web_url;
+  
+        // Handle no multimedia provided.
+        if (article.multimedia.length === 0) {
+          newArticle.image = 'https://i.stack.imgur.com/y9DpT.jpg';
+        } else {
+          newArticle.image = `https://static01.nyt.com/${article.multimedia[0].url}`;
+        }
+  
+        newArticle._id = article._id
+  
+        articleList.push(newArticle);
+        newArticle = {};
+      });
+    })
+
+    setFavArticles(articleList);
+  }
 
   return (
     <>
@@ -193,15 +207,18 @@ function LandingPage() {
       { latestArticles !== undefined ?
         latestArticles.map((article, index) => {
           return (
-            <div className = "card" style={{textDecoration: 'none', padding: '10px'}} key={article.title} onClick={() => window.open(article.link)}>
-              <ImageContainer >
-                <Image src={article.image} alt="Image for article" />
-              </ImageContainer>
-              <ArticleTitle>{article.title.length > 30 ? `${article.title.substring(0, 30)}...` : article.title}</ArticleTitle>
-              <Description>{getFormattedDate(article.publishDate)} | {article.author}</Description>
-              <p>{article.snippet.length > 60 ? `${article.snippet.substring(0, 60)}...` : article.snippet}</p>
-            </div>
-          );
+            <ArticleWrapper user={user} article={article} update={setLike} type="regular" />
+          ); 
+        }) : null
+      }
+      </Grid>
+      <h2 style={{marginTop: 50}}>My Favorite News</h2>
+      <Grid>
+      { favArticles !== undefined ?
+        favArticles.map((article, index) => {
+          return (
+            <ArticleWrapper user={user} article={article} update={setLike} type="favorite" />
+          ); 
         }) : null
       }
       </Grid>

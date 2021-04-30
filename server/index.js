@@ -35,6 +35,10 @@ app.get('/getlogin', routes.getLogin)
 app.post('/login', routes.login)
 app.get('/user/:username', routes.userFind)
 
+app.post('/addarticle', routes.articleAppend)
+app.post('/removearticle', routes.articleRemove)
+app.get('/getarticle', routes.getCovidArticleById)
+
 app.get('/vaccine', routes.getVaccineData);
 app.get('/income/q1', routes.getIncomeDataQ1);
 app.get('/income/q2', routes.getIncomeDataQ2);

@@ -15,3 +15,22 @@ export const getLatestCovidArticles = () => {
     throw axiosErrorHandler(err);
   });
 };
+
+export const getCovidArticle = (idList) => {
+  let promises = []
+  idList.forEach(id => {
+    const promise =  axios.get(`http://localhost:8081/getarticle?id=${id}`)
+                      .then((res) => res.data)
+                      .catch((err) => {
+                        console.log(err);
+                        throw axiosErrorHandler(err);
+                      });
+    promises.push(promise)
+  })
+  return Promise.all(promises)
+    .then((res) => res)
+    .catch((err) => {
+      console.log(err);
+      throw axiosErrorHandler(err);
+    })
+}

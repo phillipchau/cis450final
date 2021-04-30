@@ -108,11 +108,58 @@ const userLookup = function(username, callback) {
     });
 }
 
+const addArticle = function(username, article, callback) {
+    var params = {
+        TableName: "Users",
+        Key: {
+            "username": username,
+        },
+        UpdateExpression: 'set articles = list_append(if_not_exists(articles, :empty_list), :article)',
+        ExpressionAttributeValues: {
+            ':article': [article],
+            ':empty_list': []
+        },
+        ReturnValues : "UPDATED_NEW"
+    }
+    db.update(params, function(error, data) {
+        if (error) {
+            console.log(error);
+            callback(error, null);
+        }
+        else {
+            callback(null, data)
+        }
+    });
+}
+
+const removeArticle = function(username, idx, callback) {
+    console.log(idx)
+    var params = {
+        TableName: "Users",
+        Key: {
+            "username": username,
+        },
+        UpdateExpression: `REMOVE articles[${idx}]`,
+        ReturnValues : "UPDATED_NEW"
+    }
+    db.update(params, function(error, data) {
+        if (error) {
+            console.log(error);
+            callback(error, null);
+        }
+        else {
+            callback(null, data)
+        }
+    });
+}
+
 
 var database = {
     profileInfo: profileInfo,
     loginLookup: loginLookup,
-    userLookup: userLookup
+    userLookup: userLookup,
+    addArticle: addArticle,
+    removeArticle: removeArticle
 }; 
 
 module.exports = database;
