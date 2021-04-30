@@ -7,7 +7,7 @@ import { useHistory, Link } from 'react-router-dom';
 
 const Content = styled.div`
   height: 50px;
-  padding: 40px;
+  padding: 50px;
   text-align: center;
   background-color:#054A91;
 `;

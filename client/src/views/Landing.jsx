@@ -27,12 +27,7 @@ const Wall = styled.div`
 position: relative; 
 margin-left: -6%;
 height: 100vh;
-<<<<<<< HEAD
-width: 100%;
-padding: -1rem;
-=======
 width: 112%;
->>>>>>> 13fd0806ba5d20adb8e66c27c30f4ee4fb7f44e2
 display: flex;
 align-items: center;
 justify-content: center;
