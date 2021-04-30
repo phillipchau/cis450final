@@ -25,8 +25,9 @@ grid-gap: 2rem;
 
 const Wall = styled.div`
 position: relative; 
+margin-left: -6%;
 height: 100vh;
-width: 100%;
+width: 112%;
 display: flex;
 align-items: center;
 justify-content: center;
