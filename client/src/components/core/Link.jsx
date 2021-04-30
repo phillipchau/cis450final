@@ -4,10 +4,13 @@ import styled from 'styled-components';
 export const NavbarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text};
   font-size: ${({ theme }) => theme.fontSize.medium};
-  text-decoration: none;
+  padding: 0.25rem 1rem;
 
   &:hover {
-    text-decoration: underline;
+    text-decoration: none;
+    color: inherit;
+    background: ${({ theme }) => theme.colors.navbarBlue};
+    border-radius: 0.25rem;
   }
 `;
 
