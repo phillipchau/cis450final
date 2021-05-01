@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import { getVaccineData } from '../api/Vaccine';
-import { getLogin, getUser } from '../api/Home';
+import { getLogin, getUser, getCaseData } from '../api/Home';
 import ErrorMessage from '../components/core/Error';
 import { Text, LandingHeaderText } from '../components/core/Text';
 import { useHistory, Link } from 'react-router-dom'
@@ -52,7 +52,7 @@ const WallText = styled.div`
 function LandingPage() {
   const history = useHistory()
   // Hold the vaccine data.
-  const [vaccineData, setVaccineData] = useState();
+  const [caseData, setCaseData] = useState();
 
   // The latest articles from NYT.
   const [latestArticles, setLatestArticles] = useState();
@@ -95,14 +95,14 @@ function LandingPage() {
   // Get the vaccine data.
   useEffect(() => {
     setLoading(true);
-    getVaccineData().then((res) => {
-      setVaccineData(res);
+    getCaseData('').then((res) => {
+      setCaseData(res);
       setLoading(false);
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
     });
-  }, [setVaccineData]);
+  }, [setCaseData]);
 
   useEffect(() => {
     setLoading(true);
@@ -178,7 +178,37 @@ function LandingPage() {
         }) : null
       }
       </Grid>
-        
+      <h2 style={{marginTop: 50}}>Top 25 Cases By County</h2>
+      <TableElement>
+        <TableHead>
+          <TableRowElement>
+            <TableHeadElement>State</TableHeadElement>
+            <TableHeadElement>County</TableHeadElement>
+            <TableHeadElement>Count</TableHeadElement>
+          </TableRowElement>
+        </TableHead>
+        <TableBody>
+          {caseData === undefined ?
+            (
+              loading ? (
+                <TableRowElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                </TableRowElement>
+              ) : null
+            )
+            :
+            caseData.map((c, index) => (
+              <TableRowElement key={index}>
+                <TableDataElement>{c.State}</TableDataElement>
+                <TableDataElement>{c.County}</TableDataElement>
+                <TableDataElement>{c.CaseCount}</TableDataElement>
+              </TableRowElement>
+            ))
+          }
+        </TableBody>
+      </TableElement>        
       { error ? <ErrorMessage message={error} /> : null }
     </>
   );

@@ -15,6 +15,7 @@ const StyledMainContainer = styled.div`
 const StyledHomeContainer = styled.div`
   margin: 0 auto;
   width: 90%;
+  padding-bottom: 20px;
 `;
 
 const StyledMinimalContainer = styled.div`

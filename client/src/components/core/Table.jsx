@@ -6,8 +6,8 @@ export const TableElement = styled.table`
   font-size: 0.9em;
   min-width: 400px;
   max-height: 800px;
-  border-radius: 5px 5px 0 0;
   overflow: hidden;
+  border-radius: 5px 5px 0 0;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 `;
 
@@ -21,6 +21,8 @@ export const TableHead = styled.thead`
 export const TableBody = styled.tbody`
   color: ${({ theme }) => theme.colors.white};
   text-align: left;
+  overflow-y:scroll;
+  height:100px;
 `;
 
 export const TableRowElement = styled.tr`

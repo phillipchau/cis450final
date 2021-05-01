@@ -19,4 +19,10 @@ export const getUser = (user) => axios.get(`http://localhost:8081/user/${user}`)
     throw axiosErrorHandler(err);
 });
 
+export const getCaseData = (state) => axios.get(`http://localhost:8081/casecount?state=${state}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+});
+
 

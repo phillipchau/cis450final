@@ -416,6 +416,28 @@ function getTotalCovid(req, res) {
   })
 }
 
+//gets top 25 cases of all time or within a given state if applicable
+function getTop25Cases(req, res) {
+  var state = req.query.state
+  console.log(state)
+  var where = ''
+  if (state !== '') {
+    where= `AND State='${state}'`
+  }
+  var query = 
+    `SELECT CaseCount, State, County
+    FROM covid
+    WHERE Date='2021-04-01' ${where}
+    ORDER BY CaseCount DESC
+    LIMIT 25;`
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err);
+    else {
+      res.json(rows)
+    }
+  })
+}
 
 function getLatestCovidArticles(req, res) {
   axios.get(`https://api.nytimes.com/svc/search/v2/articlesearch.json?q=covid&sort=newest&api-key=${process.env.NYT_API_KEY}`)
@@ -756,5 +778,6 @@ module.exports = {
   getCaseEthnicityQuantiles: getCaseEthnicityQuantiles,
   articleAppend: articleAppend,
   getCovidArticleById: getCovidArticleById,
-  articleRemove: articleRemove
+  articleRemove: articleRemove,
+  getTop25Cases: getTop25Cases
 }
