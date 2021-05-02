@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { getUser, getLogin } from '../api/Home';
 import { getIncomeDataQ1, getIncomeDataQ2, getIncomeDataQ3, getIncomeDataQ4 } from '../api/Income';
 import { getPovertyQ1, getPovertyQ2, getPovertyQ3, getPovertyQ4, 
   getTotalCovidState, getStateCoords, getMaskQ1, getMaskQ2, getMaskQ3, getMaskQ4 } from '../api/MapData';
@@ -32,7 +31,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
 
   const defaultPosition = [37.0902, -100]; // center of US position
   const defaultZoom = 5
-  const defaultRadius = 7000
+  const defaultRadius = 4
 
   //changes map parameters based on if a certain state is chosen
   const[zoom, setZoom] = useState(defaultZoom)
@@ -68,10 +67,9 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
         setZoom(6.3)
         setCenter(newCoor)
         if (filtermetric === 'deaths') {
-          console.log(filtermetric)
-          setRadius(20000)
+          setRadius(21)
         } else {
-          setRadius(1000)
+          setRadius(10)
         }
       })
     }
@@ -86,13 +84,14 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
       if (filtermetric === 'deaths') {
         console.log(radius)
         setMetric('DeathsRate')
-        setRadius(defaultRadius)
+        setRadius(21)
       } else {
         setMetric('CasesRate')
-        setRadius(300)
+        setRadius(5)
       }
       console.log(radius)
       getIncomeDataQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
+        console.log(res)
         setGroupDataQ1(res);
         }).catch((err) => {
           console.log(err)
@@ -118,10 +117,10 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
     } else if (filtermode === 'poverty') {
       if (filtermetric === 'deaths') {
         setMetric('DeathsRate')
-        setRadius(defaultRadius)
+        setRadius(21)
       } else {
         setMetric('CasesRate')
-        setRadius(500)
+        setRadius(5)
       }
       console.log(filterstate)
       getPovertyQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
@@ -153,10 +152,11 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
       //change radius to account for total
       if (filtermetric === 'deaths') {
         setMetric('sum_deaths')
+        setRadius(2)
       } else {
         setMetric('sum_cases')
+        setRadius(1)
       }
-      setRadius(0.00006)
       getTotalCovidState().then((res) => {
         console.log(res)
         setGroupDataQ1(res);
@@ -166,15 +166,14 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
       }).catch((err) => {
         console.log(err)
       })
-        
     }
     else if (filtermode === 'mask') {
       if (filtermetric === 'deaths') {
         setMetric('DeathsRate')
-        setRadius(50)
+        setRadius(1.1)
       } else {
         setMetric('CasesRate')
-        setRadius(50)
+        setRadius(0.8)
       }
       getMaskQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         console.log(res)
@@ -224,7 +223,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
               <CircleMarker
                 key={k}
                 center={[city["Lat"], city["Lon"]]}
-                radius={radius * city[metric]}
+                radius={radius * Math.log(city[metric])}
                 fillOpacity={0.6}
                 stroke={false}
                 fillColor='blue'
@@ -240,7 +239,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
               <CircleMarker
                 key={k}
                 center={[city["Lat"], city["Lon"]]}
-                radius={radius * city[metric]}
+                radius={radius * Math.log(city[metric])}
                 fillOpacity={0.6}
                 stroke={false}
                 fillColor='red'
@@ -256,7 +255,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
               <CircleMarker
                 key={k}
                 center={[city["Lat"], city["Lon"]]}
-                radius={radius * city[metric]}
+                radius={radius * Math.log(city[metric])}
                 fillOpacity={0.6}
                 stroke={false}
                 fillColor='green'
@@ -272,7 +271,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
               <CircleMarker
                 key={k}
                 center={[city["Lat"], city["Lon"]]}
-                radius={radius * city[metric]}
+                radius={radius * Math.log(city[metric])}
                 fillOpacity={0.6}
                 stroke={false}
                 fillColor='black'

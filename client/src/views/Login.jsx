@@ -1,32 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import { signin, checkLogin } from '../api/Login';
 import { useHistory, Link } from 'react-router-dom'
+import ErrorMessage from '../components/core/Error';
 
 const Login = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  // Hold error text.
+  const [error, setError] = useState('');
+
   const history = useHistory()
 
-  const checkLogin = async () => {
-    const data = await axios.get('http://localhost:8081/getlogin', {withCredentials: true})
-    console.log(data)
-    if (data.data && data.data !== "") {
-      history.push('/')
-    }
-  }
-
-  const signin = async () => {
-    const data = await axios.post('http://localhost:8081/login', { username, password }, {withCredentials: true})
-    if (typeof data.data === 'string' && data.data.startsWith('ERROR:')) {
-      alert('An error occured while logging in')
-    } else {  
-      console.log(data)
-      history.push(`/`)
-    }
-  }
 
   useEffect(() => {
-    checkLogin()
+    checkLogin().then((res) => {
+      if (res !== "") {
+        history.push('/')
+      }
+    }).catch((err) => {
+      setError(err.message);
+    });
   },[])
 
   return (
@@ -41,7 +34,12 @@ const Login = () => {
                   <h2 className="text-secondary">Login</h2>
                   <form onSubmit={e => {
                     e.preventDefault()
-                    signin()
+                    signin(username, password)
+                      .then((res) => {
+                        history.push('/')
+                      }).catch((err) => {
+                        setError(err.message);
+                      });
                     setUsername('')
                     setPassword('')
                   }}
@@ -58,6 +56,7 @@ const Login = () => {
                         New to COVID19 Dashboard?
                         <Link to="/signup"> Sign Up Here</Link>
                       </p>
+                      { error ? <ErrorMessage message={error} /> : null }
                     </div>
                   </form>
                 </div>

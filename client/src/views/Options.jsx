@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { getStates } from '../api/MapData';
 import getFormattedDate from '../util/Utility';
+import ErrorMessage from '../components/core/Error';
 
 const Bar = styled.div`
 height: 100%;
@@ -35,6 +36,7 @@ function Options({statefilter, modefilter, setStart, modemetric, userState}) {
     // Hold error text.
     const [error, setError] = useState('');
 
+
     //determines the metric 
     const [metric, setMetric] = useState('deaths')
 
@@ -46,6 +48,10 @@ function Options({statefilter, modefilter, setStart, modemetric, userState}) {
         console.log(err)
       });
     }, [])
+
+    useEffect(() => {
+      setCurrState(userState)
+    }, [userState])
 
   const submitForm = () => {
     if (popmode !== "state") {
@@ -73,7 +79,7 @@ function Options({statefilter, modefilter, setStart, modemetric, userState}) {
          <h5>Date Selector</h5>
 
         <Label htmlFor="start-date-input">Current Date</Label>
-        <Input type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+        <Input disabled={mode == 'mask' || mode == 'total'} type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
           setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
@@ -144,6 +150,7 @@ function Options({statefilter, modefilter, setStart, modemetric, userState}) {
         </div>
         <button style={{ marginTop: 40 }} type="submit" className="btn btn-primary btn-lg btn-block">Submit Filters</button>
       </form>
+      { error ? <ErrorMessage message={error} /> : null }
     </Bar>
     </>
   );

@@ -1,11 +1,19 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
-import { getLogin, getUser } from '../api/Home';
+import { getLogin, getUser, getCaseData } from '../api/Home';
 import { useHistory } from 'react-router-dom'
 import { Text, LandingHeaderText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import ArticleWrapper from './ArticleWrapper'
 import { getCovidArticle } from '../api/NYTData';
+import {
+  TableElement,
+  TableHead,
+  TableBody,
+  TableRowElement,
+  TableHeadElement,
+  TableDataElement,
+} from '../components/core/Table';
 
 const Grid = styled.div`
 margin-top: 20px;
@@ -24,7 +32,10 @@ function UserPage() {
     const [like, setLike] = useState(false)
     // Hold error text.
     const [error, setError] = useState('');
+    // Hold loading boolean.
+    const [loading, setLoading] = useState(false);
 
+    const [caseData, setCaseData] = useState();
     const history = useHistory()
     //initially load who is logged in 
     useEffect(() => {
@@ -35,10 +46,6 @@ function UserPage() {
         } else {
           getUser(res).then((response) => {
             setUser(response)
-            getCovidArticle(response.articles)
-              .then(data => {
-                addFavoriteArticles(data)
-              })
           }).catch((e) => {
             setError(e.message)
           });
@@ -46,8 +53,33 @@ function UserPage() {
       }).catch((err) => {
         setError(err.message);
       });
+    }, [])
+
+    useEffect(() => {
+      if (user) {
+        getCovidArticle(user.articles)
+        .then(data => {
+          addFavoriteArticles(data)
+        }).catch((e) => {
+          setError(e.message)
+        });
+      }
       setLike(false)
-    }, [like])
+    }, [like, user])
+
+    useEffect(() => {
+      if (user) {
+        setLoading(true);
+        getCaseData(user.state).then((res) => {
+          setCaseData(res);
+          setLoading(false);
+        }).catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+      }
+
+    }, [setCaseData, user]);
 
     const addFavoriteArticles = (articles) => {
         let articleList = [];
@@ -102,6 +134,38 @@ function UserPage() {
               </Grid>
             ) : <Text>You don't have any favorited news articles yet!</Text>
             }
+
+            <h2 style={{marginTop: 50}}>My State's Metrics</h2>
+            <TableElement>
+        <TableHead>
+          <TableRowElement>
+            <TableHeadElement>State</TableHeadElement>
+            <TableHeadElement>County</TableHeadElement>
+            <TableHeadElement>Count</TableHeadElement>
+          </TableRowElement>
+        </TableHead>
+        <TableBody>
+          {caseData === undefined ?
+            (
+              loading ? (
+                <TableRowElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                </TableRowElement>
+              ) : null
+            )
+            :
+            caseData.map((c, index) => (
+              <TableRowElement key={index}>
+                <TableDataElement>{c.State}</TableDataElement>
+                <TableDataElement>{c.County}</TableDataElement>
+                <TableDataElement>{c.CaseCount}</TableDataElement>
+              </TableRowElement>
+            ))
+          }
+        </TableBody>
+      </TableElement> 
             { error ? <ErrorMessage message={error} /> : null }
         </>
     )

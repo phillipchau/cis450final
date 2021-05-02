@@ -37,11 +37,11 @@ function getIncomeQ1(req, res) {
   }
   var query = `
   WITH covidByCounty AS (
-    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    SELECT State, County, DailyCaseCount AS Cases, DailyDeathCount AS Deaths
     FROM covid c 
     WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
-    SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
 ), incomeByCounty AS (
     SELECT State, County, AVG(Lat) AS LatCounty, AVG(Lon) AS LonCounty, AVG(Mean) AS Income
@@ -74,11 +74,11 @@ function getIncomeQ2(req, res) {
   }
   var query = `
   WITH covidByCounty AS (
-    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    SELECT State, County, DailyCaseCount AS Cases, DailyDeathCount AS Deaths
     FROM covid c 
     WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
-    SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
 ), incomeByCounty AS (
     SELECT State, County, AVG(Lat) AS LatCounty, AVG(Lon) AS LonCounty, AVG(Mean) AS Income
@@ -112,11 +112,11 @@ function getIncomeQ3(req, res) {
   }
   var query = `
   WITH covidByCounty AS (
-    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    SELECT State, County, DailyCaseCount AS Cases, DailyDeathCount AS Deaths
     FROM covid c 
     WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
-    SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
 ), incomeByCounty AS (
     SELECT State, County, AVG(Lat) AS LatCounty, AVG(Lon) AS LonCounty, AVG(Mean) AS Income
@@ -150,11 +150,11 @@ function getIncomeQ4(req, res) {
   }
   var query = `
   WITH covidByCounty AS (
-    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    SELECT State, County, DailyCaseCount AS Cases, DailyDeathCount AS Deaths
     FROM covid c 
     WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
-    SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
 ), incomeByCounty AS (
     SELECT State, County, AVG(Lat) AS LatCounty, AVG(Lon) AS LonCounty, AVG(Mean) AS Income
@@ -188,11 +188,11 @@ function getPovertyQ1(req, res) {
   }
   var query = `
   WITH covidByCounty AS (
-    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    SELECT State, County, DailyCaseCount AS Cases, DailyDeathCount AS Deaths
     FROM covid c 
     WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
-    SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
 ), povertyByCounty AS (
     SELECT i.State, i.County, AVG(i.Lat) AS LatCounty, AVG(i.Lon) AS LonCounty, AVG(c.Poverty) AS PovCounty
@@ -225,11 +225,11 @@ function getPovertyQ2(req, res) {
   }
   var query = `
   WITH covidByCounty AS (
-    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    SELECT State, County, DailyCaseCount AS Cases, DailyDeathCount AS Deaths
     FROM covid c 
     WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
-    SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
 ), povertyByCounty AS (
     SELECT i.State, i.County, AVG(i.Lat) AS LatCounty, AVG(i.Lon) AS LonCounty, AVG(c.Poverty) AS PovCounty
@@ -263,11 +263,11 @@ function getPovertyQ3(req, res) {
   }
   var query = `
   WITH covidByCounty AS (
-    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    SELECT State, County, DailyCaseCount AS Cases, DailyDeathCount AS Deaths
     FROM covid c 
     WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
-    SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
 ), povertyByCounty AS (
     SELECT i.State, i.County, AVG(i.Lat) AS LatCounty, AVG(i.Lon) AS LonCounty, AVG(c.Poverty) AS PovCounty
@@ -301,11 +301,11 @@ function getPovertyQ4(req, res) {
   }
   var query = `
   WITH covidByCounty AS (
-    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    SELECT State, County, DailyCaseCount AS Cases, DailyDeathCount AS Deaths
     FROM covid c 
     WHERE Date = '${req.query.startdate}'
 ), covidRateByCounty AS (
-    SELECT cov.State, cov.County, cov.Cases/cen.TotalPop AS CasesRate, cov.Deaths/cen.TotalPop AS DeathsRate
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
     FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
 ), povertyByCounty AS (
     SELECT i.State, i.County, AVG(i.Lat) AS LatCounty, AVG(i.Lon) AS LonCounty, AVG(c.Poverty) AS PovCounty
@@ -404,7 +404,7 @@ function getCountPerStateDate(req, res) {
 //gets the aggregation for all days
 function getTotalCovid(req, res) {
   var query = `
-  SELECT State, County, SUM(CaseCount) AS sum_cases, SUM(DeathCount) AS sum_deaths
+  SELECT State, County, SUM(DailyCaseCount) AS sum_cases, SUM(DailyDeathCount) AS sum_deaths
   FROM covid
   GROUP BY State, County;
   `;
@@ -419,7 +419,6 @@ function getTotalCovid(req, res) {
 //gets top 25 cases of all time or within a given state if applicable
 function getTop25Cases(req, res) {
   var state = req.query.state
-  console.log(state)
   var where = ''
   if (state !== '') {
     where= `AND State='${state}'`
@@ -429,6 +428,28 @@ function getTop25Cases(req, res) {
     FROM covid
     WHERE Date='2021-04-01' ${where}
     ORDER BY CaseCount DESC
+    LIMIT 25;`
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err);
+    else {
+      res.json(rows)
+    }
+  })
+}
+
+//gets top 25 cases of all time or within a given state if applicable
+function getTop25Deaths(req, res) {
+  var state = req.query.state
+  var where = ''
+  if (state !== '') {
+    where= `AND State='${state}'`
+  }
+  var query = 
+    `SELECT DeathCount, State, County
+    FROM covid
+    WHERE Date='2021-04-01' ${where}
+    ORDER BY DeathCount DESC
     LIMIT 25;`
 
   connection.query(query, function(err, rows, fields) {
@@ -465,7 +486,7 @@ function getTotalCovidState(req, res) {
     GROUP BY State, County
   ),
   casesState AS (
-    SELECT State, County, SUM(CaseCount) AS sum_cases, SUM(DeathCount) AS sum_deaths
+    SELECT State, County, SUM(DailyCaseCount) AS sum_cases, SUM(DailyDeathCount) AS sum_deaths
     FROM covid
     GROUP BY State, County
   )
@@ -489,19 +510,23 @@ function getMaskQ1(req, res) {
   }
   var query = `
   WITH cov AS (
-    SELECT c.State, c.County, SUM(c.CaseCount) AS Cases, (SUM(c.DeathCount) / e.TotalPop) AS DeathPercentage
-    FROM covid c JOIN census e ON c.State = e.State AND c.County = e.County
+    SELECT State, County, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS DeathPercentage
+    FROM covid 
     GROUP BY State, County
   ), masks AS (
     SELECT State, County, MaskUsagePercentage
     FROM mask
     ORDER BY MaskUsagePercentage ASC
     LIMIT 413
+  ), incomeGroup AS (
+	  SELECT State, County, AVG(Lat) as Lat, AVG(Lon) as Lon
+    FROM income
+    GROUP BY State, County
   )
   SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
   FROM masks m JOIN cov c 
   ON m.State = c.State AND m.County = c.County
-  JOIN income i ON m.State = i.State AND m.County = i.County;
+  JOIN incomeGroup i ON m.State = i.State AND m.County = i.County;
   `
 
   connection.query(query, function(err, rows, fields) {
@@ -519,8 +544,8 @@ function getMaskQ2(req, res) {
   }
   var query = `
   WITH cov AS (
-    SELECT c.State, c.County, SUM(c.CaseCount) AS Cases, (SUM(c.DeathCount) / e.TotalPop) AS DeathPercentage
-    FROM covid c JOIN census e ON c.State = e.State AND c.County = e.County
+    SELECT State, County, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS DeathPercentage
+    FROM covid 
     GROUP BY State, County
   ), masks AS (
     SELECT State, County, MaskUsagePercentage
@@ -528,11 +553,15 @@ function getMaskQ2(req, res) {
     ORDER BY MaskUsagePercentage ASC
     LIMIT 413
     OFFSET 413
+  ), incomeGroup AS (
+	  SELECT State, County, AVG(Lat) as Lat, AVG(Lon) as Lon
+    FROM income
+    GROUP BY State, County
   )
   SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
   FROM masks m JOIN cov c 
   ON m.State = c.State AND m.County = c.County
-  JOIN income i ON m.State = i.State AND m.County = i.County;
+  JOIN incomeGroup i ON m.State = i.State AND m.County = i.County;
   `
 
   connection.query(query, function(err, rows, fields) {
@@ -550,8 +579,8 @@ function getMaskQ3(req, res) {
   }
   var query = `
   WITH cov AS (
-    SELECT c.State, c.County, SUM(c.CaseCount) AS Cases, (SUM(c.DeathCount) / e.TotalPop) AS DeathPercentage
-    FROM covid c JOIN census e ON c.State = e.State AND c.County = e.County
+    SELECT State, County, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS DeathPercentage
+    FROM covid 
     GROUP BY State, County
   ), masks AS (
     SELECT State, County, MaskUsagePercentage
@@ -559,11 +588,15 @@ function getMaskQ3(req, res) {
     ORDER BY MaskUsagePercentage ASC
     LIMIT 413
     OFFSET 816
+  ), incomeGroup AS (
+	  SELECT State, County, AVG(Lat) as Lat, AVG(Lon) as Lon
+    FROM income
+    GROUP BY State, County
   )
   SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
   FROM masks m JOIN cov c 
   ON m.State = c.State AND m.County = c.County
-  JOIN income i ON m.State = i.State AND m.County = i.County;
+  JOIN incomeGroup i ON m.State = i.State AND m.County = i.County;
   `
 
   connection.query(query, function(err, rows, fields) {
@@ -581,8 +614,8 @@ function getMaskQ4(req, res) {
   }
   var query = `
   WITH cov AS (
-    SELECT c.State, c.County, SUM(c.CaseCount) AS Cases, (SUM(c.DeathCount) / e.TotalPop) AS DeathPercentage
-    FROM covid c JOIN census e ON c.State = e.State AND c.County = e.County
+    SELECT State, County, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS DeathPercentage
+    FROM covid 
     GROUP BY State, County
   ), masks AS (
     SELECT State, County, MaskUsagePercentage
@@ -590,11 +623,15 @@ function getMaskQ4(req, res) {
     ORDER BY MaskUsagePercentage ASC
     LIMIT 413
     OFFSET 1229
+  ), incomeGroup AS (
+	  SELECT State, County, AVG(Lat) as Lat, AVG(Lon) as Lon
+    FROM income
+    GROUP BY State, County
   )
   SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
   FROM masks m JOIN cov c 
   ON m.State = c.State AND m.County = c.County
-  JOIN income i ON m.State = i.State AND m.County = i.County;
+  JOIN incomeGroup i ON m.State = i.State AND m.County = i.County;
   `
 
   connection.query(query, function(err, rows, fields) {
@@ -682,6 +719,9 @@ const signup = function(req, res) {
   db.profileInfo(info, function(err, data) {
     if (err) {
       console.log(err)
+      res.status(400).send({
+        message: 'User not found'
+      });
     } else {
       console.log('success')
       req.session.username = info.username
@@ -695,11 +735,16 @@ const login = function(req, res) {
   db.loginLookup(info.username, info.password, function(err, data) {
     if (err) {
       console.log(err)
+      res.status(400).send({
+        message: 'User not found'
+      });
     } else if (data) {
       req.session.username = info.username
       res.send(req.session.username)
     } else {
-      console.log('failed to login')
+      res.status(400).send({
+        message: 'User not found'
+      });
     }
   })
 }
@@ -709,6 +754,9 @@ const userFind = function(req, res) {
   db.userLookup(username, function(err, data) {
     if (err) {
       console.log(err)
+      res.status(400).send({
+        message: 'User not found'
+      });
     } else if (data) {
       res.json(data)
     }
@@ -779,5 +827,6 @@ module.exports = {
   articleAppend: articleAppend,
   getCovidArticleById: getCovidArticleById,
   articleRemove: articleRemove,
-  getTop25Cases: getTop25Cases
+  getTop25Cases: getTop25Cases,
+  getTop25Deaths: getTop25Deaths
 }

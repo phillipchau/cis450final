@@ -39,7 +39,6 @@ function MapContainer() {
       setError(err.message);
     });
   }, [])
-  console.log(userState)
 
   return (
     <div class="container-fluid">

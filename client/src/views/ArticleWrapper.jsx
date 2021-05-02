@@ -36,7 +36,13 @@ const ArticleTitle = styled.p`
 
 function ArticleWrapper({user, article, type, update}) {
     //tracks whether the article is currently liked
-    const [articleLike, setArticleLike] = useState(user.articles.includes(article._id));
+    const [articleLike, setArticleLike] = useState(false);
+
+    useEffect(() => {
+      if (user) {
+        setArticleLike(user.articles.includes(article._id))
+      }
+    },[user])
 
     let buttonType = ''
     if (articleLike) {

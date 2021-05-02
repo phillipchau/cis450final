@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import { getStates } from '../api/MapData';
+import { signup } from '../api/Login';
+import ErrorMessage from '../components/core/Error';
 import { useHistory, Link } from 'react-router-dom'
 
 const Signup = () => {
@@ -11,19 +13,11 @@ const Signup = () => {
   const [state, setState] = useState('')
   const [stateList, setStateList] = useState([])
 
-  const history = useHistory()
-  const signup = async () => {
-    const data = await axios.post('http://localhost:8081/signup', {
-      username, password, fname, lname, state
-    })
-    console.log(data.data)
-    if (data.data !== 'success') {
-      alert('An error occured while signing up')
-    } else {
-      history.push('/')
-    }
-  }
+  // Hold error text.
+  const [error, setError] = useState('');
 
+  const history = useHistory()
+ 
   useEffect(() => {
     getStates().then((res) => {
       setStateList(res);
@@ -44,7 +38,12 @@ const Signup = () => {
                   <p className="text-secondary">Get started on PennConnects!</p>
                   <form onSubmit={e => {
                     e.preventDefault()
-                    signup()
+                    signup(username, password, fname, lname, state)
+                      .then((res) => {
+                        history.push('/')
+                      }).catch((err) => {
+                        setError(err.message);
+                      });
                     setUsername('')
                     setPassword('')
                     setState('')
@@ -87,6 +86,7 @@ const Signup = () => {
                         Already have an account?
                         <Link to="/login"> Return to login page</Link>
                       </p>
+                      { error ? <ErrorMessage message={error} /> : null }
                       <button className="btn btn-primary float-right" type="submit">Submit</button>
                     </div>
                   </form>

@@ -25,4 +25,10 @@ export const getCaseData = (state) => axios.get(`http://localhost:8081/casecount
     throw axiosErrorHandler(err);
 });
 
+export const getDeathData = (state) => axios.get(`http://localhost:8081/deathcount?state=${state}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+});
+
 
