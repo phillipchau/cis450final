@@ -216,7 +216,7 @@ function LandingPage() {
                 <TableRowElement key={index}>
                   <TableDataElement>{c.State}</TableDataElement>
                   <TableDataElement>{c.County}</TableDataElement>
-                  <TableDataElement>{c.CaseCount}</TableDataElement>
+                  <TableDataElement style={{color: 'red'}}>{c.CaseCount}</TableDataElement>
                 </TableRowElement>
               ))
               }
@@ -249,7 +249,7 @@ function LandingPage() {
                 <TableRowElement key={index}>
                   <TableDataElement>{c.State}</TableDataElement>
                   <TableDataElement>{c.County}</TableDataElement>
-                  <TableDataElement>{c.DeathCount}</TableDataElement>
+                  <TableDataElement style={{color: 'red'}}>{c.DeathCount}</TableDataElement>
                 </TableRowElement>
               ))
               }

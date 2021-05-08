@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
-import { getLogin, getUser, getCaseData } from '../api/Home';
+import { getLogin, getUser, getCaseData, getDeathData } from '../api/Home';
 import { useHistory } from 'react-router-dom'
 import { Text, LandingHeaderText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
@@ -36,6 +36,7 @@ function UserPage() {
     const [loading, setLoading] = useState(false);
 
     const [caseData, setCaseData] = useState();
+    const [deathData, setDeathData] = useState(); 
     const history = useHistory()
     //initially load who is logged in 
     useEffect(() => {
@@ -77,9 +78,16 @@ function UserPage() {
           setError(err.message);
           setLoading(false);
         });
+        getDeathData(user.state).then((res) => {
+          setDeathData(res);
+          setLoading(false);
+        }).catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
       }
 
-    }, [setCaseData, user]);
+    }, [setCaseData, setDeathData, user]);
 
     const addFavoriteArticles = (articles) => {
         let articleList = [];
@@ -136,17 +144,54 @@ function UserPage() {
             }
 
             <h2 style={{marginTop: 50}}>My State's Metrics</h2>
+            <div class="container">
+        <div class="row">
+          <div class="col-sm">
+            <h4 style={{marginTop: 10}}>Top 25 Cases By County</h4>
             <TableElement>
-        <TableHead>
-          <TableRowElement>
-            <TableHeadElement>State</TableHeadElement>
-            <TableHeadElement>County</TableHeadElement>
-            <TableHeadElement>Count</TableHeadElement>
-          </TableRowElement>
-        </TableHead>
-        <TableBody>
-          {caseData === undefined ?
-            (
+              <TableHead>
+                <TableRowElement>
+                  <TableHeadElement>State</TableHeadElement>
+                  <TableHeadElement>County</TableHeadElement>
+                  <TableHeadElement>Count</TableHeadElement>
+                </TableRowElement>
+              </TableHead>
+              <TableBody>
+              {caseData === undefined ?
+              (
+              loading ? (
+                <TableRowElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                  <TableDataElement>Loading...</TableDataElement>
+                </TableRowElement>
+                ) : null
+              )
+              :
+              caseData.map((c, index) => (
+                <TableRowElement key={index}>
+                  <TableDataElement>{c.State}</TableDataElement>
+                  <TableDataElement>{c.County}</TableDataElement>
+                  <TableDataElement style={{color: 'red'}}>{c.CaseCount}</TableDataElement>
+                </TableRowElement>
+              ))
+              }
+              </TableBody>
+            </TableElement>    
+          </div>
+          <div class="col-sm">  
+            <h4 style={{marginTop: 10}}>Top 25 Deaths By County</h4>
+            <TableElement>
+              <TableHead>
+                <TableRowElement>
+                  <TableHeadElement>State</TableHeadElement>
+                  <TableHeadElement>County</TableHeadElement>
+                  <TableHeadElement>Count</TableHeadElement>
+                </TableRowElement>
+              </TableHead>
+              <TableBody>
+              {deathData === undefined ?
+              (
               loading ? (
                 <TableRowElement>
                   <TableDataElement>Loading...</TableDataElement>
@@ -154,18 +199,21 @@ function UserPage() {
                   <TableDataElement>Loading...</TableDataElement>
                 </TableRowElement>
               ) : null
-            )
-            :
-            caseData.map((c, index) => (
-              <TableRowElement key={index}>
-                <TableDataElement>{c.State}</TableDataElement>
-                <TableDataElement>{c.County}</TableDataElement>
-                <TableDataElement>{c.CaseCount}</TableDataElement>
-              </TableRowElement>
-            ))
-          }
-        </TableBody>
-      </TableElement> 
+              )
+              :
+              deathData.map((c, index) => (
+                <TableRowElement key={index}>
+                  <TableDataElement>{c.State}</TableDataElement>
+                  <TableDataElement>{c.County}</TableDataElement>
+                  <TableDataElement style={{color: 'red'}}>{c.DeathCount}</TableDataElement>
+                </TableRowElement>
+              ))
+              }
+              </TableBody>
+            </TableElement>
+          </div>
+        </div>
+      </div>
             { error ? <ErrorMessage message={error} /> : null }
         </>
     )
