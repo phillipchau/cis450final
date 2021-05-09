@@ -214,11 +214,11 @@ function VaccinePage() {
           value: state.State
         });
       });
-      setSelectedState(distinctStates[0].value);
+      setSelectedState(distinctStates[0].State);
       setSelectedStatesOptions(options);
 
       // Create the initial graph.
-      submitStateOptions(VaccineOptionsTab.STATE, firstDay, lastDay, distinctStates[0].value);
+      submitStateOptions(VaccineOptionsTab.STATE, firstDay, lastDay, distinctStates[0].State);
     } else {
       // Get the distinct states to be displayed.
       getDistinctStates().then((res) => {
@@ -236,6 +236,7 @@ function VaccinePage() {
         <VaccineOptionsSidebar
           selectedStatesOptions={selectedStatesOptions}
           distinctStates={distinctStates}
+          selectedState={selectedState}
           onStateSubmit={submitStateOptions}
           onOverallSubmit={submitOverallOptions}
         />

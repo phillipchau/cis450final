@@ -321,6 +321,13 @@ export function VaccineOptionsSidebar(params) {
   // The states to be shown on the plot.
   const [selectedStates, setSelectedStates] = useState([]);
 
+  // When the options are set, select the selected state.
+  useEffect(() => {
+    if (params.selectedState !== undefined) {
+      setSelectedState(params.selectedState);
+    }
+  }, [params.selectedState]);
+
   // When the options are set, select all the states.
   useEffect(() => {
     if (params.selectedStatesOptions.length > 0) {
@@ -352,9 +359,11 @@ export function VaccineOptionsSidebar(params) {
 
         <h5>Selected State</h5>
         {
-          params.distinctStates ? (
+          params.distinctStates && selectedState ? (
             // TODO: Get value of the select, perhaps onchange attach.
-            <select name="State">
+            <select name="State" onChange={(e) => {
+              setSelectedState(e.target.value);
+            }} value={selectedState}>
               {
                 params.distinctStates.map((state, index) => {
                   return (
@@ -366,6 +375,8 @@ export function VaccineOptionsSidebar(params) {
           ) : null
         }
         
+        <br></br>
+        <br></br>
         <h5>Date Range</h5>
   
         <Label>Start</Label>
@@ -392,7 +403,6 @@ export function VaccineOptionsSidebar(params) {
           }
         }} />
   
-        <br></br>
         <Button 
           onClick={() => {
             setError('');
