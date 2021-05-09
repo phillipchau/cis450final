@@ -725,7 +725,7 @@ function getOverallVaccinations(req, res) {
         FROM census 
         GROUP BY State) t 
     ON v.State = t.State
-    WHERE State IN (${req.query.selectedStatesStr});
+    WHERE v.State IN (${req.query.selectedStatesStr});
   `;
 
   connection.query(query, function(err, rows, fields) {

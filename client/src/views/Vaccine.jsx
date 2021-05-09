@@ -109,9 +109,17 @@ function VaccinePage() {
   }, []);
 
   // Construct the plot data to be displayed for the state tab.
-  const displayVaccineCaseData = useCallback((selectedStateParam, startDateParam, endDateParam) => {
+  const displayVaccineCaseData = useCallback((selectedStateParam, vaccineCaseData) => {
     // The plot data to be saved.
     let newPlotData = [];
+
+    // Get the index for the plot data; x-axis and line descriptions.
+    let indexData = ['Date', 'Daily Vaccines', 'Daily Cases'];
+    newPlotData.push(indexData);
+
+    vaccineCaseData.forEach((data) => {
+      newPlotData.push([new Date(data.Date), data.Vaccinated, data.DailyCaseCountState]);
+    })
 
     // Print to console for debugging.
     console.log(newPlotData);
@@ -125,7 +133,6 @@ function VaccinePage() {
 
   // Get the state vaccine and case data.
   const getVaccineCaseData = useCallback((selectedStateParam, startDateParam, endDateParam) => {
-    // Get the vaccine and case count data.
     let params = {
       selectedState: selectedStateParam,
       startDate: getFormattedDate(startDateParam),
