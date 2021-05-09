@@ -64,7 +64,7 @@ function Header() {
         <RightHeader to="/map">
           Map
         </RightHeader>
-        <RightHeader to="/vaccinepage">
+        <RightHeader to="/vaccine">
           Vaccine
         </RightHeader>
         <RightHeader to="/user">

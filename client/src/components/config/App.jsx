@@ -23,7 +23,7 @@ function App() {
       <CustomRoute path="/map" component={MapContainer} layout={MainLayout} exact />
       <CustomRoute path="/plot" component={PlotPage} layout={MinimalLayout} exact />
       <CustomRoute path="/user" component={UserPage} layout={MainLayout} exact />
-      <CustomRoute path="/vaccinepage" component={VaccinePage} layout={MinimalLayout} exact />
+      <CustomRoute path="/vaccine" component={VaccinePage} layout={MinimalLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
   );
