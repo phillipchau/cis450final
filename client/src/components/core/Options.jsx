@@ -360,7 +360,6 @@ export function VaccineOptionsSidebar(params) {
         <h5>Selected State</h5>
         {
           params.distinctStates && selectedState ? (
-            // TODO: Get value of the select, perhaps onchange attach.
             <select name="State" onChange={(e) => {
               setSelectedState(e.target.value);
             }} value={selectedState}>
