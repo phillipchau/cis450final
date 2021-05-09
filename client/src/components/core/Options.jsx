@@ -406,7 +406,7 @@ export function VaccineOptionsSidebar(params) {
         <Button 
           onClick={() => {
             setError('');
-            params.onOverallSubmit(optionsTab, selectedStates);
+            params.onStateSubmit(optionsTab, startDateState, endDateState, selectedState);
           }}
         >
           Submit

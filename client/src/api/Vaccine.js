@@ -16,13 +16,13 @@ export const getVaccineData = () => axios.get(routes.getVaccineData)
     throw axiosErrorHandler(err);
   });
 
-export const getVaccinatedCaseCounts = () => axios.get(routes.getVaccinatedCaseCounts)
+export const getVaccinatedCaseCounts = (params) => axios.get(routes.getVaccinatedCaseCounts, { params: params })
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const getOverallVaccineData = () => axios.get(routes.getOverallVaccineData)
+export const getOverallVaccineData = (params) => axios.get(routes.getOverallVaccineData, { params: params })
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
