@@ -444,8 +444,12 @@ export function VaccineOptionsSidebar(params) {
         
         <Button 
           onClick={() => {
-            setError('');
-            params.onOverallSubmit(optionsTab, selectedStates);
+            if (selectedStates.length === 0) {
+              setError('There must be at least one selected state.');
+            } else {
+              setError('');
+              params.onOverallSubmit(optionsTab, selectedStates);
+            }
           }}
         >
           Submit
