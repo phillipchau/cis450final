@@ -7,7 +7,7 @@ import { Button } from '../core/Button';
 const GoogleButton = styled(Button)`
   position: relative;
   display: block;
-  margin: 10px auto;
+  margin: 0 10px;
   background: ${({ theme }) => theme.colors.white};
   text-align: center;
 `;
@@ -20,6 +20,10 @@ const GoogleImage = styled.img`
   vertical-align: middle;
 `;
 
+const GoogleText = styled.span`
+  padding-left: 35px;
+`;
+
 function GoogleLogin(props) {
   const { successAction, errorAction } = props;
 
@@ -27,14 +31,18 @@ function GoogleLogin(props) {
     const provider = new firebase.auth.GoogleAuthProvider();
     app.auth()
       .signInWithRedirect(provider)
-      .then(() => successAction())
-      .catch((err) => errorAction(err.message));
+      .then(() => {
+        successAction()
+      })
+      .catch((err) => {
+        errorAction(err.message)
+      });
   };
 
   return (
     <GoogleButton type="button" className="login-provider-button" onClick={onSubmit}>
       <GoogleImage src="https://img.icons8.com/fluent/48/000000/google-logo.png" />
-      <span> Google</span>
+      <GoogleText> Google</GoogleText>
     </GoogleButton>
   );
 }
