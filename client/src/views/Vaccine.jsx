@@ -83,6 +83,34 @@ function VaccinePage() {
   // Specifies the ethnicity that the plot describes.
   const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
 
+  /**
+   * Vaccine Data
+   */
+
+  const [vaccine, setVaccine] = useState([])
+  const [vaccineTweetIds, setVaccineTweetIds] = useState([]);
+  const [vaccineTweetIndex, setVaccineTweetIndex] = useState(0);
+  useEffect(() => {
+    getVaccineData().then((res) => {
+      setVaccine(res);
+    }).catch((err) => {
+      console.log(err)
+    });
+    
+    getRecentCovidVaccineTweets().then((res) => {
+      let tweetIds = [];
+      res.forEach((tweet) => {
+        // Only select the English-language tweets.
+        if (tweet.lang === 'en') {
+          tweetIds.push(tweet.id);
+        }
+      })
+      setVaccineTweetIds(tweetIds);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, []);
+
   // Helper method to add the state's count.
   const addStateCount = (states, currentStateIndex, data, count, currentDate) => {
     // Add 0 until we get to the correct state.
@@ -304,36 +332,10 @@ function VaccinePage() {
     }
   }, [distinctStates, submitStatesOptions]);
 
-
-
-  const [vaccine, setVaccine] = useState([])
-  const [vaccineTweetIds, setVaccineTweetIds] = useState([]);
-  const [vaccineTweetIndex, setVaccineTweetIndex] = useState(0);
-  useEffect(() => {
-    getVaccineData().then((res) => {
-      setVaccine(res);
-    }).catch((err) => {
-      console.log(err)
-    });
-    
-    getRecentCovidVaccineTweets().then((res) => {
-      let tweetIds = [];
-      res.forEach((tweet) => {
-        // Only select the English-language tweets.
-        if (tweet.lang === 'en') {
-          tweetIds.push(tweet.id);
-        }
-      })
-      setVaccineTweetIds(tweetIds);
-    }).catch((err) => {
-      console.log(err);
-    });
-  }, []);
-
   return (
     <>
       <FlexContainer>
-        <PlotOptionsSidebar
+        <VaccineOptionsSidebar
           distinctStates={distinctStates}
           onStatesSubmit={submitStatesOptions}
           onDemographicsSubmit={submitDemographicsOptions}
@@ -350,7 +352,7 @@ function VaccinePage() {
               loader={<LoadingChart><LoadingContainerText>Loading Chart...</LoadingContainerText></LoadingChart>}
               data={plotData}
               options={{
-                title: `${optionsTab === PlotOptionsTab.STATES ? `${typeCountStates} by State over Time` : `Covid ${typeCountDemographics} for ${ethnicity} Quantiles`}`,
+                title: `${optionsTab === VaccineOptionsTab.STATE ? `Vaccines and Cases for ${selectedState}` : `Total Vaccination Count`}`,
                 hAxis: {
                   title: 'Date',
                 },
