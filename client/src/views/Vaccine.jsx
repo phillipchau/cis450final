@@ -1,9 +1,13 @@
 import styled from 'styled-components';
 import React, { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
-import { getVaccineData, getRecentCovidVaccineTweets } from '../api/Vaccine';
-import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
-import { Ethnicities, getCaseEthnicityQuantile } from '../api/CaseDemographics';
+import {
+  getVaccineData,
+  getVaccinatedCaseCounts, 
+  getOverallVaccineData,
+  getRecentCovidVaccineTweets,
+} from '../api/Vaccine';
+import { getDistinctStates } from '../api/StateCount';
 import { VaccineOptionsSidebar, VaccineOptionsTab } from '../components/core/Options';
 import getFormattedDate from '../util/Utility';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
@@ -104,35 +108,10 @@ function VaccinePage() {
     });
   }, []);
 
-  // Construct the plot data to be displayed for the demographics tab.
-  const displayDemographicsPlotData = useCallback((startDateParam, endDateParam, caseEthnicityQuantiles) => {
+  // Construct the plot data to be displayed for the state tab.
+  const displayVaccineCaseData = useCallback((selectedStateParam, startDateParam, endDateParam) => {
     // The plot data to be saved.
     let newPlotData = [];
-
-    // Get the list of quantiles to be included, with 'Date' for x-axis.
-    let plotAttributes = ['Date', 'Quantile 1', 'Quantile 2', 'Quantile 3', 'Quantile 4', 'Quantile 5'];
-    newPlotData.push(plotAttributes);
-
-    // Add data for all dates indicated by options.
-    let currentDate = new Date(startDateParam);
-    while (!sameDay(currentDate, new Date(endDateParam))) {
-      let index;
-      let ratios = [];
-      ratios.push(new Date(currentDate));
-      for (index = 0; index < 5; index++) {
-        // Add the ratio for the specific quantile at that date.
-        if (!caseEthnicityQuantiles[index].has(getFormattedDate(currentDate))) {
-          ratios.push(0);
-        } else {
-          ratios.push(caseEthnicityQuantiles[index].get(getFormattedDate(currentDate)));
-        }
-      }
-      newPlotData.push(ratios);
-
-      // Increment the current date.
-      currentDate.setDate(currentDate.getDate() + 1);
-      console.log(currentDate);
-    }
 
     // Print to console for debugging.
     console.log(newPlotData);
@@ -146,7 +125,7 @@ function VaccinePage() {
 
   // Get the state vaccine and case data.
   const getVaccineCaseData = useCallback((selectedStateParam, startDateParam, endDateParam) => {
-    // Get the count data.
+    // Get the vaccine and case count data.
     let params = {
       selectedState: selectedStateParam,
       startDate: getFormattedDate(startDateParam),
@@ -154,21 +133,19 @@ function VaccinePage() {
     };
     getVaccinatedCaseCounts(params).then((res) => {
       console.log(res);
-
-      // Get the 
-      displayOverallPlotData(selectedStatesParam, res);
+      displayVaccineCaseData(selectedStatesParam, res);
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
     });
-  }, [displayDemographicsPlotData]);
+  }, [displayVaccineCaseData]);
 
   // Submit the options shown on the sidebar state tab.
   const submitStateOptions = useCallback((optionsTabParam, startDateParam, endDateParam, selectedStateParam) => {
     setError('');
     setLoading(true);
     setOptionsTab(optionsTabParam);
-    getCaseEthnicityQuantiles(selectedStateParam, startDateParam, endDateParam);
+    getVaccineCaseData(selectedStateParam, startDateParam, endDateParam);
   }, [getCaseEthnicityQuantiles]);
 
   // Construct the plot data to be displayed for the state tab.
@@ -198,7 +175,7 @@ function VaccinePage() {
   }, [setPlotData]);
 
   // Get the overall vaccine data across the selected states.
-  const getOverallVaccineData = useCallback((selectedStatesParam) => {
+  const getOverallVaccinations = useCallback((selectedStatesParam) => {
     // Format the selected states.
     let selectedStatesList = [];
     selectedStatesParam.forEach((state) => {
@@ -210,7 +187,7 @@ function VaccinePage() {
     let params = {
       selectedStatesStr: selectedStatesStr,
     };
-    getOverallVaccinations(params).then((res) => {
+    getOverallVaccineData(params).then((res) => {
       console.log(res);
       displayOverallPlotData(selectedStatesParam, res);
     }).catch((err) => {
@@ -224,7 +201,7 @@ function VaccinePage() {
     setError('');
     setLoading(true);
     setOptionsTab(optionsTabParam);
-    getOverallVaccineData(selectedStatesParam);
+    getOverallVaccinations(selectedStatesParam);
   }, [getOverallVaccineData]);
 
   // Setting the state options.
