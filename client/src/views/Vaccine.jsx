@@ -16,32 +16,6 @@ import ErrorMessage from '../components/core/Error';
 import { TopMarginButton } from '../components/core/Button';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
 
-/**
-<Chart
-  width={'600px'}
-  height={'400px'}
-  chartType={`${optionsTab === VaccineOptionsTab.STATE ? 'LineChart' : 'ColumnChart'}`}
-  loader={<LoadingChart><LoadingContainerText>Loading Chart...</LoadingContainerText></LoadingChart>}
-  data={plotData}
-  options={{
-    title: `${optionsTab === VaccineOptionsTab.STATE ? `Vaccines and Cases for ${selectedState}` : 'Total Vaccination Count'}`,
-    hAxis: {
-      title: `${optionsTab === VaccineOptionsTab.STATE ? 'Date' : 'States'}`,
-    },
-    vAxis: {
-      title: `${optionsTab === VaccineOptionsTab.STATE ? `Number of Vaccines Given or Cases Tracked for ${selectedState}` : 'Number of Vaccines Given'}`,
-      viewWindow: {
-        min: 0,
-      },
-    },
-    series: {
-      1: { curveType: 'function' },
-    },
-  }}
-  rootProps={{ 'data-testid': '2' }}
-/>
- */
-
 const TweetContainer = styled.div`
   margin: 0 auto;
   width: 325px;
