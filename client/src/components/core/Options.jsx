@@ -394,7 +394,7 @@ export function VaccineOptionsSidebar(params) {
         <Button 
           onClick={() => {
             setError('');
-            params.onStatesSubmit(optionsTab, startDateState, endDateState, selectedState);
+            params.onOverallSubmit(optionsTab, selectedStates);
           }}
         >
           Submit
@@ -433,7 +433,7 @@ export function VaccineOptionsSidebar(params) {
         <Button 
           onClick={() => {
             setError('');
-            params.onDemographicsSubmit(optionsTab, typeCountDemographics, ethnicity, startDateDemographics, endDateDemographics);
+            params.onOverallSubmit(optionsTab, selectedStates);
           }}
         >
           Submit

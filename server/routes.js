@@ -702,7 +702,7 @@ function getVaccinatedCaseCounts(req, res) {
 
     SELECT v.Date, v.State, v.Vaccinated, c.DailyCaseCountState
     FROM vaccine v JOIN cov c ON v.State = c.State AND v.Date = c.Date
-    WHERE v.State = '${req.query.state}' AND v.Date >= '${req.query.startDate}' AND v.Date <= '${req.query.endDate}';
+    WHERE v.State = '${req.query.selectedState}' AND v.Date >= '${req.query.startDate}' AND v.Date <= '${req.query.endDate}';
   `;
 
   connection.query(query, function(err, rows, fields) {

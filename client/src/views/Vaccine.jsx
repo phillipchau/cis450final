@@ -4,7 +4,7 @@ import Chart from 'react-google-charts';
 import { getVaccineData, getRecentCovidVaccineTweets } from '../api/Vaccine';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import { Ethnicities, getCaseEthnicityQuantile } from '../api/CaseDemographics';
-import { PlotOptionsSidebar, PlotOptionsTab } from '../components/core/Options';
+import { VaccineOptionsSidebar, VaccineOptionsTab } from '../components/core/Options';
 import getFormattedDate from '../util/Utility';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import { Text, LoadingContainerText } from '../components/core/Text';
@@ -47,7 +47,7 @@ const LoadingChart = styled.div`
 `;
 
 // These are the dates available in the COVID database.
-const firstDay = new Date(2020, 0, 20);
+const firstDay = new Date(2021, 0, 12);
 const lastDay = new Date(2021, 3, 1);
 
 function VaccinePage() {
@@ -61,27 +61,20 @@ function VaccinePage() {
   const [plotData, setPlotData] = useState();
 
   // Hold the formatted plot data to be displayed.
-  const [optionsTab, setOptionsTab] = useState(PlotOptionsTab.STATES);
+  const [optionsTab, setOptionsTab] = useState(VaccineOptionsTab.STATE);
+
+  // Hold the data retrieved by the database.
+  const [distinctStates, setDistinctStates] = useState();
+
+  // All of the states available on the plot.
+  const [selectedStatesOptions, setSelectedStatesOptions] = useState([]);
 
   /**
    * State Tab 
    */
 
-  // Hold the data retrieved by the database.
-  const [distinctStates, setDistinctStates] = useState();
-
   // The selected state to show on the plot.
   const [selectedState, setSelectedState] = useState('');
-
-  /**
-   * Overall Tab
-   */
-
-  // Specifies whether the plot holds cases or deaths information.
-  const [typeCountDemographics, setTypeCountDemographics] = useState(TypeCount.CASES);
-
-  // Specifies the ethnicity that the plot describes.
-  const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
 
   /**
    * Vaccine Data
@@ -110,109 +103,6 @@ function VaccinePage() {
       console.log(err);
     });
   }, []);
-
-  // Helper method to add the state's count.
-  const addStateCount = (states, currentStateIndex, data, count, currentDate) => {
-    // Add 0 until we get to the correct state.
-    while (states[currentStateIndex] !== data.State) {
-      count.push(0);
-      currentStateIndex++;
-      if (states.indexOf(data.State) < currentStateIndex) {
-        console.log(states.indexOf(data.State));
-        console.log(currentStateIndex);
-        console.log(currentDate);
-        return 0;
-      }
-    }
-
-    // Add the current state's count, and increment.
-    count.push(data.Count);
-    currentStateIndex++;
-    return currentStateIndex;
-  };
-
-  // Construct the plot data to be displayed for the states tab.
-  const displayStatesPlotData = useCallback((startDateParam, selectedStatesParam, countPerStateDateParam) => {
-    // The plot data to be saved.
-    let newPlotData = [];
-
-    // Get the list of states to be included. This can be modified.
-    let states = [];
-    selectedStatesParam.forEach((state) => {
-      states.push(state.value);
-    });
-    states.sort();
-
-    // Add the 'Date' as the first entry for x-axis description.
-    states.unshift('Date');
-    newPlotData.push(states);
-
-    // Iterate through the plot data, for every new date, construct the list.
-    let currentDate = new Date(startDateParam);
-    currentDate.setDate(currentDate.getDate() - 1);
-    let currentStateIndex = 1;
-    let count = [currentDate];
-    countPerStateDateParam.forEach((data) => {
-      if (sameDay(currentDate, new Date(data.Date))) {
-        currentStateIndex = addStateCount(states, currentStateIndex, data, count, currentDate);
-      } else {
-        // Add 0 until there is no state date left to add.
-        while (currentStateIndex < states.length) {
-          count.push(0);
-          currentStateIndex++;
-        }
-
-        // Reset variables, then add new state.
-        newPlotData.push(count);
-        currentDate = new Date(data.Date);
-        currentStateIndex = 1;
-        count = [currentDate];
-        currentStateIndex = addStateCount(states, currentStateIndex, data, count, currentDate);
-      }
-    });
-
-    // Print to console for debugging.
-    console.log(newPlotData);
-
-    // Set the new plot data.
-    setPlotData(newPlotData);
-
-    // Display the plot.
-    setLoading(false);
-  }, [setPlotData]);
-
-  // Get the states data.
-  const getCountStateData = useCallback((typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
-    // Format the selected states.
-    let selectedStatesList = [];
-    selectedStatesParam.forEach((state) => {
-      selectedStatesList.push(state.value);
-    });
-    let selectedStatesStr = `'${selectedStatesList.join("', '")}'`;
-
-    // Get the count data.
-    let params = {
-      typeCount: typeCountParam,
-      startDate: getFormattedDate(startDateParam),
-      endDate: getFormattedDate(endDateParam),
-      selectedStatesStr: selectedStatesStr,
-    };
-    getCountPerStateDate(params).then((res) => {
-      console.log(res);
-      displayStatesPlotData(startDateParam, selectedStatesParam, res);
-    }).catch((err) => {
-      setError(err.message);
-    });
-  }, [displayStatesPlotData]);
-
-  // Submit the options shown on the sidebar states tab.
-  const submitStatesOptions = useCallback((optionsTabParam, typeCountParam, startDateParam, endDateParam, selectedStatesParam) => {
-    setError('');
-    setLoading(true);
-    setOptionsTab(optionsTabParam);
-    setTypeCountStates(typeCountParam);
-    getCountStateData(typeCountParam, startDateParam, endDateParam, selectedStatesParam);
-  }, [setTypeCountStates, getCountStateData]);
 
   // Construct the plot data to be displayed for the demographics tab.
   const displayDemographicsPlotData = useCallback((startDateParam, endDateParam, caseEthnicityQuantiles) => {
@@ -254,58 +144,88 @@ function VaccinePage() {
     setLoading(false);
   }, [setPlotData]);
 
-  // Get the demographics data.
-  const getCaseEthnicityQuantiles = useCallback((ethnicityParam, typeCountParam, startDateParam, endDateParam) => {
+  // Get the state vaccine and case data.
+  const getVaccineCaseData = useCallback((selectedStateParam, startDateParam, endDateParam) => {
     // Get the count data.
     let params = {
-      ethnicity: ethnicityParam,
+      selectedState: selectedStateParam,
       startDate: getFormattedDate(startDateParam),
       endDate: getFormattedDate(endDateParam),
     };
+    getVaccinatedCaseCounts(params).then((res) => {
+      console.log(res);
 
-    // For loop to get all the quantiles.
-    let quantile;
-    const promises = [];
-    for (quantile = 0; quantile < 5; quantile++) {
-      params.quantile = quantile;
-      promises.push(getCaseEthnicityQuantile(params));
-    }
-    
-    // Resolve all promises and call function to display the data.
-    Promise.all(promises).then((res) => {
-      // Transform each array to a map with a date key and ratio value.
-      const caseEthnicityQuantiles = [];
-      res.forEach((quantileData) => {
-        const quantileMap = new Map();
-        quantileData.forEach((data) => {
-          // Add the data to a map.
-          quantileMap.set(
-            data.Date, 
-            (typeCountParam === TypeCount.CASES ? data.CaseRate : data.DeathRate)
-          );
-        });
-        caseEthnicityQuantiles.push(quantileMap);
-      });
-
-      // Print to console for debugging.
-      console.log(caseEthnicityQuantiles);
-      
-      displayDemographicsPlotData(startDateParam, endDateParam, caseEthnicityQuantiles);
+      // Get the 
+      displayOverallPlotData(selectedStatesParam, res);
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
     });
   }, [displayDemographicsPlotData]);
 
-  // Submit the options shown on the sidebar demographics tab.
-  const submitDemographicsOptions = useCallback((optionsTabParam, typeCountParam, ethnicityParam, startDateParam, endDateParam) => {
+  // Submit the options shown on the sidebar state tab.
+  const submitStateOptions = useCallback((optionsTabParam, startDateParam, endDateParam, selectedStateParam) => {
     setError('');
     setLoading(true);
     setOptionsTab(optionsTabParam);
-    setTypeCountDemographics(typeCountParam);
-    setEthnicity(ethnicityParam);
-    getCaseEthnicityQuantiles(ethnicityParam, typeCountParam, startDateParam, endDateParam);
+    getCaseEthnicityQuantiles(selectedStateParam, startDateParam, endDateParam);
   }, [getCaseEthnicityQuantiles]);
+
+  // Construct the plot data to be displayed for the state tab.
+  const displayOverallPlotData = useCallback((selectedStatesParam, vaccineData) => {
+    // The plot data to be saved.
+    let newPlotData = [];
+
+    // Get the list of states to be included. This can be modified.
+    let states = [];
+    selectedStatesParam.forEach((state) => {
+      states.push(state.value);
+    });
+    states.sort();
+
+    // Add the 'Date' as the first entry for x-axis description.
+    states.unshift('Date');
+    newPlotData.push(states);
+
+    // Print to console for debugging.
+    console.log(newPlotData);
+
+    // Set the new plot data.
+    setPlotData(newPlotData);
+
+    // Display the plot.
+    setLoading(false);
+  }, [setPlotData]);
+
+  // Get the overall vaccine data across the selected states.
+  const getOverallVaccineData = useCallback((selectedStatesParam) => {
+    // Format the selected states.
+    let selectedStatesList = [];
+    selectedStatesParam.forEach((state) => {
+      selectedStatesList.push(state.value);
+    });
+    let selectedStatesStr = `'${selectedStatesList.join("', '")}'`;
+
+    // Get the overall vaccine data.
+    let params = {
+      selectedStatesStr: selectedStatesStr,
+    };
+    getOverallVaccinations(params).then((res) => {
+      console.log(res);
+      displayOverallPlotData(selectedStatesParam, res);
+    }).catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
+  }, []);
+
+  // Submit the options shown on the sidebar overall tab.
+  const submitOverallOptions = useCallback((optionsTabParam, selectedStatesParam) => {
+    setError('');
+    setLoading(true);
+    setOptionsTab(optionsTabParam);
+    getOverallVaccineData(selectedStatesParam);
+  }, [getOverallVaccineData]);
 
   // Setting the state options.
   useEffect(() => {
@@ -317,10 +237,11 @@ function VaccinePage() {
           value: state.State
         });
       });
+      setSelectedState(distinctStates[0].value);
       setSelectedStatesOptions(options);
 
       // Create the initial graph.
-      submitStatesOptions(PlotOptionsTab.STATES, TypeCount.CASES, firstDay, lastDay, options);
+      submitStateOptions(VaccineOptionsTab.STATE, firstDay, lastDay, distinctStates[0].value);
     } else {
       // Get the distinct states to be displayed.
       getDistinctStates().then((res) => {
@@ -330,15 +251,16 @@ function VaccinePage() {
         setError(err.message);
       });
     }
-  }, [distinctStates, submitStatesOptions]);
+  }, [distinctStates, submitStateOptions]);
 
   return (
     <>
       <FlexContainer>
         <VaccineOptionsSidebar
+          selectedStatesOptions={selectedStatesOptions}
           distinctStates={distinctStates}
-          onStatesSubmit={submitStatesOptions}
-          onDemographicsSubmit={submitDemographicsOptions}
+          onStateSubmit={submitStateOptions}
+          onOverallSubmit={submitOverallOptions}
         />
         <ChildFlexContainer
           flex={7}
@@ -348,16 +270,16 @@ function VaccinePage() {
             <Chart
               width={'600px'}
               height={'400px'}
-              chartType="LineChart"
+              chartType={`${optionsTab === VaccineOptionsTab.STATE ? 'LineChart' : 'ColumnChart'}`}
               loader={<LoadingChart><LoadingContainerText>Loading Chart...</LoadingContainerText></LoadingChart>}
               data={plotData}
               options={{
-                title: `${optionsTab === VaccineOptionsTab.STATE ? `Vaccines and Cases for ${selectedState}` : `Total Vaccination Count`}`,
+                title: `${optionsTab === VaccineOptionsTab.STATE ? `Vaccines and Cases for ${selectedState}` : 'Total Vaccination Count'}`,
                 hAxis: {
-                  title: 'Date',
+                  title: `${optionsTab === VaccineOptionsTab.STATE ? 'Date' : 'States'}`,
                 },
                 vAxis: {
-                  title: `${optionsTab === PlotOptionsTab.STATES ? `${typeCountStates}` : `Ratio of Covid ${typeCountDemographics} to Total U.S. Population`}`,
+                  title: `${optionsTab === VaccineOptionsTab.STATE ? `Number of Vaccines Given or Cases Tracked for ${selectedState}` : 'Number of Vaccines Given'}`,
                   viewWindow: {
                     min: 0,
                   },
