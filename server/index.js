@@ -68,6 +68,7 @@ app.get('/case-demographics', routes.getCaseEthnicityQuantiles);
 app.get('/casecount', routes.getTop25Cases);
 app.get('/deathcount', routes.getTop25Deaths);
 app.get('/vaccinated-case-count', routes.getVaccinatedCaseCounts);
+app.get('/overall-vaccinations', routes.getOverallVaccinations);
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);

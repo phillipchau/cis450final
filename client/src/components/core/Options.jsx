@@ -318,15 +318,8 @@ export function VaccineOptionsSidebar(params) {
    * Overall Tab
    */
 
-  // Specifies whether the plot holds cases or deaths information.
-  const [typeCountDemographics, setTypeCountDemographics] = useState(TypeCount.CASES);
-
-  // Specifies the ethnicity that the plot describes.
-  const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
-
-  // Hold the starting and ending dates.
-  const [startDateDemographics, setStartDateDemographics] = useState(plotFirstDay);
-  const [endDateDemographics, setEndDateDemographics] = useState(plotLastDay);
+  // The states to be shown on the plot.
+  const [selectedStates, setSelectedStates] = useState([]);
 
   // When the options are set, select all the states.
   useEffect(() => {
@@ -429,70 +422,14 @@ export function VaccineOptionsSidebar(params) {
         </OptionsTabContainer>
         { error ? <ErrorMessage message={error} /> : null }
 
-        <h5>Date Range</h5>
-  
-        <Label>Start</Label>
-        <Input type="date" value={getFormattedDate(startDateDemographics)} onChange={(e) => {
-          setError('');
-          let newDate = new Date(e.target.value);
-          newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= plotFirstDay && newDate <= plotLastDay && newDate <= endDateStates) {
-            setStartDateDemographics(newDate);
-          } else {
-            setError('The date must have data in the database and be before the ending date.');
-          }
-        }} />
-  
-        <Label>End</Label>
-        <Input type="date" value={getFormattedDate(endDateDemographics)} onChange={(e) => {
-          setError('');
-          let newDate = new Date(e.target.value);
-          newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= plotFirstDay && newDate <= plotLastDay && newDate >= startDateStates) {
-            setEndDateDemographics(newDate);
-          } else {
-            setError('The date must have data in the database and be after the starting date.');
-          }
-        }} />
-
-        <br></br>
-        <h5>Filters</h5>
-        <SubHeaderText>Count Type</SubHeaderText>
-        <MinimalLabel>
-          Count Cases
-          <InlineInput
-            name="Count Cases"
-            type="checkbox"
-            checked={typeCountDemographics === TypeCount.CASES}
-            onChange={() => setTypeCountDemographics(TypeCount.CASES)}
-          />
-        </MinimalLabel>
-        <MinimalLabel>
-          Count Deaths
-          <InlineInput
-            name="Count Deaths"
-            type="checkbox"
-            checked={typeCountDemographics === TypeCount.DEATHS}
-            onChange={() => setTypeCountDemographics(TypeCount.DEATHS)}
-          />
-        </MinimalLabel>
-        <SubHeaderText>Ethnicities</SubHeaderText>
-        { Object.values(Ethnicities).map((ethnicityType, index) => {
-            return (
-              <MinimalLabel
-                key={ethnicityType}
-              >
-                {ethnicityType}
-                <InlineInput
-                  name={ethnicityType}
-                  type="checkbox"
-                  checked={ethnicity === ethnicityType}
-                  onChange={() => setEthnicity(ethnicityType)}
-                />
-              </MinimalLabel>
-            );
-          })
-        }
+        <h5>Selected States</h5>
+        <StyledMultiSelect
+          options={params.selectedStatesOptions}
+          value={selectedStates}
+          onChange={setSelectedStates}
+          labelledBy="Select"
+        />
+        
         <Button 
           onClick={() => {
             setError('');
