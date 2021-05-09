@@ -64,11 +64,6 @@ const Login = () => {
             </div>
           </div>
         </div>
-        <div class="card-action">
-              <a href="http://localhost:8081/auth/facebook" class="waves-effect waves-light btn social facebook">
-                <i class="fa fa-facebook"></i> Sign in with facebook
-              </a>
-        </div>
       </div>
       <div>
         <p style={{textAlign: 'center'}}className="text-secondary bot-margin">Created by G36</p>

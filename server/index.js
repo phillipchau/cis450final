@@ -19,42 +19,6 @@ app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const passport = require("passport");
-const FacebookStrategy = require("passport-facebook").Strategy;
-require('dotenv').config();
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser((user, cb) => {
-    cb(null, user);
-});
-
-passport.deserializeUser((user, cb) => {
-    cb(null, user);
-});
-
-// Facebook Strategy
-passport.use(new FacebookStrategy({
-        clientID: process.env.FACEBOOK_CLIENT_ID,
-        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-        callbackURL: "/auth/facebook/callback",
-		profileFields: ["email", "name"]
-    },
-    (accessToken, refreshToken, profile, cb) => {
-		const { email, first_name, last_name } = profile._json;
-		console.log(profile)
-        return cb(null, profile);
-    }));
-
-app.get("/auth/facebook", passport.authenticate("facebook"));
-app.get("/auth/facebook/callback",
-	passport.authenticate("facebook"),
-	(req, res) => {
-		//console.log(req)
-		res.redirect("http://localhost:3000/");
-	});
-
 /* ---------------------------------------------------------------- */
 /* ------------------- Route handler registration ----------------- */
 /* ---------------------------------------------------------------- */
