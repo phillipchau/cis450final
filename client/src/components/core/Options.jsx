@@ -357,7 +357,9 @@ export function VaccineOptionsSidebar(params) {
             <select name="State">
               {
                 params.distinctStates.map((state, index) => {
-                  <option value={state} id={state}>{state}</option>
+                  return (
+                    <option value={state.State} key={state.State}>{state.State}</option>
+                  );
                 })
               }
             </select>

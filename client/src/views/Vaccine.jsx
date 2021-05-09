@@ -133,7 +133,7 @@ function VaccinePage() {
     };
     getVaccinatedCaseCounts(params).then((res) => {
       console.log(res);
-      displayVaccineCaseData(selectedStatesParam, res);
+      displayVaccineCaseData(selectedStateParam, res);
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
@@ -146,7 +146,7 @@ function VaccinePage() {
     setLoading(true);
     setOptionsTab(optionsTabParam);
     getVaccineCaseData(selectedStateParam, startDateParam, endDateParam);
-  }, [getCaseEthnicityQuantiles]);
+  }, [getVaccineCaseData]);
 
   // Construct the plot data to be displayed for the state tab.
   const displayOverallPlotData = useCallback((selectedStatesParam, vaccineData) => {
