@@ -691,6 +691,28 @@ function getCaseEthnicityQuantiles(req, res) {
   }
 }
 
+function getVaccinatedCaseCounts(req, res) {
+  // Valid state and date range must be provided.
+  var query = `
+    WITH cov AS (
+        SELECT Date, State, SUM(DailyCaseCount) AS DailyCaseCountState
+        FROM covid
+        GROUP BY Date, State
+    )
+
+    SELECT v.Date, v.State, v.Vaccinated, c.DailyCaseCountState
+    FROM vaccine v JOIN cov c ON v.State = c.State AND v.Date = c.Date
+    WHERE v.State = '${req.query.state}' AND v.Date >= '${req.query.startDate}' AND v.Date <= '${req.query.endDate}';
+  `;
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  });
+}
+
 // Get the recent COVID Vaccine tweets.
 function getRecentCovidVaccineTweets(req, res) {
   var config = {

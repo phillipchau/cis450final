@@ -28,7 +28,7 @@ const InlineInput = styled.input`
   margin-left: 5px;
 `;
 
-export const OptionsTab = Object.freeze({ STATES: 'States', DEMOGRAPHICS: 'Demographics' });
+export const PlotOptionsTab = Object.freeze({ STATES: 'States', DEMOGRAPHICS: 'Demographics' });
 
 const OptionsTabContainer = styled.div`
   display: flex;
@@ -49,12 +49,12 @@ const OptionsTabText = styled(Text)`
 `;
 
 // These are the dates available in the COVID database.
-const firstDay = new Date(2020, 0, 20);
-const lastDay = new Date(2021, 3, 1);
+const plotFirstDay = new Date(2020, 0, 20);
+const plotLastDay = new Date(2021, 3, 1);
 
-export function OptionsSidebar(params) {
+export function PlotOptionsSidebar(params) {
   // Specifies the parameters in the options sidebar.
-  const [optionsTab, setOptionsTab] = useState(OptionsTab.STATES);
+  const [optionsTab, setOptionsTab] = useState(PlotOptionsTab.STATES);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -67,8 +67,8 @@ export function OptionsSidebar(params) {
   const [typeCountStates, setTypeCountStates] = useState(TypeCount.CASES);
 
   // Hold the starting and ending dates.
-  const [startDateStates, setStartDateStates] = useState(firstDay);
-  const [endDateStates, setEndDateStates] = useState(lastDay);
+  const [startDateStates, setStartDateStates] = useState(plotFirstDay);
+  const [endDateStates, setEndDateStates] = useState(plotLastDay);
 
   // The states to be shown on the plot.
   const [selectedStates, setSelectedStates] = useState([]);
@@ -84,8 +84,8 @@ export function OptionsSidebar(params) {
   const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
 
   // Hold the starting and ending dates.
-  const [startDateDemographics, setStartDateDemographics] = useState(firstDay);
-  const [endDateDemographics, setEndDateDemographics] = useState(lastDay);
+  const [startDateDemographics, setStartDateDemographics] = useState(plotFirstDay);
+  const [endDateDemographics, setEndDateDemographics] = useState(plotLastDay);
 
   // When the options are set, select all the states.
   useEffect(() => {
@@ -95,23 +95,23 @@ export function OptionsSidebar(params) {
   }, [params.selectedStatesOptions]);
 
   // Display the state count tab.
-  if (optionsTab === OptionsTab.STATES) {
+  if (optionsTab === PlotOptionsTab.STATES) {
     return (
       <ChildFlexContainer
         flex={3}
       >
         <OptionsTabContainer>
           <OptionsTabText
-            onClick={() => setOptionsTab(OptionsTab.STATES)}
-            enabled={optionsTab === OptionsTab.STATES}
+            onClick={() => setOptionsTab(PlotOptionsTab.STATES)}
+            enabled={optionsTab === PlotOptionsTab.STATES}
           >
-            {OptionsTab.STATES}
+            {PlotOptionsTab.STATES}
           </OptionsTabText>
           <OptionsTabText
-            onClick={() => setOptionsTab(OptionsTab.DEMOGRAPHICS)}
-            enabled={optionsTab === OptionsTab.DEMOGRAPHICS}
+            onClick={() => setOptionsTab(PlotOptionsTab.DEMOGRAPHICS)}
+            enabled={optionsTab === PlotOptionsTab.DEMOGRAPHICS}
           >
-            {OptionsTab.DEMOGRAPHICS}
+            {PlotOptionsTab.DEMOGRAPHICS}
           </OptionsTabText>
         </OptionsTabContainer>
         { error ? <ErrorMessage message={error} /> : null }
@@ -130,7 +130,7 @@ export function OptionsSidebar(params) {
           setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDateStates) {
+          if (newDate >= plotFirstDay && newDate <= plotLastDay && newDate <= endDateStates) {
             setStartDateStates(newDate);
           } else {
             setError('The date must have data in the database and be before the ending date.');
@@ -142,7 +142,7 @@ export function OptionsSidebar(params) {
           setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDateStates) {
+          if (newDate >= plotFirstDay && newDate <= plotLastDay && newDate >= startDateStates) {
             setEndDateStates(newDate);
           } else {
             setError('The date must have data in the database and be after the starting date.');
@@ -184,23 +184,23 @@ export function OptionsSidebar(params) {
         </Button>
       </ChildFlexContainer>
     );
-  } else if (optionsTab === OptionsTab.DEMOGRAPHICS) {
+  } else if (optionsTab === PlotOptionsTab.DEMOGRAPHICS) {
     return (
       <ChildFlexContainer
         flex={3}
       >
         <OptionsTabContainer>
           <OptionsTabText
-            onClick={() => setOptionsTab(OptionsTab.STATES)}
-            enabled={optionsTab === OptionsTab.STATES}
+            onClick={() => setOptionsTab(PlotOptionsTab.STATES)}
+            enabled={optionsTab === PlotOptionsTab.STATES}
           >
-            {OptionsTab.STATES}
+            {PlotOptionsTab.STATES}
           </OptionsTabText>
           <OptionsTabText
-            onClick={() => setOptionsTab(OptionsTab.DEMOGRAPHICS)}
-            enabled={optionsTab === OptionsTab.DEMOGRAPHICS}
+            onClick={() => setOptionsTab(PlotOptionsTab.DEMOGRAPHICS)}
+            enabled={optionsTab === PlotOptionsTab.DEMOGRAPHICS}
           >
-            {OptionsTab.DEMOGRAPHICS}
+            {PlotOptionsTab.DEMOGRAPHICS}
           </OptionsTabText>
         </OptionsTabContainer>
         { error ? <ErrorMessage message={error} /> : null }
@@ -212,7 +212,7 @@ export function OptionsSidebar(params) {
           setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate <= endDateStates) {
+          if (newDate >= plotFirstDay && newDate <= plotLastDay && newDate <= endDateStates) {
             setStartDateDemographics(newDate);
           } else {
             setError('The date must have data in the database and be before the ending date.');
@@ -224,7 +224,7 @@ export function OptionsSidebar(params) {
           setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);
-          if (newDate >= firstDay && newDate <= lastDay && newDate >= startDateStates) {
+          if (newDate >= plotFirstDay && newDate <= plotLastDay && newDate >= startDateStates) {
             setEndDateDemographics(newDate);
           } else {
             setError('The date must have data in the database and be after the starting date.');
@@ -288,6 +288,228 @@ export function OptionsSidebar(params) {
       </ChildFlexContainer>
     )
   }
+}
 
+export const VaccineOptionsTab = Object.freeze({ STATE: 'State', OVERALL: 'Overall' });
+
+// These are the dates available in the Vaccine database.
+const vaccineFirstDay = new Date(2021, 0, 12);
+const vaccineLastDay = new Date(2021, 3, 1);
+
+export function VaccineOptionsSidebar(params) {
+  // Specifies the parameters in the options sidebar.
+  const [optionsTab, setOptionsTab] = useState(VaccineOptionsTab.STATE);
+
+  // Hold error text.
+  const [error, setError] = useState('');
+
+  /**
+   * State Tab
+   */
+
+  // Hold the starting and ending dates.
+  const [startDateState, setStartDateState] = useState(vaccineFirstDay);
+  const [endDateState, setEndDateState] = useState(vaccineLastDay);
+
+  // The selected state to show on the plot.
+  const [selectedState, setSelectedState] = useState('');
+
+  /**
+   * Overall Tab
+   */
+
+  // Specifies whether the plot holds cases or deaths information.
+  const [typeCountDemographics, setTypeCountDemographics] = useState(TypeCount.CASES);
+
+  // Specifies the ethnicity that the plot describes.
+  const [ethnicity, setEthnicity] = useState(Ethnicities.HISPANIC);
+
+  // Hold the starting and ending dates.
+  const [startDateDemographics, setStartDateDemographics] = useState(plotFirstDay);
+  const [endDateDemographics, setEndDateDemographics] = useState(plotLastDay);
+
+  // When the options are set, select all the states.
+  useEffect(() => {
+    if (params.selectedStatesOptions.length > 0) {
+      setSelectedStates(params.selectedStatesOptions);
+    }
+  }, [params.selectedStatesOptions]);
+
+  // Display the state tab.
+  if (optionsTab === VaccineOptionsTab.STATE) {
+    return (
+      <ChildFlexContainer
+        flex={3}
+      >
+        <OptionsTabContainer>
+          <OptionsTabText
+            onClick={() => setOptionsTab(VaccineOptionsTab.STATE)}
+            enabled={optionsTab === VaccineOptionsTab.STATE}
+          >
+            {VaccineOptionsTab.STATE}
+          </OptionsTabText>
+          <OptionsTabText
+            onClick={() => setOptionsTab(VaccineOptionsTab.OVERALL)}
+            enabled={optionsTab === VaccineOptionsTab.OVERALL}
+          >
+            {VaccineOptionsTab.OVERALL}
+          </OptionsTabText>
+        </OptionsTabContainer>
+        { error ? <ErrorMessage message={error} /> : null }
+
+        <h5>Selected State</h5>
+        {
+          params.distinctStates ? (
+            // TODO: Get value of the select, perhaps onchange attach.
+            <select name="State">
+              {
+                params.distinctStates.map((state, index) => {
+                  <option value={state} id={state}>{state}</option>
+                })
+              }
+            </select>
+          ) : null
+        }
+        
+        <h5>Date Range</h5>
   
+        <Label>Start</Label>
+        <Input type="date" value={getFormattedDate(startDateState)} onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= vaccineFirstDay && newDate <= vaccineLastDay && newDate <= endDateState) {
+            setStartDateState(newDate);
+          } else {
+            setError('The date must have data in the database and be before the ending date.');
+          }
+        }} />
+  
+        <Label>End</Label>
+        <Input type="date" value={getFormattedDate(endDateState)} onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= vaccineFirstDay && newDate <= vaccineLastDay && newDate >= startDateState) {
+            setEndDateState(newDate);
+          } else {
+            setError('The date must have data in the database and be after the starting date.');
+          }
+        }} />
+  
+        <br></br>
+        <Button 
+          onClick={() => {
+            setError('');
+            params.onStatesSubmit(optionsTab, startDateState, endDateState, selectedState);
+          }}
+        >
+          Submit
+        </Button>
+      </ChildFlexContainer>
+    );
+  } else if (optionsTab === VaccineOptionsTab.OVERALL) {
+    return (
+      <ChildFlexContainer
+        flex={3}
+      >
+        <OptionsTabContainer>
+          <OptionsTabText
+            onClick={() => setOptionsTab(VaccineOptionsTab.STATE)}
+            enabled={optionsTab === VaccineOptionsTab.STATE}
+          >
+            {VaccineOptionsTab.STATE}
+          </OptionsTabText>
+          <OptionsTabText
+            onClick={() => setOptionsTab(VaccineOptionsTab.OVERALL)}
+            enabled={optionsTab === VaccineOptionsTab.OVERALL}
+          >
+            {VaccineOptionsTab.OVERALL}
+          </OptionsTabText>
+        </OptionsTabContainer>
+        { error ? <ErrorMessage message={error} /> : null }
+
+        <h5>Date Range</h5>
+  
+        <Label>Start</Label>
+        <Input type="date" value={getFormattedDate(startDateDemographics)} onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= plotFirstDay && newDate <= plotLastDay && newDate <= endDateStates) {
+            setStartDateDemographics(newDate);
+          } else {
+            setError('The date must have data in the database and be before the ending date.');
+          }
+        }} />
+  
+        <Label>End</Label>
+        <Input type="date" value={getFormattedDate(endDateDemographics)} onChange={(e) => {
+          setError('');
+          let newDate = new Date(e.target.value);
+          newDate.setDate(newDate.getDate() + 1);
+          if (newDate >= plotFirstDay && newDate <= plotLastDay && newDate >= startDateStates) {
+            setEndDateDemographics(newDate);
+          } else {
+            setError('The date must have data in the database and be after the starting date.');
+          }
+        }} />
+
+        <br></br>
+        <h5>Filters</h5>
+        <SubHeaderText>Count Type</SubHeaderText>
+        <MinimalLabel>
+          Count Cases
+          <InlineInput
+            name="Count Cases"
+            type="checkbox"
+            checked={typeCountDemographics === TypeCount.CASES}
+            onChange={() => setTypeCountDemographics(TypeCount.CASES)}
+          />
+        </MinimalLabel>
+        <MinimalLabel>
+          Count Deaths
+          <InlineInput
+            name="Count Deaths"
+            type="checkbox"
+            checked={typeCountDemographics === TypeCount.DEATHS}
+            onChange={() => setTypeCountDemographics(TypeCount.DEATHS)}
+          />
+        </MinimalLabel>
+        <SubHeaderText>Ethnicities</SubHeaderText>
+        { Object.values(Ethnicities).map((ethnicityType, index) => {
+            return (
+              <MinimalLabel
+                key={ethnicityType}
+              >
+                {ethnicityType}
+                <InlineInput
+                  name={ethnicityType}
+                  type="checkbox"
+                  checked={ethnicity === ethnicityType}
+                  onChange={() => setEthnicity(ethnicityType)}
+                />
+              </MinimalLabel>
+            );
+          })
+        }
+        <Button 
+          onClick={() => {
+            setError('');
+            params.onDemographicsSubmit(optionsTab, typeCountDemographics, ethnicity, startDateDemographics, endDateDemographics);
+          }}
+        >
+          Submit
+        </Button>
+      </ChildFlexContainer>
+    )
+  } else {
+    return (
+      <ChildFlexContainer
+        flex={3}
+      >
+        <ErrorMessage message={'This is an invalid tab, return to a previous setting.'} />
+      </ChildFlexContainer>
+    )
+  }
 }
