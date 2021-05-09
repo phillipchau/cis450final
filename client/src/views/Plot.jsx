@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
 import { Ethnicities, getCaseEthnicityQuantile } from '../api/CaseDemographics';
-import { OptionsSidebar, OptionsTab } from '../components/core/Options';
+import { PlotOptionsSidebar, PlotOptionsTab } from '../components/core/Options';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import getFormattedDate from '../util/Utility';
 import ErrorMessage from '../components/core/Error';
@@ -39,7 +39,7 @@ function PlotPage() {
   const [plotData, setPlotData] = useState();
 
   // Hold the formatted plot data to be displayed.
-  const [optionsTab, setOptionsTab] = useState(OptionsTab.STATES);
+  const [optionsTab, setOptionsTab] = useState(PlotOptionsTab.STATES);
 
   /**
    * States Tab
@@ -273,7 +273,7 @@ function PlotPage() {
       setSelectedStatesOptions(options);
 
       // Create the initial graph.
-      submitStatesOptions(OptionsTab.STATES, TypeCount.CASES, firstDay, lastDay, options);
+      submitStatesOptions(PlotOptionsTab.STATES, TypeCount.CASES, firstDay, lastDay, options);
     } else {
       // Get the distinct states to be displayed.
       getDistinctStates().then((res) => {
@@ -287,7 +287,7 @@ function PlotPage() {
 
   return (
     <FlexContainer>
-      <OptionsSidebar
+      <PlotOptionsSidebar
         selectedStatesOptions={selectedStatesOptions}
         onStatesSubmit={submitStatesOptions}
         onDemographicsSubmit={submitDemographicsOptions}
@@ -304,12 +304,12 @@ function PlotPage() {
             loader={<LoadingChart><LoadingContainerText>Loading Chart...</LoadingContainerText></LoadingChart>}
             data={plotData}
             options={{
-              title: `${optionsTab === OptionsTab.STATES ? `${typeCountStates} by State over Time` : `Covid ${typeCountDemographics} for ${ethnicity} Quantiles`}`,
+              title: `${optionsTab === PlotOptionsTab.STATES ? `${typeCountStates} by State over Time` : `Covid ${typeCountDemographics} for ${ethnicity} Quantiles`}`,
               hAxis: {
                 title: 'Date',
               },
               vAxis: {
-                title: `${optionsTab === OptionsTab.STATES ? `${typeCountStates}` : `Ratio of Covid ${typeCountDemographics} to Total U.S. Population`}`,
+                title: `${optionsTab === PlotOptionsTab.STATES ? `${typeCountStates}` : `Ratio of Covid ${typeCountDemographics} to Total U.S. Population`}`,
                 viewWindow: {
                   min: 0,
                 },

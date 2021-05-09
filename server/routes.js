@@ -691,6 +691,51 @@ function getCaseEthnicityQuantiles(req, res) {
   }
 }
 
+function getVaccinatedCaseCounts(req, res) {
+  // Valid state and date range must be provided.
+  var query = `
+    WITH cov AS (
+        SELECT Date, State, SUM(DailyCaseCount) AS DailyCaseCountState
+        FROM covid
+        GROUP BY Date, State
+    )
+
+    SELECT v.Date, v.State, v.Vaccinated, c.DailyCaseCountState
+    FROM vaccine v JOIN cov c ON v.State = c.State AND v.Date = c.Date
+    WHERE v.State = '${req.query.selectedState}' AND v.Date >= '${req.query.startDate}' AND v.Date <= '${req.query.endDate}';
+  `;
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  });
+}
+
+function getOverallVaccinations(req, res) {
+  // Get the overall total vaccinations for all states indicated.
+  var query = `
+    SELECT v.State, v.TotalVacc 
+    FROM (SELECT State, SUM(Vaccinated) AS TotalVacc
+        FROM vaccine 
+        GROUP BY State) v 
+            JOIN 
+        (SELECT State, SUM(TotalPop) AS SumTotalPop
+        FROM census 
+        GROUP BY State) t 
+    ON v.State = t.State
+    WHERE v.State IN (${req.query.selectedStatesStr});
+  `;
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  });
+}
+
 // Get the recent COVID Vaccine tweets.
 function getRecentCovidVaccineTweets(req, res) {
   var config = {
@@ -828,5 +873,7 @@ module.exports = {
   getCovidArticleById: getCovidArticleById,
   articleRemove: articleRemove,
   getTop25Cases: getTop25Cases,
-  getTop25Deaths: getTop25Deaths
+  getTop25Deaths: getTop25Deaths,
+  getVaccinatedCaseCounts: getVaccinatedCaseCounts,
+  getOverallVaccinations: getOverallVaccinations
 }
