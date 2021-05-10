@@ -173,7 +173,7 @@ function PlotPage() {
     let newPlotData = [];
 
     // Get the list of quantiles to be included, with 'Date' for x-axis.
-    let plotAttributes = ['Date', 'Quantile 1', 'Quantile 2', 'Quantile 3', 'Quantile 4', 'Quantile 5'];
+    let plotAttributes = ['Date', '0.43%-0.69%', '0.71%-0.80%', '0.90%-1.21%', '1.22%-2.06%', '2.50%-30.76%'];
     newPlotData.push(plotAttributes);
 
     // Add data for all dates indicated by options.

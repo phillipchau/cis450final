@@ -63,7 +63,7 @@ function UserPage() {
       }).catch((err) => {
         setError(err.message);
       });
-    }, [])
+    }, [update])
 
     useEffect(() => {
       getStates().then((res) => {

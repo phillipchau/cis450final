@@ -173,7 +173,7 @@ function LandingPage() {
             </h3>
           }
           <br></br>
-          <h3 style={{color: 'white'}}>This is some subtext. This is the longest the subtext can go before wrapping around.</h3>
+         
         </WallText>
       </Wall>
       <h2 style={{marginTop: 50}}>Latest News</h2>
