@@ -34,7 +34,7 @@ const Signup = () => {
               <div className="card">
                 <div className="card-body">
                   <h1>Create an account</h1>
-                  <p className="text-secondary">Get started on PennConnects!</p>
+                  <p className="text-secondary">Get started on COVID19 Dashboard!</p>
                   <form onSubmit={e => {
                     e.preventDefault()
                     signup(username, password, fname, lname, state)
