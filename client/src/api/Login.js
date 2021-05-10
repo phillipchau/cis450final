@@ -10,6 +10,15 @@ export const checkLogin = () => {
     });
 };
 
+export const userFind = (username) => {
+  return axios.get(`http://localhost:8081/user/${username}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    console.log(err);
+    throw axiosErrorHandler(err);
+  });
+};
+
 export const signin = (username, password) => {
     return axios.post('http://localhost:8081/login', { username: username, password: password }, {withCredentials: true})
     .then((res) => res.data)

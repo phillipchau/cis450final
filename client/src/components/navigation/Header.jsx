@@ -4,6 +4,7 @@ import { NavbarLink } from '../core/Link';
 import { NavbarButton } from '../core/Button';
 import axios from 'axios';
 import { useHistory, Link } from 'react-router-dom';
+import app from '../../api/Firebase';
 
 const Content = styled.div`
   height: 50px;
@@ -41,6 +42,10 @@ const RightHeader = styled(NavbarLink)`
 function Header() {
   const history = useHistory();
   const logout = () => {
+    // Sign out of Google login (only does action if that is used).
+    app.auth().signOut();
+
+    // Sign out of primary AWS registration.
     axios.get('http://localhost:8081/logout', {withCredentials: true})
       .then((res) => history.push('/login'))
       .catch((err) => {

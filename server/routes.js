@@ -796,6 +796,9 @@ const login = function(req, res) {
 
 const userFind = function(req, res) {
   let username = req.params.username
+  console.log('Test');
+  console.log(req);
+  console.log(username);
   db.userLookup(username, function(err, data) {
     if (err) {
       console.log(err)
@@ -804,6 +807,10 @@ const userFind = function(req, res) {
       });
     } else if (data) {
       res.json(data)
+    } else {
+      res.status(404).send({
+        message: 'User not found'
+      });
     }
   })
 }
