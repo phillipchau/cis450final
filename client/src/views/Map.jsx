@@ -74,7 +74,7 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
           }
         } else {
           if (filtermode === 'mask') {
-            setRadius(2)
+            setRadius(3)
           } else {
             setRadius(15)
           }
