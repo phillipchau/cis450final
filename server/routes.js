@@ -668,6 +668,9 @@ function getCaseEthnicityQuantiles(req, res) {
   // The list of hardcoded valid ethnicities to prevent SQL injection.
   var validEthnicities = ['Hispanic', 'White', 'Black', 'Native', 'Asian', 'Pacific'];
 
+  // The limit changes to 11 if you are on the last group of states.
+  let limit = req.query.quantile === 4 ? 11 : 10;
+
   if (!validEthnicities.includes(req.query.ethnicity)) {
     console.log('The provided ethnicity is not in our database.');
   } else if (req.query.quantile < 0 || req.query.quantile > 4) {
@@ -684,7 +687,7 @@ function getCaseEthnicityQuantiles(req, res) {
         FROM census
         GROUP BY State
         ORDER BY AvgRaceState ASC
-        LIMIT 10
+        LIMIT ${limit}
         OFFSET ${req.query.quantile * 10}
       ), quintile AS (
         SELECT cov.Date, r.State, r.AvgRaceState, cov.Cases AS StateCases, cov.Deaths AS StateDeaths
@@ -695,6 +698,40 @@ function getCaseEthnicityQuantiles(req, res) {
       FROM quintile
       GROUP BY Date
       ORDER BY Date ASC;
+    `;
+
+    connection.query(query, function(err, rows, fields) {
+      if (err) console.log(err)
+      else {
+        res.json(rows)
+      }
+    });
+  }
+}
+
+function getEthnicityBound(req, res) {
+  // The list of hardcoded valid ethnicities to prevent SQL injection.
+  var validEthnicities = ['Hispanic', 'White', 'Black', 'Native', 'Asian', 'Pacific'];
+
+  // The limit changes to 11 if you are on the last group of states.
+  let limit = req.query.quantile === 4 ? 11 : 10;
+
+  if (!validEthnicities.includes(req.query.ethnicity)) {
+    console.log('The provided ethnicity is not in our database.');
+  } else if (req.query.quantile < 0 || req.query.quantile > 4) {
+    console.log('The provided quantile is invalid.');
+  } else {
+    var query = `
+      WITH RaceQuintile AS (
+        SELECT State, AVG(${req.query.ethnicity}) AS AvgRaceState
+        FROM census
+        GROUP BY State
+        ORDER BY AvgRaceState ASC
+        LIMIT ${limit}
+        OFFSET ${req.query.quantile * 10}
+      )
+      SELECT MIN(AvgRaceState), MAX(AvgRaceState)
+      FROM RaceQuintile;
     `;
 
     connection.query(query, function(err, rows, fields) {
@@ -982,5 +1019,6 @@ module.exports = {
   getIncomeBound: getIncomeBound,
   getPovertyBound: getPovertyBound,
   getMaskBound: getMaskBound,
-  stateUpdate: stateUpdate
+  stateUpdate: stateUpdate,
+  getEthnicityBound: getEthnicityBound,
 }
