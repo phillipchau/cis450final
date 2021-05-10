@@ -24,6 +24,13 @@ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 grid-gap: 2rem;
 `
 
+const StateBox = styled.div`
+border: 3px solid #3E93CD;
+width: 30%;
+margin: auto;
+padding: 10px;
+`
+
 
 function UserPage() {
     //all favorite articles
@@ -174,17 +181,17 @@ function UserPage() {
             <div className="form-group">
               <label htmlFor="stateselector"> My Home State: </label>
               <br/>
-              <div>
-              <select id="stateselector" class="form-select" aria-label="State Selector" value={state} onChange={e => setState(e.target.value)}>
-                {stateList.map((place, k) => {
-                  return (
-                    <>
-                      <option key={k} value={place.State}>{place.State}</option>
-                    </>
-                )})}
-              </select>
-              <button onClick={buttonClick} className="btn btn-primary" type="button" style={{display: 'block', marginLeft: '42%'}}>Submit</button>
-              </div>
+              <StateBox>
+                <select style={{height: '40px'}} id="stateselector" class="form-select" aria-label="State Selector" value={state} onChange={e => setState(e.target.value)}>
+                  {stateList.map((place, k) => {
+                    return (
+                      <>
+                        <option key={k} value={place.State}>{place.State}</option>
+                      </>
+                  )})}
+                </select>
+                <button onClick={buttonClick} className="btn btn-primary" type="button" style={{display: 'block', marginLeft: '42%'}}>Submit</button>
+              </StateBox>
 
             </div>
             <div class="container">
