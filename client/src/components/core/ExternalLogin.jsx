@@ -9,15 +9,13 @@ const AppButton = styled(Button)`
   display: block;
   margin: 0 10px;
   background: ${({ theme }) => theme.colors.white};
-  text-align: center;
 `;
 
 const AppImage = styled.img`
   display: inline;
   position: absolute;
   left: 15px;
-  width: 30px;
-  vertical-align: middle;
+  width: 1.5rem;
 `;
 
 const AppText = styled.span`
@@ -40,9 +38,9 @@ export function GoogleLogin(props) {
   };
 
   return (
-    <AppButton type="button" className="login-provider-button" onClick={onSubmit}>
+    <AppButton type="button" onClick={onSubmit}>
       <AppImage src="https://img.icons8.com/fluent/48/000000/google-logo.png" />
-      <AppText> Google</AppText>
+      <AppText>Google</AppText>
     </AppButton>
   );
 }
@@ -63,7 +61,7 @@ export function FacebookLogin(props) {
   };
 
   return (
-    <AppButton type="button" className="login-provider-button" onClick={onSubmit}>
+    <AppButton type="button" onClick={onSubmit}>
       <AppImage src="https://img.icons8.com/color/344/facebook-new.png" />
       <AppText> Facebook</AppText>
     </AppButton>
