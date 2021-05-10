@@ -68,13 +68,13 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
         setCenter(newCoor)
         if (filtermetric === 'deaths') {
           if (filtermode === 'mask') {
-            setRadius(4)
+            setRadius(8)
           } else {
             setRadius(30)
           }
         } else {
           if (filtermode === 'mask') {
-            setRadius(3)
+            setRadius(4)
           } else {
             setRadius(15)
           }
@@ -91,10 +91,10 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
     if (filtermode === 'income') {
       if (filtermetric === 'deaths') {
         console.log(radius)
-        setMetric('DeathsRate')
+        setMetric('Deaths')
         setRadius(21)
       } else {
-        setMetric('CasesRate')
+        setMetric('Cases')
         setRadius(5)
       }
       console.log(radius)
@@ -124,10 +124,10 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
         });
     } else if (filtermode === 'poverty') {
       if (filtermetric === 'deaths') {
-        setMetric('DeathsRate')
+        setMetric('Deaths')
         setRadius(21)
       } else {
-        setMetric('CasesRate')
+        setMetric('Cases')
         setRadius(5)
       }
       getPovertyQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
@@ -176,11 +176,11 @@ function MapPage({statefilter, modefilter, date, modemetric}) {
     }
     else if (filtermode === 'mask') {
       if (filtermetric === 'deaths') {
-        setMetric('DeathsRate')
-        setRadius(3)
+        setMetric('Deaths')
+        setRadius(10)
       } else {
-        setMetric('CasesRate')
-        setRadius(1)
+        setMetric('Cases')
+        setRadius(4)
       }
       getMaskQ1(filterstate, startdate.toISOString().substring(0, 10)).then((res) => {
         console.log(res)
