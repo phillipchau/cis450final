@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react'
-import axios from 'axios'
 import { getStates } from '../api/MapData';
 import { signup } from '../api/Login';
 import ErrorMessage from '../components/core/Error';

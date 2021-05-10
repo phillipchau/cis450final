@@ -55,21 +55,22 @@ function ArticleWrapper({user, article, type, update}) {
       if (articleLike) {
         buttonType = "btn btn-outline-primary"
         const idx = user.articles.indexOf(article._id)
-        const data = await axios.post('http://localhost:8081/removearticle', { username: user.username, index: idx })
-        if (typeof data.data === 'string' && data.data.startsWith('ERROR:')) {
-          alert('An error occured while updating')
-        } else {  
-          console.log(data)
-          update(true)
-        }
+        axios.post('http://localhost:8081/removearticle', { username: user.username, index: idx })
+          .then((data) => {
+            update(true)
+          })
+          .catch((err) => {
+            console.log(err)
+          });
       } else {
         buttonType = "btn btn-primary"
-        const data = await axios.post('http://localhost:8081/addarticle', { username: user.username, article: article._id })
-        if (typeof data.data === 'string' && data.data.startsWith('ERROR:')) {
-          alert('An error occured while updating')
-        } else {  
-          update(true)
-        }
+        axios.post('http://localhost:8081/addarticle', { username: user.username, article: article._id })
+          .then((data) => {
+            update(true)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       }
       setArticleLike(!articleLike)
     }

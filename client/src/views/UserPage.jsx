@@ -1,10 +1,12 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios'
 import { getLogin, getUser, getCaseData, getDeathData } from '../api/Home';
 import { useHistory } from 'react-router-dom'
 import { Text, LandingHeaderText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import ArticleWrapper from './ArticleWrapper'
+import { getStates } from '../api/MapData';
 import { getCovidArticle } from '../api/NYTData';
 import {
   TableElement,
@@ -37,6 +39,11 @@ function UserPage() {
 
     const [caseData, setCaseData] = useState();
     const [deathData, setDeathData] = useState(); 
+    const [state, setState] = useState('')
+    const [stateList, setStateList] = useState([])
+    //anytime a state is updated, we force a rerender
+    const [update, setUpdate] = useState(false)
+
     const history = useHistory()
     //initially load who is logged in 
     useEffect(() => {
@@ -47,12 +54,22 @@ function UserPage() {
         } else {
           getUser(res).then((response) => {
             setUser(response)
+            setState(response.state)
+            setUpdate(false)
           }).catch((e) => {
             setError(e.message)
           });
         }
       }).catch((err) => {
         setError(err.message);
+      });
+    }, [])
+
+    useEffect(() => {
+      getStates().then((res) => {
+        setStateList(res);
+      }).catch((err) => {
+        setError(err.message)
       });
     }, [])
 
@@ -88,6 +105,16 @@ function UserPage() {
       }
 
     }, [setCaseData, setDeathData, user]);
+
+    //button to update the desired state
+    const buttonClick = async () => {
+      axios.post('http://localhost:8081/updatestate', {username: user.username, state: state})
+        .then((res) => setUpdate(true))
+        .catch((err) => {
+          console.log(err)
+          setError(err.message)
+        })
+    }
 
     const addFavoriteArticles = (articles) => {
         let articleList = [];
@@ -144,76 +171,92 @@ function UserPage() {
             }
 
             <h2 style={{marginTop: 50}}>My State's Metrics</h2>
+            <div className="form-group">
+              <label htmlFor="stateselector"> My Home State: </label>
+              <br/>
+              <div>
+              <select id="stateselector" class="form-select" aria-label="State Selector" value={state} onChange={e => setState(e.target.value)}>
+                {stateList.map((place, k) => {
+                  return (
+                    <>
+                      <option key={k} value={place.State}>{place.State}</option>
+                    </>
+                )})}
+              </select>
+              <button onClick={buttonClick} className="btn btn-primary" type="button" style={{display: 'block', marginLeft: '50%'}}>Submit</button>
+              </div>
+
+            </div>
             <div class="container">
-        <div class="row">
-          <div class="col-sm">
-            <h4 style={{marginTop: 10}}>Top 25 Cases By County</h4>
-            <TableElement>
-              <TableHead>
-                <TableRowElement>
-                  <TableHeadElement>State</TableHeadElement>
-                  <TableHeadElement>County</TableHeadElement>
-                  <TableHeadElement>Count</TableHeadElement>
-                </TableRowElement>
-              </TableHead>
-              <TableBody>
-              {caseData === undefined ?
-              (
-              loading ? (
-                <TableRowElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                </TableRowElement>
-                ) : null
-              )
-              :
-              caseData.map((c, index) => (
-                <TableRowElement key={index}>
-                  <TableDataElement>{c.State}</TableDataElement>
-                  <TableDataElement>{c.County}</TableDataElement>
-                  <TableDataElement style={{color: 'red'}}>{c.CaseCount}</TableDataElement>
-                </TableRowElement>
-              ))
-              }
-              </TableBody>
-            </TableElement>    
-          </div>
-          <div class="col-sm">  
-            <h4 style={{marginTop: 10}}>Top 25 Deaths By County</h4>
-            <TableElement>
-              <TableHead>
-                <TableRowElement>
-                  <TableHeadElement>State</TableHeadElement>
-                  <TableHeadElement>County</TableHeadElement>
-                  <TableHeadElement>Count</TableHeadElement>
-                </TableRowElement>
-              </TableHead>
-              <TableBody>
-              {deathData === undefined ?
-              (
-              loading ? (
-                <TableRowElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                  <TableDataElement>Loading...</TableDataElement>
-                </TableRowElement>
-              ) : null
-              )
-              :
-              deathData.map((c, index) => (
-                <TableRowElement key={index}>
-                  <TableDataElement>{c.State}</TableDataElement>
-                  <TableDataElement>{c.County}</TableDataElement>
-                  <TableDataElement style={{color: 'red'}}>{c.DeathCount}</TableDataElement>
-                </TableRowElement>
-              ))
-              }
-              </TableBody>
-            </TableElement>
-          </div>
-        </div>
-      </div>
+              <div class="row">
+                <div class="col-sm">
+                  <h4 style={{marginTop: 10}}>Top 25 Cases By County</h4>
+                    <TableElement>
+                      <TableHead>
+                        <TableRowElement>
+                          <TableHeadElement>State</TableHeadElement>
+                          <TableHeadElement>County</TableHeadElement>
+                          <TableHeadElement>Count</TableHeadElement>
+                        </TableRowElement>
+                      </TableHead>
+                      <TableBody>
+                      {caseData === undefined ?
+                        (
+                        loading ? (
+                          <TableRowElement>
+                            <TableDataElement>Loading...</TableDataElement>
+                            <TableDataElement>Loading...</TableDataElement>
+                            <TableDataElement>Loading...</TableDataElement>
+                          </TableRowElement>
+                        ) : null
+                        )
+                        :
+                        caseData.map((c, index) => (
+                          <TableRowElement key={index}>
+                            <TableDataElement>{c.State}</TableDataElement>
+                            <TableDataElement>{c.County}</TableDataElement>
+                            <TableDataElement style={{color: 'red'}}>{c.CaseCount}</TableDataElement>
+                          </TableRowElement>
+                        ))
+                      }
+                      </TableBody>
+                    </TableElement>    
+                </div>
+                <div class="col-sm">  
+                  <h4 style={{marginTop: 10}}>Top 25 Deaths By County</h4>
+                  <TableElement>
+                    <TableHead>
+                      <TableRowElement>
+                        <TableHeadElement>State</TableHeadElement>
+                        <TableHeadElement>County</TableHeadElement>
+                        <TableHeadElement>Count</TableHeadElement>
+                      </TableRowElement>
+                    </TableHead>
+                    <TableBody>
+                    {deathData === undefined ?
+                    (
+                    loading ? (
+                      <TableRowElement>
+                        <TableDataElement>Loading...</TableDataElement>
+                        <TableDataElement>Loading...</TableDataElement>
+                        <TableDataElement>Loading...</TableDataElement>
+                      </TableRowElement>
+                    ) : null
+                    )
+                    :
+                    deathData.map((c, index) => (
+                      <TableRowElement key={index}>
+                        <TableDataElement>{c.State}</TableDataElement>
+                        <TableDataElement>{c.County}</TableDataElement>
+                        <TableDataElement style={{color: 'red'}}>{c.DeathCount}</TableDataElement>
+                      </TableRowElement>
+                    ))
+                    }
+                    </TableBody>
+                  </TableElement>
+                </div>
+              </div>
+            </div>
             { error ? <ErrorMessage message={error} /> : null }
         </>
     )

@@ -48,7 +48,7 @@ function MapContainer() {
         </div>
         <div class="col-xl">
           <Map statefilter={stateFilter} modefilter={modeFilter} date={startdate} modemetric={modeMetric}/>
-          <Legend />
+          <Legend mode={modeFilter} />
         </div> 
       </div>
     </div>

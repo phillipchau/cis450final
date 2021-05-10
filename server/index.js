@@ -33,16 +33,21 @@ app.get('/logout', routes.logout)
 app.get('/getlogin', routes.getLogin)
 app.post('/login', routes.login)
 app.get('/user/:username', routes.userFind)
+app.post('/updatestate', routes.stateUpdate)
 
 app.post('/addarticle', routes.articleAppend)
 app.post('/removearticle', routes.articleRemove)
 app.get('/getarticle', routes.getCovidArticleById)
 
-app.get('/vaccine', routes.getVaccineData);
-app.get('/income/q1', routes.getIncomeDataQ1);
-app.get('/income/q2', routes.getIncomeDataQ2);
-app.get('/income/q3', routes.getIncomeDataQ3);
-app.get('/income/q4', routes.getIncomeDataQ4);
+app.get('/vaccine', routes.getVaccineData)
+app.get('/income/q1', routes.getIncomeDataQ1)
+app.get('/income/q2', routes.getIncomeDataQ2)
+app.get('/income/q3', routes.getIncomeDataQ3)
+app.get('/income/q4', routes.getIncomeDataQ4)
+app.get('/incomebound', routes.getIncomeBound)
+app.get('/povertybound', routes.getPovertyBound)
+app.get('/maskbound', routes.getMaskBound)
+
 
 app.get('/poverty/q1', routes.getPovertyQ1)
 app.get('/poverty/q2', routes.getPovertyQ2)

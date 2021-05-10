@@ -64,7 +64,6 @@ function Options({statefilter, modefilter, setStart, modemetric, userState}) {
     setStart(startDate)
     modemetric(metric)
   }
-  console.log(userState)
 
   return (
     <>
@@ -79,7 +78,7 @@ function Options({statefilter, modefilter, setStart, modemetric, userState}) {
          <h5>Date Selector</h5>
 
         <Label htmlFor="start-date-input">Current Date</Label>
-        <Input disabled={mode == 'mask' || mode == 'total'} type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
+        <Input disabled={mode == 'total'} type="date" value={getFormattedDate(startDate)} id="start-date-input" onChange={(e) => {
           setError('');
           let newDate = new Date(e.target.value);
           newDate.setDate(newDate.getDate() + 1);

@@ -81,3 +81,27 @@ export const getMaskQ4 = (state, startdate) => axios.get(`${basePath}/mask/q4?st
   .catch((err) => {
     throw axiosErrorHandler(err);
 })
+
+export const getBoundQ1 = (type) => axios.get(`${basePath}/${type}bound?offset=0`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})
+
+export const getBoundQ2 = (type) => axios.get(`${basePath}/${type}bound?offset=413`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})
+
+export const getBoundQ3 = (type) => axios.get(`${basePath}/${type}bound?offset=826`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})
+
+export const getBoundQ4 = (type) => axios.get(`${basePath}/${type}bound?offset=1239`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+})
