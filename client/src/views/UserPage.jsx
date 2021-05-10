@@ -183,7 +183,7 @@ function UserPage() {
                     </>
                 )})}
               </select>
-              <button onClick={buttonClick} className="btn btn-primary" type="button" style={{display: 'block', marginLeft: '50%'}}>Submit</button>
+              <button onClick={buttonClick} className="btn btn-primary" type="button" style={{display: 'block', marginLeft: '42%'}}>Submit</button>
               </div>
 
             </div>
