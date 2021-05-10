@@ -22,8 +22,8 @@ const Login = () => {
     app.auth().onAuthStateChanged((account) => {
       if (account !== null) {
         // If the user is found, log in; otherwise, register.
-        userFind(account.displayName).then((data) => {
-          signin(account.displayName, 'password').then((res) => {
+        userFind(account.uid).then((data) => {
+          signin(account.uid, 'externalloginpassword').then((res) => {
             history.push('/');
           }).catch((err) => {
             setError(err.message);
@@ -32,13 +32,13 @@ const Login = () => {
           // Register using hard-coded password and account details.
           let name = account.displayName.split(' ');
           if (name.length == 2) {
-            signup(account.displayName, 'password', name[0], name[1], 'Pennsylvania').then((res) => {
+            signup(account.uid, 'externalloginpassword', name[0], name[1], 'Pennsylvania').then((res) => {
               history.push('/');
             }).catch((err) => {
               setError(err.message);
             });
           } else {
-            signup(account.displayName, 'password', account.displayName, '', 'Pennsylvania').then((res) => {
+            signup(account.uid, 'externalloginpassword', account.displayName, '', 'Pennsylvania').then((res) => {
               history.push('/');
             }).catch((err) => {
               setError(err.message);
