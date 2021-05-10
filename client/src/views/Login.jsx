@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { signin, signup, userFind, checkLogin } from '../api/Login';
 import { useHistory, useLocation, Link } from 'react-router-dom'
 import ErrorMessage from '../components/core/Error';
-import GoogleLogin from '../components/core/GoogleLogin';
+import { GoogleLogin, FacebookLogin } from '../components/core/ExternalLogin';
 import app from '../api/Firebase';
 
 const Login = () => {
@@ -88,7 +88,9 @@ const Login = () => {
                     <div className="form-group form-row">
                       <button type="submit" className="btn btn-primary">Log In</button>
                       <GoogleLogin successAction={redirectAction} errorAction={setError} />
+                      <FacebookLogin successAction={redirectAction} errorAction={setError} />
                       <p style={{marginLeft: 20}}className="signup-margin text-secondary">
+                        <br></br>
                         New to COVID19 Dashboard?
                         <Link to="/signup"> Sign Up Here</Link>
                       </p>
