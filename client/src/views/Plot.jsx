@@ -309,7 +309,7 @@ function PlotPage() {
                 title: 'Date',
               },
               vAxis: {
-                title: `${optionsTab === PlotOptionsTab.STATES ? `${typeCountStates}` : `Ratio of Covid ${typeCountDemographics} to Total U.S. Population`}`,
+                title: `${optionsTab === PlotOptionsTab.STATES ? `${typeCountStates}` : `Daily Covid ${typeCountDemographics}`}`,
                 viewWindow: {
                   min: 0,
                 },

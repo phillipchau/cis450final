@@ -675,31 +675,24 @@ function getCaseEthnicityQuantiles(req, res) {
   } else {
     var query = `
       WITH covidByState AS (
-        SELECT Date, State, SUM(CaseCount) AS Cases, SUM(DeathCount) AS Deaths
-        FROM covid
+        SELECT Date, State, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS Deaths
+        FROM covid 
         GROUP BY Date, State
         HAVING Date >= '${req.query.startDate}' AND Date <= '${req.query.endDate}'
-      ), totalPopByState AS (
-        SELECT State, SUM(TotalPop) AS totalpopstate
-        FROM census
-        GROUP BY State
-      ), covidRateByCounty AS (
-        SELECT cov.Date, cov.State, cov.Cases/cen.totalpopstate AS CasesRate, cov.Deaths/cen.totalpopstate AS DeathsRate
-        FROM covidByState cov JOIN totalPopByState cen ON cov.State = cen.State
       ), raceByState AS (
-        SELECT State, (AVG(${req.query.ethnicity}) / 100) AS AvgRaceState
+        SELECT State, AVG(${req.query.ethnicity})  AS AvgRaceState
         FROM census
         GROUP BY State
         ORDER BY AvgRaceState ASC
         LIMIT 10
         OFFSET ${req.query.quantile * 10}
-      ), quantile AS (
-        SELECT cov.Date, r.State, r.AvgRaceState, cov.CasesRate AS StateCaseRate, cov.DeathsRate AS StateDeathRate
-        FROM raceByState r JOIN covidRateByCounty cov
+      ), quintile AS (
+        SELECT cov.Date, r.State, r.AvgRaceState, cov.Cases AS StateCases, cov.Deaths AS StateDeaths
+        FROM raceByState r JOIN covidByState cov
         ON r.State = cov.State
       )
-      SELECT Date, AVG(StateCaseRate) AS CaseRate, AVG(StateDeathRate) AS DeathRate
-      FROM quantile
+      SELECT Date, SUM(StateCases) AS CaseRate, SUM(StateDeaths) AS DeathRate
+      FROM quintile
       GROUP BY Date
       ORDER BY Date ASC;
     `;
@@ -717,14 +710,18 @@ function getVaccinatedCaseCounts(req, res) {
   // Valid state and date range must be provided.
   var query = `
     WITH cov AS (
-        SELECT Date, State, SUM(DailyCaseCount) AS DailyCaseCountState
-        FROM covid
-        GROUP BY Date, State
+      SELECT Date, SUM(DailyCaseCount) AS DailyCaseCountState
+      FROM covid
+      GROUP BY Date, State
+      HAVING State = '${req.query.selectedState}' AND Date >= '${req.query.startDate}' AND Date <= '${req.query.endDate}'
+    ), vaccineSelected AS (
+      SELECT Date, Vaccinated
+      FROM vaccine
+      WHERE State = '${req.query.selectedState}'
     )
 
-    SELECT v.Date, v.State, v.Vaccinated, c.DailyCaseCountState
-    FROM vaccine v JOIN cov c ON v.State = c.State AND v.Date = c.Date
-    WHERE v.State = '${req.query.selectedState}' AND v.Date >= '${req.query.startDate}' AND v.Date <= '${req.query.endDate}';
+    SELECT v.Date, v.Vaccinated, c.DailyCaseCountState
+    FROM vaccineSelected v JOIN cov c ON v.Date = c.Date
   `;
 
   connection.query(query, function(err, rows, fields) {

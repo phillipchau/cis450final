@@ -293,7 +293,7 @@ export function PlotOptionsSidebar(params) {
 export const VaccineOptionsTab = Object.freeze({ STATE: 'State', OVERALL: 'Overall' });
 
 // These are the dates available in the Vaccine database.
-const vaccineFirstDay = new Date(2021, 0, 12);
+const vaccineFirstDay = new Date(2021, 0, 13);
 const vaccineLastDay = new Date(2021, 3, 1);
 
 export function VaccineOptionsSidebar(params) {
