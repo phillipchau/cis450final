@@ -651,7 +651,7 @@ function getCaseEthnicityQuantiles(req, res) {
   }
 }
 
-function getEthnicityBound(req, res) {
+function getEthnicityBounds(req, res) {
   // The list of hardcoded valid ethnicities to prevent SQL injection.
   var validEthnicities = ['Hispanic', 'White', 'Black', 'Native', 'Asian', 'Pacific'];
 
@@ -672,7 +672,7 @@ function getEthnicityBound(req, res) {
         LIMIT ${limit}
         OFFSET ${req.query.quantile * 10}
       )
-      SELECT MIN(AvgRaceState), MAX(AvgRaceState)
+      SELECT MIN(AvgRaceState) AS Min, MAX(AvgRaceState) AS Max
       FROM RaceQuintile;
     `;
 
@@ -962,5 +962,5 @@ module.exports = {
   getPovertyBound: getPovertyBound,
   getMaskBound: getMaskBound,
   stateUpdate: stateUpdate,
-  getEthnicityBound: getEthnicityBound,
+  getEthnicityBounds: getEthnicityBounds
 }
