@@ -506,27 +506,33 @@ function getTotalCovidState(req, res) {
 function getMaskQ1(req, res) {
   var condition = ''
   if (req.query.state !== 'none') {
-    condition = `WHERE m.State = '${req.query.state}'`
+    condition = `AND State = '${req.query.state}'`
   }
   var query = `
-  WITH cov AS (
-    SELECT State, County, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS DeathPercentage
-    FROM covid 
+  WITH covidByCounty AS (
+    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    FROM covid c 
+    WHERE Date = '${req.query.startdate}' ${condition}
+  ), covidRateByCounty AS (
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
+    FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
+  ), latlonByCounty AS (
+    SELECT i.State, i.County, AVG(i.Lat) AS LatCounty, AVG(i.Lon) AS LonCounty
+    FROM income i JOIN census c ON i.State = c.State AND i.County = c.County
     GROUP BY State, County
-  ), masks AS (
-    SELECT State, County, MaskUsagePercentage
-    FROM mask
-    ORDER BY MaskUsagePercentage ASC
+  ), maskByCountyQuartile AS (
+    SELECT i.State, i.County, m.MaskUsagePercentage
+    FROM income i JOIN mask m ON i.State = m.State AND i.County = m.County
+    GROUP BY State, County
+    ORDER BY m.MaskUsagePercentage ASC
     LIMIT 413
-  ), incomeGroup AS (
-	  SELECT State, County, AVG(Lat) as Lat, AVG(Lon) as Lon
-    FROM income
-    GROUP BY State, County
   )
-  SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
-  FROM masks m JOIN cov c 
-  ON m.State = c.State AND m.County = c.County
-  JOIN incomeGroup i ON m.State = i.State AND m.County = i.County;
+  SELECT m.State, m.County, l.LatCounty as Lat, l.LonCounty as Lon, m.MaskUsagePercentage, c.CasesRate, c.DeathsRate
+  FROM maskByCountyQuartile m JOIN latlonByCounty l
+  ON m.State = l.State AND m.County = l.County 
+  JOIN covidRateByCounty c
+  ON m.State = c.State AND m.County = c.County;
+
   `
 
   connection.query(query, function(err, rows, fields) {
@@ -540,28 +546,33 @@ function getMaskQ1(req, res) {
 function getMaskQ2(req, res) {
   var condition = ''
   if (req.query.state !== 'none') {
-    condition = `WHERE m.State = '${req.query.state}'`
+    condition = ` AND State = '${req.query.state}'`
   }
   var query = `
-  WITH cov AS (
-    SELECT State, County, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS DeathPercentage
-    FROM covid 
+  WITH covidByCounty AS (
+    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    FROM covid c 
+    WHERE Date = '${req.query.startdate}' ${condition}
+  ), covidRateByCounty AS (
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
+    FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
+  ), latlonByCounty AS (
+    SELECT i.State, i.County, AVG(i.Lat) AS LatCounty, AVG(i.Lon) AS LonCounty
+    FROM income i JOIN census c ON i.State = c.State AND i.County = c.County
     GROUP BY State, County
-  ), masks AS (
-    SELECT State, County, MaskUsagePercentage
-    FROM mask
-    ORDER BY MaskUsagePercentage ASC
+  ), maskByCountyQuartile AS (
+    SELECT i.State, i.County, m.MaskUsagePercentage
+    FROM income i JOIN mask m ON i.State = m.State AND i.County = m.County
+    GROUP BY State, County
+    ORDER BY m.MaskUsagePercentage ASC
     LIMIT 413
     OFFSET 413
-  ), incomeGroup AS (
-	  SELECT State, County, AVG(Lat) as Lat, AVG(Lon) as Lon
-    FROM income
-    GROUP BY State, County
   )
-  SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
-  FROM masks m JOIN cov c 
-  ON m.State = c.State AND m.County = c.County
-  JOIN incomeGroup i ON m.State = i.State AND m.County = i.County;
+  SELECT m.State, m.County, l.LatCounty as Lat, l.LonCounty as Lon, m.MaskUsagePercentage, c.CasesRate, c.DeathsRate
+  FROM maskByCountyQuartile m JOIN latlonByCounty l
+  ON m.State = l.State AND m.County = l.County 
+  JOIN covidRateByCounty c
+  ON m.State = c.State AND m.County = c.County;
   `
 
   connection.query(query, function(err, rows, fields) {
@@ -575,28 +586,33 @@ function getMaskQ2(req, res) {
 function getMaskQ3(req, res) {
   var condition = ''
   if (req.query.state !== 'none') {
-    condition = `WHERE m.State = '${req.query.state}'`
+    condition = ` AND State = '${req.query.state}'`
   }
   var query = `
-  WITH cov AS (
-    SELECT State, County, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS DeathPercentage
-    FROM covid 
+  WITH covidByCounty AS (
+    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    FROM covid c 
+    WHERE Date = '${req.query.startdate}' ${condition}
+  ), covidRateByCounty AS (
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
+    FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
+  ), latlonByCounty AS (
+    SELECT i.State, i.County, AVG(i.Lat) AS LatCounty, AVG(i.Lon) AS LonCounty
+    FROM income i JOIN census c ON i.State = c.State AND i.County = c.County
     GROUP BY State, County
-  ), masks AS (
-    SELECT State, County, MaskUsagePercentage
-    FROM mask
-    ORDER BY MaskUsagePercentage ASC
+  ), maskByCountyQuartile AS (
+    SELECT i.State, i.County, m.MaskUsagePercentage
+    FROM income i JOIN mask m ON i.State = m.State AND i.County = m.County
+    GROUP BY State, County
+    ORDER BY m.MaskUsagePercentage ASC
     LIMIT 413
     OFFSET 816
-  ), incomeGroup AS (
-	  SELECT State, County, AVG(Lat) as Lat, AVG(Lon) as Lon
-    FROM income
-    GROUP BY State, County
   )
-  SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
-  FROM masks m JOIN cov c 
-  ON m.State = c.State AND m.County = c.County
-  JOIN incomeGroup i ON m.State = i.State AND m.County = i.County;
+  SELECT m.State, m.County, l.LatCounty as Lat, l.LonCounty as Lon, m.MaskUsagePercentage, c.CasesRate, c.DeathsRate
+  FROM maskByCountyQuartile m JOIN latlonByCounty l
+  ON m.State = l.State AND m.County = l.County 
+  JOIN covidRateByCounty c
+  ON m.State = c.State AND m.County = c.County;
   `
 
   connection.query(query, function(err, rows, fields) {
@@ -610,28 +626,34 @@ function getMaskQ3(req, res) {
 function getMaskQ4(req, res) {
   var condition = ''
   if (req.query.state !== 'none') {
-    condition = `WHERE m.State = '${req.query.state}'`
+    condition = ` AND State = '${req.query.state}'`
   }
   var query = `
-  WITH cov AS (
-    SELECT State, County, SUM(DailyCaseCount) AS Cases, SUM(DailyDeathCount) AS DeathPercentage
-    FROM covid 
+  WITH covidByCounty AS (
+    SELECT State, County, CaseCount AS Cases, DeathCount AS Deaths
+    FROM covid c 
+    WHERE Date = '${req.query.startdate}' ${condition}
+  ), covidRateByCounty AS (
+    SELECT cov.State, cov.County, cov.Cases AS CasesRate, cov.Deaths AS DeathsRate
+    FROM covidByCounty cov JOIN census cen ON cov.State = cen.State AND cov.County = cen.County
+  ), latlonByCounty AS (
+    SELECT i.State, i.County, AVG(i.Lat) AS LatCounty, AVG(i.Lon) AS LonCounty
+    FROM income i JOIN census c ON i.State = c.State AND i.County = c.County
     GROUP BY State, County
-  ), masks AS (
-    SELECT State, County, MaskUsagePercentage
-    FROM mask
-    ORDER BY MaskUsagePercentage ASC
+  ), maskByCountyQuartile AS (
+    SELECT i.State, i.County, m.MaskUsagePercentage
+    FROM income i JOIN mask m ON i.State = m.State AND i.County = m.County
+    GROUP BY State, County
+    ORDER BY m.MaskUsagePercentage ASC
     LIMIT 413
-    OFFSET 1229
-  ), incomeGroup AS (
-	  SELECT State, County, AVG(Lat) as Lat, AVG(Lon) as Lon
-    FROM income
-    GROUP BY State, County
+    OFFSET 1239
   )
-  SELECT m.State, m.County, m.MaskUsagePercentage, c.Cases AS CasesRate, c.DeathPercentage as DeathsRate, i.Lat as Lat, i.Lon as Lon
-  FROM masks m JOIN cov c 
-  ON m.State = c.State AND m.County = c.County
-  JOIN incomeGroup i ON m.State = i.State AND m.County = i.County;
+  SELECT m.State, m.County, l.LatCounty as Lat, l.LonCounty as Lon, m.MaskUsagePercentage, c.CasesRate, c.DeathsRate
+  FROM maskByCountyQuartile m JOIN latlonByCounty l
+  ON m.State = l.State AND m.County = l.County 
+  JOIN covidRateByCounty c
+  ON m.State = c.State AND m.County = c.County;
+
   `
 
   connection.query(query, function(err, rows, fields) {
@@ -735,7 +757,73 @@ function getOverallVaccinations(req, res) {
     }
   });
 }
+/*----------------------- boundary routes ----------------------- */
+function getIncomeBound(req, res) {
+  var offset = req.query.offset
+  var query = `
+  WITH incomeByCounty AS (
+    SELECT AVG(Mean) AS Income
+    FROM income
+    GROUP BY State, County
+    ORDER BY Income ASC
+    LIMIT 413 
+    OFFSET ${offset}
+  )
+  SELECT FLOOR(MIN(Income)) as min, FLOOR(MAX(Income)) as max
+  FROM incomeByCounty;
+  `
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  });
+}
 
+function getPovertyBound(req, res) {
+  var offset = req.query.offset
+  var query = `
+  WITH povertyByCounty AS (
+    SELECT AVG(c.Poverty) AS PovCounty
+    FROM income i JOIN census c ON i.State = c.State AND i.County = c.County
+    GROUP BY i.State, i.County
+    ORDER BY PovCounty ASC
+    LIMIT 413
+    OFFSET ${offset}
+  )
+  SELECT MIN(PovCounty) as min, MAX(PovCounty) as max
+  FROM povertyByCounty;
+
+  `
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  });
+}
+
+function getMaskBound(req, res) {
+  var offset = req.query.offset
+  var query = `
+  WITH maskByCountyQuartile AS (
+    SELECT m.MaskUsagePercentage
+    FROM income i JOIN mask m ON i.State = m.State AND i.County = m.County
+    GROUP BY i.State, i.County
+    ORDER BY m.MaskUsagePercentage ASC
+    LIMIT 413
+    OFFSET ${offset}
+  )
+  SELECT 100*MIN(MaskUsagePercentage) as min, 100*MAX(MaskUsagePercentage) as max
+  FROM maskByCountyQuartile;
+  `
+  connection.query(query, function(err, rows, fields) {
+    if (err) console.log(err)
+    else {
+      res.json(rows)
+    }
+  });
+}
 // Get the recent COVID Vaccine tweets.
 function getRecentCovidVaccineTweets(req, res) {
   var config = {
@@ -757,8 +845,8 @@ function getRecentCovidVaccineTweets(req, res) {
     console.log(err);
   });
 }
+/* -------------------------------LOGIN ROUTES------------------------------- */
 
-// login routes
 const signup = function(req, res) {
   let info = req.body;
   db.profileInfo(info, function(err, data) {
@@ -829,6 +917,19 @@ const articleAppend = function(req, res) {
   })
 }
 
+const stateUpdate = function(req, res) {
+  let { username, state } = req.body
+  console.log(username)
+  console.log(state)
+  db.addState(username, state, function(err, data) {
+    if (err) {
+      console.log(err)
+    } else {
+      res.send('success')
+    }
+  })
+}
+
 const articleRemove = function(req, res) {
   let { username, index } = req.body
   db.removeArticle(username, index, function(err, data) {
@@ -875,5 +976,9 @@ module.exports = {
   getTop25Cases: getTop25Cases,
   getTop25Deaths: getTop25Deaths,
   getVaccinatedCaseCounts: getVaccinatedCaseCounts,
-  getOverallVaccinations: getOverallVaccinations
+  getOverallVaccinations: getOverallVaccinations,
+  getIncomeBound: getIncomeBound,
+  getPovertyBound: getPovertyBound,
+  getMaskBound: getMaskBound,
+  stateUpdate: stateUpdate
 }

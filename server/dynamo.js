@@ -132,6 +132,32 @@ const addArticle = function(username, article, callback) {
     });
 }
 
+const addState = function(username, state, callback) {
+    var params = {
+        TableName: "Users",
+        Key: {
+            "username": username,
+        },
+        UpdateExpression: 'set #s = :curr',
+        ExpressionAttributeNames: {
+            "#s": "state"
+        },
+        ExpressionAttributeValues: {
+            ':curr': state,
+        },
+        ReturnValues : "UPDATED_NEW"
+    }
+    db.update(params, function(error, data) {
+        if (error) {
+            console.log(error);
+            callback(error, null);
+        }
+        else {
+            callback(null, data)
+        }
+    });
+}
+
 const removeArticle = function(username, idx, callback) {
     console.log(idx)
     var params = {
@@ -159,7 +185,8 @@ var database = {
     loginLookup: loginLookup,
     userLookup: userLookup,
     addArticle: addArticle,
-    removeArticle: removeArticle
+    removeArticle: removeArticle,
+    addState: addState
 }; 
 
 module.exports = database;
