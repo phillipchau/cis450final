@@ -44,7 +44,7 @@ const LoadingChart = styled.div`
 `;
 
 // These are the dates available in the COVID database.
-const firstDay = new Date(2021, 0, 12);
+const firstDay = new Date(2021, 0, 13);
 const lastDay = new Date(2021, 3, 1);
 
 function VaccinePage() {
@@ -145,6 +145,7 @@ function VaccinePage() {
     setError('');
     setLoading(true);
     setOptionsTab(optionsTabParam);
+    setSelectedState(selectedStateParam);
     getVaccineCaseData(selectedStateParam, startDateParam, endDateParam);
   }, [getVaccineCaseData]);
 

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import React, { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { getCountPerStateDate, getDistinctStates, TypeCount } from '../api/StateCount';
-import { Ethnicities, getCaseEthnicityQuantile } from '../api/CaseDemographics';
+import { Ethnicities, getCaseEthnicityQuantile, getEthnicityBounds } from '../api/CaseDemographics';
 import { PlotOptionsSidebar, PlotOptionsTab } from '../components/core/Options';
 import { FlexContainer, ChildFlexContainer } from '../components/core/Container';
 import getFormattedDate from '../util/Utility';
@@ -168,12 +168,15 @@ function PlotPage() {
   }, [setTypeCountStates, getCountStateData]);
 
   // Construct the plot data to be displayed for the demographics tab.
-  const displayDemographicsPlotData = useCallback((startDateParam, endDateParam, caseEthnicityQuantiles) => {
+  const displayDemographicsPlotData = useCallback((startDateParam, endDateParam, caseEthnicityQuantiles, ethnicityBounds) => {
     // The plot data to be saved.
     let newPlotData = [];
 
     // Get the list of quantiles to be included, with 'Date' for x-axis.
-    let plotAttributes = ['Date', 'Quantile 1', 'Quantile 2', 'Quantile 3', 'Quantile 4', 'Quantile 5'];
+    let plotAttributes = ['Date'];
+    ethnicityBounds.forEach((bound) => {
+      plotAttributes.push(`${bound[0].Min}% - ${bound[0].Max}%`);
+    });
     newPlotData.push(plotAttributes);
 
     // Add data for all dates indicated by options.
@@ -194,7 +197,6 @@ function PlotPage() {
 
       // Increment the current date.
       currentDate.setDate(currentDate.getDate() + 1);
-      console.log(currentDate);
     }
 
     // Print to console for debugging.
@@ -242,8 +244,19 @@ function PlotPage() {
 
       // Print to console for debugging.
       console.log(caseEthnicityQuantiles);
-      
-      displayDemographicsPlotData(startDateParam, endDateParam, caseEthnicityQuantiles);
+
+      // For loop to get all the quantile bounds.
+      let quantile;
+      const promises = [];
+      for (quantile = 0; quantile < 5; quantile++) {
+        params.quantile = quantile;
+        promises.push(getEthnicityBounds(params));
+      }
+
+      Promise.all(promises).then((bounds) => {
+        console.log(bounds);
+        displayDemographicsPlotData(startDateParam, endDateParam, caseEthnicityQuantiles, bounds);
+      });
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
@@ -309,7 +322,7 @@ function PlotPage() {
                 title: 'Date',
               },
               vAxis: {
-                title: `${optionsTab === PlotOptionsTab.STATES ? `${typeCountStates}` : `Ratio of Covid ${typeCountDemographics} to Total U.S. Population`}`,
+                title: `${optionsTab === PlotOptionsTab.STATES ? `${typeCountStates}` : `Daily Covid ${typeCountDemographics}`}`,
                 viewWindow: {
                   min: 0,
                 },

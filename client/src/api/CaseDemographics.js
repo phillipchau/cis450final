@@ -6,7 +6,8 @@ const basePath = 'http://localhost:8081';
 const routes = {
   getDistinctStates: `${basePath}/states`,
   getCountPerStateDate: `${basePath}/state-date-count`,
-  getCaseEthnicityQuantiles: `${basePath}/case-demographics`
+  getCaseEthnicityQuantiles: `${basePath}/case-demographics`,
+  getEthnicityBounds: `${basePath}/ethnicity-bounds`
 };
 
 /**
@@ -25,6 +26,14 @@ export const Ethnicities = Object.freeze({
 // Function used to get a quantile of case data for a specific ethnicity.
 export const getCaseEthnicityQuantile = (params) => axios.get(
   routes.getCaseEthnicityQuantiles, { params: params })
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+// Function used to get the quantile bounds for a specific ethnicity.
+export const getEthnicityBounds = (params) => axios.get(
+  routes.getEthnicityBounds, { params: params })
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

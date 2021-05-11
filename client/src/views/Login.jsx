@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { signin, checkLogin } from '../api/Login';
-import { useHistory, Link } from 'react-router-dom'
+import { signin, signup, userFind, checkLogin } from '../api/Login';
+import { useHistory, useLocation, Link } from 'react-router-dom'
 import ErrorMessage from '../components/core/Error';
+import { GoogleLogin, FacebookLogin } from '../components/core/ExternalLogin';
+import app from '../api/Firebase';
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -9,10 +11,43 @@ const Login = () => {
   // Hold error text.
   const [error, setError] = useState('');
 
-  const history = useHistory()
+  const history = useHistory();
+  const location = useLocation();
+
+  const redirectAction = () => history.replace(location.state?.from || '/user');
 
 
   useEffect(() => {
+    // If user logged in through Google, signup or login through provided info.
+    app.auth().onAuthStateChanged((account) => {
+      if (account !== null) {
+        // If the user is found, log in; otherwise, register.
+        userFind(account.uid).then((data) => {
+          signin(account.uid, 'externalloginpassword').then((res) => {
+            history.push('/');
+          }).catch((err) => {
+            setError(err.message);
+          });
+        }).catch((err) => {
+          // Register using hard-coded password and account details.
+          let name = account.displayName.split(' ');
+          if (name.length == 2) {
+            signup(account.uid, 'externalloginpassword', name[0], name[1], 'Pennsylvania').then((res) => {
+              history.push('/');
+            }).catch((err) => {
+              setError(err.message);
+            });
+          } else {
+            signup(account.uid, 'externalloginpassword', account.displayName, '', 'Pennsylvania').then((res) => {
+              history.push('/');
+            }).catch((err) => {
+              setError(err.message);
+            });
+          }
+        });
+      }
+    });
+
     checkLogin().then((res) => {
       if (res !== "") {
         history.push('/')
@@ -52,7 +87,10 @@ const Login = () => {
                     </div>
                     <div className="form-group form-row">
                       <button type="submit" className="btn btn-primary">Log In</button>
+                      <GoogleLogin successAction={redirectAction} errorAction={setError} />
+                      <FacebookLogin successAction={redirectAction} errorAction={setError} />
                       <p style={{marginLeft: 20}}className="signup-margin text-secondary">
+                        <br></br>
                         New to COVID19 Dashboard?
                         <Link to="/signup"> Sign Up Here</Link>
                       </p>
